@@ -1,0 +1,16 @@
+node_modules/
+dist/
+playwright-report/
+test-results/
+blob-report/
+coverage/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+
+# Keep the generated MSW browser worker under version control.
+!public/mockServiceWorker.js
+
+.cache/
