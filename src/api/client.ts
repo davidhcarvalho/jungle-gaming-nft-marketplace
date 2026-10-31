@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { getSessionToken } from '@/lib/session-token'
+import { getGuestCartId } from '@/features/cart/guest-cart-id'
 
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
@@ -14,6 +15,7 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use((config) => {
   const token = getSessionToken()
   if (token) config.headers.Authorization = `Bearer ${token}`
+  config.headers['X-Guest-Cart-Id'] = getGuestCartId()
   return config
 })
 

@@ -13,6 +13,7 @@ import {
   revokeMockSession,
 } from '@/mocks/state/auth-store'
 import { nftFixtures } from '@/features/catalog/fixtures'
+import { mergeGuestMockCart } from '@/mocks/state/cart-store'
 import type { ApiError, AuthPayload, AuthResponse, FavoritesResponse, SignupPayload } from '@/types/api'
 
 export const authHandlers = [
@@ -36,7 +37,11 @@ export const authHandlers = [
     const user = createMockAccount(account)
     const result = issueMockSession(user.id)
     if (!result) return apiError('server', 'Não foi possível criar a sessão.', 500)
-    return HttpResponse.json<AuthResponse>(result, { status: 201 })
+    const merge = mergeGuestMockCart(request.headers.get('x-guest-cart-id'), user.id)
+    return HttpResponse.json<AuthResponse>({
+      ...result,
+      cartMerge: { mergedItemCount: merge.mergedItemCount, limitedItems: merge.limitedItems },
+    }, { status: 201 })
   }),
 
   http.post('/api/auth/login', async ({ request }) => {
@@ -53,7 +58,11 @@ export const authHandlers = [
 
     const result = issueMockSession(account.id)
     if (!result) return apiError('server', 'Não foi possível iniciar a sessão.', 500)
-    return HttpResponse.json<AuthResponse>(result)
+    const merge = mergeGuestMockCart(request.headers.get('x-guest-cart-id'), account.id)
+    return HttpResponse.json<AuthResponse>({
+      ...result,
+      cartMerge: { mergedItemCount: merge.mergedItemCount, limitedItems: merge.limitedItems },
+    })
   }),
 
   http.get('/api/auth/session', ({ request }) => {

@@ -5,13 +5,17 @@ import { useQueryClient } from '@tanstack/react-query'
 import { clearSessionToken } from '@/lib/session-token'
 import { clearPrivateQueries, useLogout, useSession } from '@/features/auth/queries'
 import { queryKeys } from '@/lib/query-keys'
+import { useCart } from '@/features/cart/queries'
 
 export function RootLayout() {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const cart = useCart()
+  const cartCount = cart.data?.items.reduce((total, item) => total + item.quantity, 0) ?? 0
   const isHome = pathname === '/'
   const isDetail = pathname.startsWith('/nfts/')
+  const isCart = pathname === '/cart'
   const isAuthRoute = pathname === '/login' || pathname === '/signup'
 
   useEffect(() => {
@@ -28,7 +32,7 @@ export function RootLayout() {
   }, [isAuthRoute, navigate, queryClient])
 
   return (
-    <div className={`app-frame${isHome ? ' is-home-route' : ''}${isDetail ? ' is-detail-route' : ''}${isAuthRoute ? ' is-auth-route' : ''}`}>
+    <div className={`app-frame${isHome ? ' is-home-route' : ''}${isDetail ? ' is-detail-route' : ''}${isCart ? ' is-cart-route' : ''}${isAuthRoute ? ' is-auth-route' : ''}`}>
       <a className="skip-link" href="#main-content">Pular para o conteúdo</a>
       <header className="site-header">
         <div className="site-header-inner">
@@ -41,7 +45,7 @@ export function RootLayout() {
           </nav>
           <div className="header-actions">
             <a className="header-icon-link" href="/#catalog" aria-label="Ir para busca e catálogo"><SearchIcon /></a>
-            <Link className="header-icon-link cart-header-link" to="/cart" aria-label="Abrir carrinho"><CartIcon /></Link>
+            <Link className="header-icon-link cart-header-link" to="/cart" aria-label={`Abrir carrinho, ${cartCount} ${cartCount === 1 ? 'item' : 'itens'}`}><CartIcon /><span className="cart-count" aria-hidden="true">{cartCount}</span></Link>
             <AuthHeaderActions />
           </div>
         </div>

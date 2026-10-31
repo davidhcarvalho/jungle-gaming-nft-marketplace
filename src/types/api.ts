@@ -1,9 +1,9 @@
-import type { Favorite, Session } from '@/types/domain'
+import type { Cart, CartItem, Favorite, Quote, Session } from '@/types/domain'
 import type { MockScenario } from '@/mocks/scenarios/types'
 import type { NFT } from '@/types/domain'
 
 export interface ApiError {
-  code: 'validation' | 'unauthorized' | 'forbidden' | 'not_found' | 'conflict' | 'availability' | 'timeout' | 'network' | 'server'
+  code: 'validation' | 'unauthorized' | 'forbidden' | 'not_found' | 'conflict' | 'availability' | 'coupon_invalid' | 'coupon_expired' | 'timeout' | 'network' | 'server'
   message: string
   fields?: Record<string, string>
 }
@@ -27,6 +27,7 @@ export interface SignupPayload extends AuthPayload {
 export interface AuthResponse {
   session: Session
   sessionToken: string
+  cartMerge?: CartMergeSummary
 }
 
 export type SessionResponse = Session | null
@@ -35,6 +36,25 @@ export interface FavoritesResponse {
   userId: string
   favorites: Favorite[]
 }
+
+export type CartResponse = Cart
+
+export interface AddCartItemPayload {
+  nftId: string
+  editionId: string
+  quantity: number
+}
+
+export interface UpdateCartItemPayload {
+  quantity: number
+}
+
+export interface CartMergeSummary {
+  mergedItemCount: number
+  limitedItems: Array<Pick<CartItem, 'nftId' | 'editionId' | 'quantity'>>
+}
+
+export type QuoteResponse = Quote
 
 export interface NFTListResponse {
   items: NFT[]

@@ -200,3 +200,30 @@ Guardar estado do backend simulado (contas, sessões e favoritos por userId) em 
 
 #### Consequências
 O reset MSW restaura contas demo, sessões e favoritos. Tokens e dados de mock não são credenciais de produção; a estratégia serve à simulação no browser. O contrato permite acrescentar merge do carrinho visitante sem apagar o namespace público/visitante, que será implementado no lote de carrinho.
+
+
+### ADR-007 — Precisão ETH e merge de carrinho visitante
+
+**Data:** 2026-10-31  
+**Lote:** 04  
+**Status:** Aceito
+
+#### Contexto
+O carrinho e a cotação precisam calcular valores sem erro de ponto flutuante, e o carrinho visitante deve sobreviver à autenticação sem perder linhas ou misturar dados privados entre usuários.
+
+#### Opções consideradas
+1. Usar `number`/ponto flutuante para os valores ETH.
+2. Adicionar uma biblioteca decimal para o mock.
+3. Representar ETH como inteiros em wei (`bigint`) no cálculo interno, mantendo transporte e domínio como strings decimais.
+
+#### Decisão
+A API mock calcula valores em escala fixa de 18 casas com `bigint`; contratos REST continuam serializando ETH como strings. O navegador mantém um identificador guest estável, e após login/signup o handler mescla por par NFT/edição, soma quantidades e limita ao menor entre disponibilidade e máximo por pedido. O cart guest é removido somente depois do merge bem-sucedido; carrinhos autenticados são indexados por userId.
+
+#### Por quê
+A escala de 18 casas é exata, não exige dependência adicional e corresponde à unidade wei; a regra de merge é determinística e evita duplicação da mesma edição.
+
+#### Consequências
+Handlers MSW validam estoque/quantidade e persistem dados de demonstração localmente; o frontend nunca calcula o total final. Reset de cenário limpa o estado de carrinho. A camada de carrinho mantém identidade e versões estáveis para invalidação/reconciliação futura, sem implementar Socket.IO neste lote.
+
+#### Como explicar em entrevista
+ETH trafega como decimal string; o mock converte para wei com BigInt, aplica operações inteiras e retorna strings. No login, guest e user são combinados por identidade de edição e limitados ao estoque, preservando o carrinho privado por usuário.

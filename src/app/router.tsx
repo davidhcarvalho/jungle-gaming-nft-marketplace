@@ -11,6 +11,7 @@ import { PlaceholderPage } from '@/routes/placeholder-page'
 import { NotFoundPage } from '@/routes/not-found-page'
 import { HomePage } from '@/features/catalog/home-page'
 import { NFTDetailPage } from '@/features/nft/nft-detail-page'
+import { CartPage } from '@/features/cart/cart-page'
 import { validateCatalogSearch } from '@/features/catalog/model'
 import { AuthPage } from '@/features/auth/auth-page'
 import { sanitizeReturnTo, validateAuthSearch } from '@/features/auth/model'
@@ -40,7 +41,7 @@ const nftRoute = createRoute({
 const cartRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/cart',
-  component: () => <PlaceholderPage title="Carrinho" />,
+  component: CartPage,
 })
 
 const checkoutRoute = createRoute({

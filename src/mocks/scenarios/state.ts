@@ -9,7 +9,7 @@ const scenarioStorageKey = 'kurio:mock-scenario'
 let currentScenario = readStoredScenario() ?? initialScenario
 
 function isConfiguredScenario(value: string | undefined): value is MockScenario {
-  return value !== undefined && ['default', 'slow', 'api-error', 'empty', 'catalog-error', 'detail-error', 'variable-latency', 'signup-conflict', 'session-expired', 'favorite-error'].includes(value)
+  return value !== undefined && ['default', 'slow', 'api-error', 'empty', 'catalog-error', 'detail-error', 'variable-latency', 'signup-conflict', 'session-expired', 'favorite-error', 'cart-error', 'cart-mutation-error', 'quote-error', 'cart-existing', 'cart-existing-mutation-error'].includes(value)
 }
 
 export function getMockScenario() {

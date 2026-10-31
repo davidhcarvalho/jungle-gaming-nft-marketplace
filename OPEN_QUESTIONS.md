@@ -2,6 +2,10 @@
 
 Este arquivo contém apenas lacunas reais. Não usar como desculpa para interromper trabalho que pode ser derivado com segurança.
 
+## Estado do Lote 04
+
+O Lote 04 foi validado e aprovado. Não há questão aberta específica sobre carrinho/quote; as lacunas gerais Q1–Q5 abaixo continuam válidas e não bloquearam este lote.
+
 ## Q1 — Fonte exata
 
 As screenshots sugerem tipografia monoespaçada/retro, mas o nome da fonte não foi extraído.

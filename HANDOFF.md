@@ -2,7 +2,14 @@
 
 ## Atualização mais recente — 2026-10-31
 
-- **LOT 03 STATUS: PASS.** Runner host validou `spec:auth-favorites` (25 PASS, 2 SKIPPED; Request ID `1793454652-239275-7`) e `full` (typecheck/lint/build/build com mocks PASS; E2E 68 PASS, 4 SKIPPED, 0 FAIL; Request ID `1793454821-239275-8`). Os testes de Lotes 01 e 02 passaram na regressão completa. Lote 04 não iniciado.
+- **LOT 04 STATUS: PASS.** `spec:cart` no Local Validation Runner: 38 PASS, 1 SKIPPED, 0 FAIL (Request ID `1793457838-257338-8`). `full`: typecheck, lint, build, build com mocks PASS; E2E 106 PASS, 5 SKIPPED, 0 FAIL de 111 casos (Request ID `1793457992-257338-9`). Runtime Node 24.22.1/npm 11.19.1.
+- Evidências do carrinho: `evidence/lot-04/cart-mobile-390-review.png`, `cart-mobile-414-review.png`, `cart-desktop-1440-review.png`; comparação e diferenças conhecidas em `evidence/lot-04/visual-review.md`. Capturas históricas dos Lotes 02/03 foram preservadas após a regressão completa.
+- Arquitetura: REST/MSW para carrinho/cupom/quote; query/cache por owner; guest cart persistente e merge no login/signup; valores ETH em strings e cálculo interno de wei com `bigint`. ADR-007 documenta precisão e merge.
+- Lotes 05 e 07 permanecem não iniciados. Não implementar checkout/pedidos nem Socket.IO funcional sem instrução explícita.
+
+## Atualização mais recente — 2026-10-31
+
+- **LOT 03 STATUS: PASS.** Runner host validou `spec:auth-favorites` (25 PASS, 2 SKIPPED; Request ID `1793454652-239275-7`) e `full` (typecheck/lint/build/build com mocks PASS; E2E 68 PASS, 4 SKIPPED, 0 FAIL; Request ID `1793454821-239275-8`). Os testes de Lotes 01 e 02 passaram na regressão completa. Naquele handoff, Lote 04 ainda não havia iniciado.
 - Causa real corrigida: `AuthPage` chamava `router.history.push` sem `router` no escopo; o `ReferenceError` era capturado sem mensagem e bloqueava redirect de login/signup. `useRouter` foi restaurado.
 - Capturas e comparação final de Login/Cadastro desktop/mobile estão em `evidence/lot-03/`; resumo e desvios estão em `evidence/lot-03/visual-review.md`.
 
@@ -18,7 +25,7 @@
 ## Estado atual
 
 - Lote 02: **PASS**, aprovação externa registrada acima; resultados atuais prevalecem sobre os relatos históricos deste handoff.
-- Lote atual: `LOT_03_AUTH_FAVORITES` (**PASS**, após execução E2E no host via runner); Lote 04 não iniciado.
+- Lote atual/concluído: `LOT_04_CART_QUOTE` (**PASS**; validar Request IDs e capturas na atualização mais recente acima). Lote 05 não iniciado.
 - Node `24.22.1` e npm `11.19.1` via mise. O cache Chromium está em `.cache/ms-playwright`.
 - O checkout está na branch `main`; não criar commit/remote nem fazer push.
 

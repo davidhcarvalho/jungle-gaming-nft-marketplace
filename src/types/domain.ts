@@ -50,14 +50,26 @@ export interface Favorite {
 }
 
 export interface CartItem {
+  id: string
   nftId: string
   editionId: string
   quantity: number
+  nftName: string
+  tokenId: string
+  editionLabel: string
+  imageUrl: string
+  network: string
+  unitPriceEth: EthAmount
+  lineTotalEth: EthAmount
+  available: number
 }
 
 export interface Cart {
   id: string
+  ownerId: string
   items: CartItem[]
+  version: number
+  couponCode?: string
 }
 
 export interface Coupon {
@@ -65,6 +77,9 @@ export interface Coupon {
 }
 
 export interface Quote {
+  id: string
+  cartVersion: number
+  validUntil: string
   currency: 'ETH'
   subtotalEth: EthAmount
   discountEth: EthAmount

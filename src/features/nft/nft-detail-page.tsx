@@ -1,4 +1,4 @@
-import { Link, useParams } from '@tanstack/react-router'
+import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
 import { getApiError } from '@/api/errors'
@@ -7,9 +7,12 @@ import { NFTArtwork } from '@/features/catalog/components/nft-artwork'
 import { NFTCard } from '@/features/catalog/components/nft-card'
 import { useNFTCatalog, useNFTDetail } from '@/features/catalog/queries'
 import { FavoriteToggleButton } from '@/features/favorites/favorite-toggle-button'
+import { useAddCartItem } from '@/features/cart/queries'
 
 export function NFTDetailPage() {
   const { nftId } = useParams({ from: '/nfts/$nftId' })
+  const navigate = useNavigate()
+  const addToCart = useAddCartItem()
   const nftQuery = useNFTDetail(nftId)
   const related = useNFTCatalog({ collection: nftQuery.data?.collectionId, sort: 'popular', page: 1 }, Boolean(nftQuery.data))
   const [editionId, setEditionId] = useState<string>()
@@ -50,6 +53,13 @@ export function NFTDetailPage() {
   function chooseEdition(nextId: string) {
     setEditionId(nextId)
     setQuantity(1)
+  }
+
+  function addSelectedToCart() {
+    if (!nft || !selectedEdition) return
+    addToCart.mutate({ nftId: nft.id, editionId: selectedEdition.id, quantity }, {
+      onSuccess: () => void navigate({ to: '/cart' }),
+    })
   }
 
   const relatedItems = (related.data?.items ?? []).filter((item) => item.id !== nft.id).slice(0, 5)
@@ -120,12 +130,12 @@ export function NFTDetailPage() {
               <button type="button" aria-label="Aumentar quantidade" disabled={soldOut || quantity >= maxQuantity} onClick={() => setQuantity((value) => Math.min(maxQuantity, value + 1))}>+</button>
             </div>
             <div className="detail-cta-row">
-              <Button className="detail-buy-button" disabled={soldOut} onClick={() => { window.location.href = '/login?returnTo=%2Fcart' }}>{soldOut ? 'Edição esgotada' : 'Comprar NFT'}</Button>
+              <Button className="detail-buy-button" disabled={soldOut || addToCart.isPending} onClick={addSelectedToCart}>{soldOut ? 'Edição esgotada' : addToCart.isPending ? 'Adicionando…' : 'Comprar NFT'}</Button>
               <FavoriteToggleButton nftId={nft.id} returnTo={`/nfts/${nft.id}`} />
             </div>
           </div>
           <p className={`detail-limit-note${soldOut ? ' is-sold-out' : ''}`} role="status" aria-label="Limite de compra">{soldOut ? 'Esta edição não possui unidades disponíveis.' : `${available} disponíveis · limite de ${maxQuantity} unidade${maxQuantity === 1 ? '' : 's'} por compra.`}</p>
-          <p className="out-of-scope-note">Compra e favoritos serão conectados nos próximos lotes.</p>
+          {addToCart.isError && <p className="detail-cart-error" role="alert">{getApiError(addToCart.error).message}</p>}
 
           <dl className="detail-attributes">
             <div><dt>ID do token:</dt><dd>#{nft.tokenId}</dd></div>
@@ -154,7 +164,7 @@ export function NFTDetailPage() {
         <div className="mobile-quantity-price"><div className="quantity-control" role="group" aria-label="Quantidade de NFTs"><span className="quantity-label">Qtd.</span><button type="button" aria-label="Diminuir quantidade" disabled={quantity <= 1 || soldOut} onClick={() => setQuantity((value) => Math.max(1, value - 1))}>−</button><output>{quantity}</output><button type="button" aria-label="Aumentar quantidade" disabled={soldOut || quantity >= maxQuantity} onClick={() => setQuantity((value) => Math.min(maxQuantity, value + 1))}>+</button></div><span className="mobile-purchase-price">{price} ETH</span></div>
         {!soldOut && quantity >= maxQuantity && <p className="mobile-quantity-limit" role="status" aria-label="Limite de compra">Limite de {maxQuantity} unidades por compra.</p>}
         {soldOut && <p className="mobile-availability-note" role="status" aria-label="Limite de compra">Esta edição não possui unidades disponíveis.</p>}
-        <div className="mobile-purchase-actions"><Button className="detail-buy-button" disabled={soldOut} onClick={() => { window.location.href = '/login?returnTo=%2Fcart' }}>{soldOut ? 'Edição esgotada' : 'Comprar NFT'}</Button><Link to="/cart" className="mobile-cart-placeholder" aria-label="Abrir carrinho">▱</Link></div>
+        <div className="mobile-purchase-actions"><Button className="detail-buy-button" disabled={soldOut || addToCart.isPending} onClick={addSelectedToCart}>{soldOut ? 'Edição esgotada' : addToCart.isPending ? 'Adicionando…' : 'Comprar NFT'}</Button><Link to="/cart" className="mobile-cart-placeholder" aria-label="Abrir carrinho">▱</Link></div>
       </div>
     </article>
   )

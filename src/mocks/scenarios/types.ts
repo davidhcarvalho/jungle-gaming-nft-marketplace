@@ -9,6 +9,11 @@ export const mockScenarioNames = [
   'signup-conflict',
   'session-expired',
   'favorite-error',
+  'cart-error',
+  'cart-mutation-error',
+  'quote-error',
+  'cart-existing',
+  'cart-existing-mutation-error',
 ] as const
 
 export type MockScenario = (typeof mockScenarioNames)[number]

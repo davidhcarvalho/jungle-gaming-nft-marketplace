@@ -52,14 +52,15 @@ Este arquivo é uma visão rápida. Os critérios completos estão em `lots/`.
 - [x] revisão visual desktop/mobile
 
 ## 04 — Cart/Quote
-- [ ] add/update/remove
-- [ ] guest persist
-- [ ] merge login
-- [ ] coupon
-- [ ] quote
-- [ ] ETH precision
-- [ ] skeleton
-- [ ] E2E
+> PASS — `spec:cart` e `full` aprovados via Local Validation Runner; 106 PASS, 5 SKIPPED, 0 FAIL no E2E completo. Capturas mobile 390/414 e desktop 1440 comparadas com os frames do carrinho. Não iniciar Lote 05 sem instrução explícita.
+- [x] add/update/remove
+- [x] guest persist
+- [x] merge login
+- [x] coupon
+- [x] quote
+- [x] ETH precision
+- [x] skeleton
+- [x] E2E
 
 ## 05 — Checkout/Orders
 - [ ] forms

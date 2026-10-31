@@ -17,6 +17,8 @@ export const queryKeys = {
   private: {
     favorites: (userId: string) => ['private', userId, 'favorites'] as const,
     cart: (ownerId: string) => ['private', ownerId, 'cart'] as const,
+    quote: (ownerId: string, cartVersion: number, couponCode?: string) =>
+      ['private', ownerId, 'quote', cartVersion, couponCode ?? null] as const,
     profile: (userId: string) => ['private', userId, 'profile'] as const,
     wallets: (userId: string) => ['private', userId, 'wallets'] as const,
     order: (userId: string, orderId: string) => ['private', userId, 'orders', orderId] as const,

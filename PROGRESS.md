@@ -4,8 +4,16 @@
 
 ## Estado atual
 
-- Lote atual: `03 — Autenticação, Sessão e Favoritos` (**PASS**, quality gate consolidado via Local Validation Runner; Lote 04 não iniciado)
-- Último lote concluído: `03 — Autenticação, Sessão e Favoritos` (**PASS**, após execução completa pelo Local Validation Runner).
+- Lote atual: `04 — Carrinho e Cotação` (**PASS**; Lotes 01–03 também aprovados. Lote 05 e Lote 07 continuam não iniciados).
+- Último lote concluído: `04 — Carrinho e Cotação` (**PASS**; `spec:cart`: 38 PASS, 1 SKIPPED, 0 FAIL; `full`: 106 PASS, 5 SKIPPED, 0 FAIL; revisão visual desktop/mobile registrada em `evidence/lot-04/visual-review.md`).
+
+### Lote 04 — plano registrado antes da implementação
+
+- **Inventário visual aberto individualmente:** `design-reference/Desktop/Carrinho de NFTs.png` (2880×3508, equivalente 1440×1754 em 1x) e `design-reference/Mobile/Carrinho de NFTs.png` (828×1792, equivalente 414×896 em 1x). Desktop: header e breadcrumb existentes; container central em duas colunas; tabela de itens à esquerda com thumbnail, NFT/edição, preço unitário, quantidade, total e remoção; painel de resumo à direita com cupom, subtotal, desconto, taxa de rede, total e CTA; seção de recomendações em cinco cards e footer. Mobile: título centralizado com voltar, quatro cards verticais com arte quadrada e controles, painel financeiro abaixo e CTA largo; sem tabela desktop. Derivar 390/768 sem overflow e sem baseline tablet.
+- **Arquivos previstos:** criar `src/features/cart/api.ts`, `queries.ts`, `cart-page.tsx`, componentes de item/resumo/skeleton e helpers de identidade/decimal; criar `src/mocks/state/cart-store.ts`, `src/mocks/handlers/cart.ts`, fixtures/cenários mínimos e tipos REST/domínio; integrar handlers/reset MSW, Axios guest identity, merge em login/cadastro e invalidação de Query; substituir placeholder `/cart`; ligar CTA de detalhe à mutation de adicionar; atualizar badge do carrinho se apropriado; estilizar em `src/styles/globals.css`; criar `tests/cart.spec.ts` e capturas somente em `evidence/lot-04/`; documentar contratos/decisões e atualizar governança.
+- **Critérios de aceite:** fluxo efetivo React→Query→Axios→HTTP→MSW; adicionar/consultar/alterar/remover; persistência guest e user após refresh; merge guest→user sem perder itens nem duplicar edição e limitado à disponibilidade; isolamento após logout/troca; quote authoritative com subtotal/desconto/taxa/total vindo da API; cupons válidos/inválidos/expirados; preço ETH sempre string e cálculos exatos sem floating point; validação de disponibilidade também no handler; loading/error/empty/retry e skeleton de quote; UI acessível e coerente com ambos os frames; E2E desktop/mobile/tablet, snapshots Home de carrinho desktop 1440/mobile 390 e regressão anterior; `spec:cart` e `full` PASS via runner.
+- **Riscos iniciais:** modelo atual `CartItem` não tem identidade de item nem preço snapshot; auth é MSW persistido em localStorage e precisa mesclar no handler sem expor guest residual; reset de cenários limpa auth state e deverá limpar cart state; armazenamento deve separar guest de user e não vazar em logout/troca; quote e disponibilidade precisam usar decimal escalado/BigInt (18 casas), nunca `number` monetário; sessão e carrinho podem ter query concorrente após login; diferenças de layout mobile/desktop são grandes; promoções/códigos/fee devem ser determinísticos e documentados. Não há ambiguidade funcional bloqueante identificada nos documentos, então `OPEN_QUESTIONS.md` não será usado para detalhes inferíveis.
+- **Baseline pre-implementação:** existentes `Cart`, `CartItem`, `Coupon`, `Quote` e query key privada por owner; `/cart` ainda é placeholder; auth API/MSW não integra carrinho; detalhe direciona “Comprar NFT” ao login; nenhuma camada cart, quote ou teste cart existe. Sem alteração funcional feita antes deste plano.
 - Evidência externa do Lote 02: 45 testes, 43 PASS, 2 SKIPPED apenas nas capturas tablet deliberadamente omitidas, 0 FAIL; fluxos funcionais em 768 px passaram. Revisão visual aprovou Home e Detalhe mobile/desktop. Desvios aceitos: arte fallback em NFTs adicionais sem asset próprio, fonte exata ainda desconhecida e detalhe desktop ligeiramente mais compacto verticalmente.
 - Plano do Lote 03 registrado antes de editar código: reaproveitar a foundation, catálogo e query keys privadas existentes; implementar contratos REST/MSW para signup/login/session/logout/favorites, dois usuários isolados, sessão persistida e expirada, guards tipados, limpeza do cache privado na troca/logout, favoritos otimistas com rollback e testes E2E. Arquivos previstos: `src/features/auth/**`, `src/features/favorites/**`, handlers/fixtures/scenario MSW, tipos e query keys se necessário, `src/app/router.tsx`, layout/header, estilos, testes Playwright, `ARCHITECTURE.md`, `TASKS.md`, `PROGRESS.md`, `HANDOFF.md`; atualizar `DECISIONS.md` somente para decisões adotadas.
 - Riscos iniciais: proteger rotas sem corrida entre sessão e loader; evitar persistência de credenciais/senhas; separar cache por `userId` e limpar operações em voo ao trocar usuário; aplicar rollback otimista sem sobrescrever cache de outra sessão; preservar `returnTo` validado e contexto de carrinho sem implementar o carrinho do Lote 04. Início: refs de Login/Cadastro desktop exibem modal sobre Home; mobile usa fluxo de tela inteira.
@@ -22,7 +30,7 @@
 - [x] Lote 01 — Foundation e Infraestrutura
 - [x] Lote 02 — Catálogo e Detalhe
 - [x] Lote 03 — Autenticação, Sessão e Favoritos (**PASS**; E2E/runtime e revisão visual concluídos em 2026-10-31)
-- [ ] Lote 04 — Carrinho e Cotação
+- [x] Lote 04 — Carrinho e Cotação (**PASS**; gates estáticos e E2E via runner concluídos)
 - [ ] Lote 05 — Checkout, Pedido e Confirmação
 - [ ] Lote 06 — Perfil e Carteiras
 - [ ] Lote 07 — Tempo Real e Cenários de Falha
@@ -170,11 +178,13 @@
 - Estado: runner criado, mas não iniciado nesta sessão. Após o usuário iniciá-lo uma vez no terminal host, solicitar `spec:auth-favorites`/`full` pelo arquivo de request e ler apenas resultado com Request ID novo. Lote 03 continua bloqueado até E2E e revisão visual reais; Lote 04 não iniciado.
 
 ### Lote 04
-- Status:
-- Comandos:
-- Testes:
-- Evidências:
-- Pendências:
+- Status: **PASS**. Implementada a rota `/cart` com React → TanStack Query → Axios → HTTP/MSW, estado determinístico guest/user, persistência em localStorage do mock, merge no login/signup por NFT/edição com soma limitada à disponibilidade, remoção do residual guest e isolamento entre usuários. `/nfts/$nftId` agora adiciona por mutation ao carrinho e badge global exibe quantidade total.
+- Quote authoritative via `POST /api/quote`: subtotal, desconto, taxa e total em strings ETH; cálculo mock em wei usando `bigint` (18 casas), sem floating point monetário. `KURIO10` aplica 10%, `EXPIRED` produz erro expirado e outros códigos são inválidos. API também rejeita estoque/quantidade acima do limite (409).
+- Estados implementados: loading/skeleton do resumo, empty, populated, erro do cart com retry, quote error sem perder itens, mutation error, coupon errors e mensagens de disponibilidade. Controles acessíveis e layout responsivo sem overflow em 390/768/1440.
+- Revisão visual explícita contra `Carrinho de NFTs.png` Desktop/Mobile. Ajustada a composição do cupom: rótulo permanece acessível mas fica visualmente oculto em mobile; campo e botão formam controle contínuo como no frame. Capturas finais: `evidence/lot-04/cart-mobile-390-review.png`, `cart-mobile-414-review.png` e `cart-desktop-1440-review.png`. Avaliação e desvios em `evidence/lot-04/visual-review.md`.
+- Gates com Node 24.22.1/npm 11.19.1: typecheck PASS; lint PASS; build PASS; build com `VITE_ENABLE_MOCKS=true` PASS. `spec:cart` PASS: 38 PASS, 1 SKIPPED (somente captura tablet). Runner Request ID `1793457838-257338-8`. `full` PASS: 106 PASS, 5 SKIPPED, 0 FAIL de 111 casos; Request ID `1793457992-257338-9`. Os cinco skips são captura visual tablet de Home, Detalhe, Auth e Carrinho (quatro) e o focus-trap de Auth no projeto mobile (um); fluxos funcionais em tablet passaram.
+- Sem erros de browser/MSW inesperados reportados pela fixture do runner. E2E completo repetiu os Lotes 01–03 sem regressões. Arte provisória em NFTs adicionais sem PNG próprio e fonte exata desconhecida permanecem desvios já documentados; o frame mobile mostra subtotal `8.92 ETH`, que não corresponde à soma de linhas/quantidades, por isso a quote do app mantém o total exato dos fixtures (`8.14 ETH` antes da taxa).
+- Nenhum fluxo de checkout/pedido ou Socket.IO funcional foi implementado. Lotes 05/07 não iniciados.
 
 ### Lote 05
 - Status:
