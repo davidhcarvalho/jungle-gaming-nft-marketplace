@@ -285,6 +285,19 @@ npm run test:e2e
 npm run lighthouse
 ```
 
-O smoke de rede está em `/__foundation/smoke` durante o servidor de desenvolvimento. Ele demonstra TanStack Query → Axios → HTTP → MSW e permite restaurar o cenário inicial. As rotas de produto são placeholders técnicos até os lotes correspondentes.
+O smoke de rede está em `/__foundation/smoke` durante o servidor de desenvolvimento. Ele demonstra TanStack Query → Axios → HTTP → MSW e permite restaurar o cenário inicial. Catálogo, detalhe, autenticação e favoritos são funcionais; carrinho, checkout, perfil completo e carteiras permanecem nos lotes correspondentes.
 
 Consulte [ARCHITECTURE.md](ARCHITECTURE.md) para a arquitetura implementada. As imagens de `design-reference/` são referências, não assets renderizados pela aplicação.
+
+## Contas fictícias e autenticação mockada
+
+Com `VITE_ENABLE_MOCKS=true`, use uma das contas abaixo no login:
+
+| Usuário | E-mail | Senha de demonstração |
+|---|---|---|
+| Ana Colecionadora | `ana@kurio.test` | `KurioDemo24!` |
+| Leo Artista | `leo@kurio.test` | `Collector24!` |
+
+O MSW também permite criar contas novas. O estado simulado persiste no `localStorage` para que a sessão e os favoritos sobrevivam ao refresh; o reset em `/__foundation/smoke` restaura as contas e dados iniciais. Os cenários de conta incluem `signup-conflict`, `session-expired` e `favorite-error`. Senhas não são persistidas em texto claro: o mock guarda um digest SHA-256 determinístico para as contas de demonstração e calcula o digest de novos cadastros antes de salvar.
+
+As rotas privadas redirecionam para `/login?returnTo=...` e restauram a intenção após autenticação. Favoritos são escopados por usuário e atualizados otimisticamente, com rollback quando a API simulada falha. Login social e recuperação de senha aparecem desabilitados porque não fazem parte do desafio simulado.

@@ -34,8 +34,8 @@ Cores aproximadas podem ser extraídas das screenshots, mas não são garantia d
 
 **Ação:** tratar screenshot como fonte visual e ajustar por comparação.
 
-## Q6 — Validação Playwright bloqueada por política de bind local
+## Q6 — Reexecução externa do Lote 03 — RESOLVIDA
 
-Na última execução externa informada, 42 testes resultaram em 37 PASS, 3 FAIL e 2 SKIPPED. As falhas eram o mesmo teste de erro do catálogo nos três viewports; os cenários/reset e outros fluxos estavam passando nessa suíte. A assertion do teste falho foi corrigida conforme a semântica de nova query, e foi separado um teste de refetch em background. Typecheck/lint/build/build-mocks passaram com Node 24.22.1. Nesta sandbox, Playwright não inicia porque o webServer Vite recebe `listen EPERM` ao tentar bind em `127.0.0.1` (confirmado também na porta alternativa 4199). Portanto faltam execução browser após esta correção, suíte completa e revisão final das evidências visuais; não falta browser instalado nem dependência do sistema.
+O Local Validation Runner executou `spec:auth-favorites` e `full` no host. O spec passou (25 PASS, 2 SKIPPED); o target full passou em typecheck/lint/build/build com mocks e na suíte E2E (68 PASS, 4 SKIPPED, 0 FAIL de 72). Capturas Login/Cadastro foram geradas e comparadas com as referências, com uma rodada de correção responsiva. Request IDs e detalhes estão em `PROGRESS.md`; revisão visual em `evidence/lot-03/visual-review.md`.
 
-**Ação necessária:** executar em ambiente que permita bind o teste de nova query e o teste de refetch em background, depois a suíte completa (incluindo foundation), validar viewports/console/rede e revisar as capturas atuais de `evidence/lot-02/`. Não alterar MSW/reset sem nova evidência de regressão.
+Não há bloqueio de browser pendente. Lote 04 continua não iniciado.

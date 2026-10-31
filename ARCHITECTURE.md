@@ -1,6 +1,6 @@
-# Arquitetura da solução — fundação
+# Arquitetura da solução — Lotes 01 a 03
 
-Este documento registra apenas a fundação do Lote 01. Catálogo, conta, compra e real-time funcional ainda não foram implementados.
+Este documento registra somente o que está implementado até os Lotes 01, 02 e 03. Carrinho, checkout, perfil completo, carteiras e real-time funcional seguem para lotes posteriores.
 
 ## Runtime e build
 
@@ -17,6 +17,8 @@ Este documento registra apenas a fundação do Lote 01. Catálogo, conta, compra
 - `src/features/foundation`: harness de rede apenas em desenvolvimento.
 - `src/features/catalog`: filtros/search schema, API REST, query hooks, fixtures de dados, cartões, estados e Home.
 - `src/features/nft`: detalhe por ID, edições, limites e estados de recurso.
+- `src/features/auth`: forms de login/cadastro, sessão, token de demonstração, validação de returnTo e operações REST de conta.
+- `src/features/favorites`: API, query por usuário e mutation otimista com rollback.
 - `src/mocks`: worker, handlers, fixture e cenário resetável.
 - `src/realtime`: factory inicial de `socket.io-client`, sem conexão ou eventos nesta etapa.
 - `src/routes`: placeholders explícitos e tratamento de rota não encontrada.
@@ -24,19 +26,23 @@ Este documento registra apenas a fundação do Lote 01. Catálogo, conta, compra
 
 ## Navegação e estado remoto
 
-TanStack Router usa uma route tree code-based tipada com os caminhos previstos no plano. `/` valida os search params do catálogo (`q`, `collection`, `category`, `network`, `priceMin`, `priceMax`, `sort`, `page`); defaults são recent/page 1 e filtro novo volta à página 1. `/nfts/$nftId` busca o recurso por ID e mostra not-found próprio para resposta REST 404, distinto de rota desconhecida. As demais rotas seguem como placeholders até os lotes correspondentes. `/__foundation/smoke` entra na árvore somente durante desenvolvimento. Deep links dependem do fallback SPA do Vite.
+TanStack Router usa uma route tree code-based tipada. `/` valida os search params do catálogo; `/nfts/$nftId` distingue NFT 404 de rota desconhecida. `/login` e `/signup` validam `returnTo` contra caminhos internos para evitar open redirects. Guards fazem `fetchQuery` da sessão antes de renderizar `/checkout`, `/orders/$orderId`, `/profile` e `/wallets`; sem sessão válida redirecionam ao login preservando pathname e query. O acesso a `/cart` continua público para permitir a futura etapa de merge do carrinho visitante. `/__foundation/smoke` só existe em desenvolvimento. Deep links dependem do fallback SPA do Vite.
 
 TanStack Query usa uma instância central: uma tentativa de retry, `staleTime` de 30 segundos, `gcTime` de cinco minutos, sem refetch ao focar a janela e refetch ao reconectar. Mutations não repetem automaticamente. Essa política inicial poderá ser ajustada por domínio.
 
 ## REST e erros
 
-Todo acesso REST parte de `src/api/client.ts`, configurado por `VITE_API_BASE_URL`, timeout, credenciais e `AbortSignal`. Axios não contém fixtures nem regras de mock. `src/api/errors.ts` normaliza timeout, rede e erros estruturados.
+Todo acesso REST parte de `src/api/client.ts`, configurado por `VITE_API_BASE_URL`, timeout, credenciais e `AbortSignal`. Um request interceptor envia o token de sessão fictício no header Bearer; o response interceptor emite um sinal de expiração para 401 em recursos privados. Axios não contém fixtures nem regras de mock. `src/api/errors.ts` normaliza timeout, rede e erros estruturados.
 
 ## MSW e bootstrap
 
 `src/main.tsx` aguarda `startMocks()` antes de montar React. O worker só inicia quando `VITE_ENABLE_MOCKS=true`, em desenvolvimento e no build de demonstração. `public/mockServiceWorker.js` foi gerado pelo comando oficial `npm run mocks:worker` e está presente. O módulo do browser e handlers é carregado dinamicamente apenas quando os mocks são habilitados.
 
-GET `/api/foundation/health` percorre Query → Axios → HTTP e recebe a fixture pelo MSW. A seleção/reset de cenário usa um contrato único `POST /api/test-scenarios/reset`, chamado pelo smoke da foundation e pelos testes e interceptado pelo handler de cenários. `GET /api/nfts` aplica no handler MSW busca, coleção, categoria, rede, faixa de preço decimal, sort e paginação; retorna itens, destaque, metadados e facets. `GET /api/nfts/:nftId` retorna NFT ou erro tipado not_found. O cliente Axios encaminha o AbortSignal de Query, permitindo cancelar requests obsoletos. Cenários catalog-error, detail-error, empty, slow e variable-latency são determinísticos; o reset persiste no localStorage da aba para permitir carregamento lento em deep links.
+GET `/api/foundation/health` percorre Query → Axios → HTTP e recebe fixture pelo MSW. `POST /api/test-scenarios/reset` reseta cenário, contas, sessões e favoritos simulados. Auth usa `POST /api/auth/signup`, `POST /api/auth/login`, `GET /api/auth/session` e `POST /api/auth/logout`; favoritos usam `GET /api/favorites`, `POST /api/favorites` e `DELETE /api/favorites/:nftId`. Os handlers retornam erros estruturados de validação, conflito, unauthorized e falha de serviço. `GET /api/nfts` e `GET /api/nfts/:nftId` mantêm os contratos do catálogo/detalhe. Cenários `signup-conflict`, `session-expired` e `favorite-error` permitem testar os erros de conta e recuperação.
+
+Fixtures incluem duas contas (`user-ana`, `user-leo`) com senha representada somente por SHA-256 do e-mail normalizado e senha de demo. Estado de contas, tokens/sessões e favoritos fica no `localStorage` de mock para persistir entre refresh; o token cliente fictício também é guardado no `localStorage`, mas senha nunca é persistida. Isso é somente uma estratégia determinística de demonstração local, não um desenho de autenticação para produção.
+
+Query key da sessão é `['auth','session']`; favoritos usam `['private', userId, 'favorites']`. Logout, sessão expirada e troca de usuário cancelam queries privadas em voo e removem todo o prefixo `private`, sem apagar dados públicos. A mutation de favorito atualiza a lista em `onMutate`, restaura o snapshot em `onError`, e invalida/refaz a query em `onSettled`. Callbacks ignoram respostas tardias caso a sessão ativa tenha mudado. O ciclo de merge de carrinho visitante ainda não existe; a limpeza está limitada ao namespace privado e a intenção de navegação é preservada para a etapa de carrinho do Lote 04.
 
 ## shadcn/ui e visual
 

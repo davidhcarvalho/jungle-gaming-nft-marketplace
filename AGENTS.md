@@ -234,3 +234,7 @@ Se uma dependência necessária não puder ser inferida com segurança:
 - sinalize o bloqueio em `OPEN_QUESTIONS.md`.
 
 Não pare por questões cosméticas que possam ser derivadas das referências.
+
+## 16. Validação local fora do sandbox
+
+Se testes de browser forem bloqueados pelo sandbox (`listen EPERM`), use primeiro o **Local Validation Runner** documentado em `AI_LOCAL_VALIDATION.md`, quando estiver disponível, antes de solicitar execução manual ao usuário. Não inicie o runner em background a partir do sandbox; solicite execuções pelo arquivo de protocolo e inspecione o resultado novo antes de continuar.

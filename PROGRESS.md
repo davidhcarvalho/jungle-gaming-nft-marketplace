@@ -4,23 +4,24 @@
 
 ## Estado atual
 
-- Lote atual: `02 — Catálogo e Detalhe` (**BLOCKED — reexecução Playwright pós-correção e validação visual pendentes**)
-- Último lote concluído: `01 — Foundation e Infraestrutura`
-- Última execução externa informada: 42 testes, 37 PASS, 3 FAIL, 2 SKIPPED; as três falhas eram o mesmo teste de erro de catálogo nos viewports. A mudança de query/search cria uma key nova. Embora `placeholderData: previousData` preserve dados enquanto a nova query carrega, após erro sem sucesso para a nova key a aplicação corretamente mostra erro primário. A assertion antiga esperava incorretamente o banner de atualização em background. A correção do teste e um teste separado para erro de refetch da mesma key foram feitos, mas ainda sem execução browser local. Typecheck/lint/build/build-mocks PASS com Node 24.22.1; Playwright bloqueia antes dos casos por `listen EPERM` ao iniciar Vite. Não iniciar Lote 03.
+- Lote atual: `03 — Autenticação, Sessão e Favoritos` (**PASS**, quality gate consolidado via Local Validation Runner; Lote 04 não iniciado)
+- Último lote concluído: `03 — Autenticação, Sessão e Favoritos` (**PASS**, após execução completa pelo Local Validation Runner).
+- Evidência externa do Lote 02: 45 testes, 43 PASS, 2 SKIPPED apenas nas capturas tablet deliberadamente omitidas, 0 FAIL; fluxos funcionais em 768 px passaram. Revisão visual aprovou Home e Detalhe mobile/desktop. Desvios aceitos: arte fallback em NFTs adicionais sem asset próprio, fonte exata ainda desconhecida e detalhe desktop ligeiramente mais compacto verticalmente.
+- Plano do Lote 03 registrado antes de editar código: reaproveitar a foundation, catálogo e query keys privadas existentes; implementar contratos REST/MSW para signup/login/session/logout/favorites, dois usuários isolados, sessão persistida e expirada, guards tipados, limpeza do cache privado na troca/logout, favoritos otimistas com rollback e testes E2E. Arquivos previstos: `src/features/auth/**`, `src/features/favorites/**`, handlers/fixtures/scenario MSW, tipos e query keys se necessário, `src/app/router.tsx`, layout/header, estilos, testes Playwright, `ARCHITECTURE.md`, `TASKS.md`, `PROGRESS.md`, `HANDOFF.md`; atualizar `DECISIONS.md` somente para decisões adotadas.
+- Riscos iniciais: proteger rotas sem corrida entre sessão e loader; evitar persistência de credenciais/senhas; separar cache por `userId` e limpar operações em voo ao trocar usuário; aplicar rollback otimista sem sobrescrever cache de outra sessão; preservar `returnTo` validado e contexto de carrinho sem implementar o carrinho do Lote 04. Início: refs de Login/Cadastro desktop exibem modal sobre Home; mobile usa fluxo de tela inteira.
 
 ### Retomada — distinção de erro de nova query e erro de refetch (2026-10-31)
 
 - Inspeção: `q` está nos parâmetros da query key (`queryKeys.catalog.list`), logo preencher `retry-this-request` inicia uma nova consulta. `placeholderData: previousData` preserva os resultados anteriores somente durante a transição pendente. Na falha terminal sem dados para a key nova, `isError && !data` renderiza alerta principal; o trace mostra duas respostas 503 (retry configurado) para a URL com o novo `q`, e a captura mostra o erro primário sem cards. O teste anterior esperava incorretamente um banner de erro de atualização em background.
 - Correção: teste da nova query agora afirma alerta primário e ausência de cards, seleciona `default`, aciona retry e confirma empty state para a busca atual. Um teste separado cobre erro verdadeiro em refetch de mesma key durante reconexão: mantém resultados, mostra feedback de atualização, repete após reset para `default` e valida recuperação. O fluxo existe na aplicação por `refetchOnReconnect: true`; não foi inventada uma funcionalidade para justificar a mensagem.
-- Verificações sob Node `24.22.1` via mise: `npm run typecheck` PASS; `npm run lint` PASS; `npm run build` PASS (236 módulos); `VITE_ENABLE_MOCKS=true npm run build` PASS (474 módulos).
-- Playwright focado tentado via `PLAYWRIGHT_BROWSERS_PATH="$PWD/.cache/ms-playwright" ... playwright test ... --workers=1`, sem iniciar os casos: o webServer encerrou. Reprodução direta de Vite numa porta alternativa confirmou `listen EPERM: operation not permitted 127.0.0.1:4199`. Logo não há validação runtime pós-correção; a execução externa continua necessária. Lote 02 BLOCKED, sem início do Lote 03.
+- Verificações pós-correção de Lote 02 registradas à época: typecheck/lint/build e build com mocks PASS; execução de browser bloqueada naquele sandbox. **Este bloqueio foi posteriormente resolvido pela revisão externa registrada no estado atual acima.**
 
 ## Lotes
 
 - [x] Lote 00 — Discovery e Baseline
 - [x] Lote 01 — Foundation e Infraestrutura
-- [ ] Lote 02 — Catálogo e Detalhe
-- [ ] Lote 03 — Autenticação, Sessão e Favoritos
+- [x] Lote 02 — Catálogo e Detalhe
+- [x] Lote 03 — Autenticação, Sessão e Favoritos (**PASS**; E2E/runtime e revisão visual concluídos em 2026-10-31)
 - [ ] Lote 04 — Carrinho e Cotação
 - [ ] Lote 05 — Checkout, Pedido e Confirmação
 - [ ] Lote 06 — Perfil e Carteiras
@@ -63,7 +64,7 @@
 - Não implementados por pertencerem a lotes posteriores: fluxos completos de catálogo, autenticação, favoritos, carrinho, cupons, checkout, pedidos, perfil/carteiras e real-time funcional.
 
 ### Lote 02
-- Status: **BLOCKED — implementação e builds concluídos; Playwright runtime e comparação visual aguardam ambiente com bind local.**
+- Status: **PASS — aprovado externamente em 2026-10-31** (45 testes: 43 PASS, 2 SKIPPED deliberadamente apenas para capturas tablet, 0 FAIL; fluxos funcionais em 768 px aprovados; revisão visual aprovou Home/Detalhe mobile e desktop). Os registros históricos abaixo descrevem a etapa anterior ao desbloqueio e não representam o estado atual.
 - Inventário visual pré-implementação (referências abertas individualmente):
   - `design-reference/Desktop/Início.png` (2880×7336, referência 2x; comparativo CSS 1440×3668): header horizontal em container centrado de ~1270 px, logo à esquerda, links centrados e busca/carrinho/login à direita; hero editorial em duas colunas, texto e CTA à esquerda e arte quadrada grande à direita; indicadores sob o copy. Após espaço vertical generoso, catálogo em duas áreas: sidebar marrom (~258 px) com coleções, controle de preço e rede; área principal com tabs, ordenação e grade 3 colunas. Cards têm moldura marrom, arte quase quadrada, título compacto e preço âmbar. Seguem card promocional lateral e grade, paginação, duas faixas editoriais, diário em 4 cards e footer em blocos. Fundo quase preto (#140d0a aproximado), superfície #241612 aproximada, tipografia mono clara, texto auxiliar bege e acento âmbar.
   - `design-reference/Mobile/Início.png` (828×1792, 2x; base 414×896 CSS): header desktop desaparece; no topo há busca arredondada larga e botão quadrado de filtros. Hero castanho arredondado com copy compacto à esquerda, retrato à direita parcialmente sobreposto e indicadores em baixo. Tabs horizontais precedem cards de NFT em duas colunas com imagens dominantes, fundos castanho-escuros arredondados, cards alternados em altura; barra de navegação fixa em baixo com quatro ícones e ação central flutuante. A imagem exportada tem 414 CSS px; validar adicionalmente em 390.
@@ -85,7 +86,7 @@
 - Playwright execução: `PLAYWRIGHT_BROWSERS_PATH="$PWD/.cache/ms-playwright" mise exec node@24.22.1 -- npm run test:e2e` → BLOCKED antes de qualquer teste. Execução manual do Vite com `--debug` confirmou `Error: listen EPERM: operation not permitted 127.0.0.1:4179`. Resultado Playwright: `Process from config.webServer was not able to start. Exit code: 1`. Uma lista de testes não é evidência de execução; não houve E2E aprovado neste lote.
 - Revisão visual: referências individuais foram inspecionadas antes de alterar código e usadas para orientar macro-layout. A revisão de screenshot aplicação × referência não foi possível, pois o servidor e, consequentemente, as capturas de app não iniciaram. Não foram gerados baselines/snapshots versionados em `tests/*-snapshots/` ou evidências da aplicação. Isso deixa critérios visuais de aceite pendentes.
 - Resultado de quality gate: typecheck PASS; lint PASS; build PASS (mocks off/on); Playwright discovery PASS, execução BLOCKED; estados/filtros/URL/cancelamento/API estão implementados mas ainda sem validação runtime; viewports funcionais 390/768/1440, overflow e console não verificados; comparação visual Home 1440/414 e Detail 1440/414 pendente; baseline visual pendente. Portanto o lote permanece **BLOCKED**, não PASS.
-- Próxima ação apenas para terminar Lote 02: executar em ambiente que permita bind de `127.0.0.1:4180`; rodar os 42 testes com browsers locais; capturar Home/Detail nos viewports exigidos, comparar manualmente com `design-reference`, corrigir divergências e então criar snapshots estáveis após inspeção. Não iniciar Lote 03.
+- Encerramento: revisão externa aprovou o lote. Desvios aceitos: fallbacks dos NFTs adicionais sem asset próprio, fonte exata do Figma ainda não identificada e detalhe desktop ligeiramente mais compacto. Não reabrir gates sem evidência de regressão.
 
 #### Revisão das falhas externas e correções desta retomada
 
@@ -141,11 +142,32 @@
 - Gates finais desta retomada (Node 24.22.1/npm 11.19.1 via mise): `npm run typecheck` PASS; `npm run lint` PASS; `npm run build` PASS (236 módulos); `VITE_ENABLE_MOCKS=true npm run build` PASS (474 módulos). O Playwright focado em scenario reset/quantity foi tentado com `PLAYWRIGHT_BROWSERS_PATH="$PWD/.cache/ms-playwright"` e bloqueou antes dos casos porque o webServer não iniciou. Vite manual confirmou `listen EPERM` em `127.0.0.1:4180`. Não houve teste runtime, console/network ou captura nesta retomada.
 
 ### Lote 03
-- Status:
-- Comandos:
-- Testes:
-- Evidências:
-- Pendências:
+- Status histórico antes da retomada do runner: **BLOCKED** por `listen EPERM`; resolvido pelo Local Validation Runner.
+- Implementação: fixtures de duas contas demo; signup/login/logout/session refresh e expiração via Axios + REST/MSW; validação de formulário client/server; validação de `returnTo`; guards de checkout/pedidos/perfil/carteiras; limpeza de cache privado no logout/troca; favoritos isolados por usuário com mutation otimista, rollback e descarte de callbacks de sessão antiga. Profile continua apenas superfície de logout; merge de carrinho segue para o lote posterior.
+- Testes adicionados em `tests/auth-favorites.spec.ts`: signup/validação/conflito, persistência sem senha em claro, login inválido, redirect/intenção protegida e refresh, isolamento de favoritos entre contas, logout, rollback otimista, expiração, foco de teclado/Escape no dialog, revisão visual e overflow. `npm exec -- playwright test --list` descobriu 72 execuções em 3 projetos; isso confirma discovery, não execução.
+- Gates executados com Node `24.22.1` via mise: `npm run typecheck` PASS; `npm run lint` PASS; `npm run build` PASS (244 módulos; CSS 46.06 kB; JS 468.75 kB/149.29 kB gzip); `VITE_ENABLE_MOCKS=true npm run build` PASS (485 módulos). Runtime `npm run dev -- --host 127.0.0.1 --port 4180 --strictPort` reproduziu `listen EPERM`; Playwright focado encerrou antes de iniciar casos por falha do `webServer`.
+- Revalidação após a correção de foco e do cenário de expiração: typecheck PASS, lint PASS, build PASS (244 módulos), build com mocks PASS (485 módulos). `PLAYWRIGHT_BROWSERS_PATH="$PWD/.cache/ms-playwright" mise exec node@24.22.1 -- npm run test:e2e` tentou a suíte completa e encerrou com `Process from config.webServer was not able to start. Exit code: 1`; nenhuma execução browser ocorreu. A tentativa Playwright focada teve o mesmo resultado. A descoberta confirma 72 casos em 3 projetos, não o resultado deles.
+- Acessibilidade: o focus trap desktop agora filtra links/controles com `getClientRects()` vazio, evitando tratar elementos mobile ocultos como extremos do foco; teste E2E foi adicionado para Shift+Tab/Tab/Escape em tablet/desktop, pendente execução browser.
+- Evidências: capturas de login/cadastro e rollback foram preparadas para `evidence/lot-03/`, mas não geradas por falta de servidor/browser. `evidence/lot-03/visual-review.md` registra esse limite e os pontos para revisão externa. Screenshots dos lotes 01/02 não foram alterados.
+- Critérios pendentes naquele registro histórico: rodar a suíte Playwright completa, revisar capturas e confirmar console/rede/teclado.
+
+#### Retomada via Local Validation Runner — 2026-10-31
+
+- **Status final: PASS.** Nenhum trabalho do Lote 04 foi iniciado.
+- Primeiro `spec:auth-favorites` identificou os locators ambíguos e falhas downstream. Depois da correção de labels exatos, o ciclo seguinte comprovou o bug real: `AuthPage` usava `useNavigate`, mas ainda referenciava `router.history.push`; o erro era engolido pelo catch da mutation, impedindo redirect após login/signup. Restaurado `useRouter` para a navegação já prevista.
+- Ajustes de teste semanticamente justificados: conflito de signup valida o texto de campo efetivamente retornado pelo contrato (409 com `fields.email`); o teste de sessão de signup valida acesso protegido ao perfil e refresh, sem presumir que o link mobile tenha o mesmo nome do header desktop; sessão expirada procura heading no mobile e dialog nomeado em tablet/desktop; retorno pós-Escape valida pathname preservando parâmetros canônicos.
+- Revisão visual comparou quatro capturas contra Login/Cadastro desktop e mobile. A primeira rodada mostrou composição mobile abaixo do Figma; ajustes em espaçamentos, centralização de placeholders, largura/padding/posição desktop e CTA mobile “Criar perfil” foram implementados e novamente capturados. Registro detalhado em `evidence/lot-03/visual-review.md`.
+- Capturas finais: `evidence/lot-03/login-mobile-414-review.png`, `signup-mobile-414-review.png`, `login-desktop-1440-review.png`, `signup-desktop-1440-review.png`; também rollback mobile/desktop. Nenhum arquivo `evidence/lot-01/` foi alterado.
+- Runner: Node `24.22.1`, npm `11.19.1`. `spec:auth-favorites` final: **25 PASS, 2 SKIPPED, 0 FAIL** (Request ID `1793454652-239275-7`). `full`: **typecheck PASS; lint PASS; build PASS; build com mocks PASS; E2E PASS, 68 PASS e 4 SKIPPED de 72 encontrados** (Request ID `1793454821-239275-8`). Os skips são os casos deliberadamente desativados para mobile focus-trap e capturas visuais tablet; os fluxos funcionais tablet passaram.
+- O gate completo repetiu os testes dos Lotes 01/02 sem regressões. Sem erros reportados pelo runner. Auditorias Lighthouse e funcionalidades dos Lotes 04+ não pertencem ao gate deste lote.
+- Lote 04 permanece não iniciado.
+
+### Infraestrutura local de validação externa — 2026-10-31
+
+- Adicionados `scripts/ai-local-runner.sh` e `AI_LOCAL_VALIDATION.md` para solicitar validações no host pelo protocolo de arquivos `.ai/runner/`, sem alterar runtime/build do produto. O script fica versionável; apenas request/resultados/lock temporários são ignorados pelo Git.
+- Targets fixos e whitelist: `static`, `e2e`, `full`, `spec:<nome seguro existente>`. O runner usa `mise exec node@24.22.1`, browser cache em `.cache/ms-playwright`, claim atômico do request, lock contra instâncias concorrentes, resultados RUNNING/final com Request ID e log combinado stdout/stderr. Falhas de gates não interrompem os gates seguintes nem o loop.
+- Validado somente por sintaxe com `bash -n` porque o runner não deve ser iniciado pelo sandbox. `shellcheck` não está instalado; não foi instalado.
+- Estado: runner criado, mas não iniciado nesta sessão. Após o usuário iniciá-lo uma vez no terminal host, solicitar `spec:auth-favorites`/`full` pelo arquivo de request e ler apenas resultado com Request ID novo. Lote 03 continua bloqueado até E2E e revisão visual reais; Lote 04 não iniciado.
 
 ### Lote 04
 - Status:

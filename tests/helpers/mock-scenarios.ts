@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 
-export type TestMockScenario = 'default' | 'slow' | 'empty' | 'catalog-error' | 'detail-error' | 'variable-latency'
+export type TestMockScenario = 'default' | 'slow' | 'empty' | 'catalog-error' | 'detail-error' | 'variable-latency' | 'signup-conflict' | 'session-expired' | 'favorite-error'
 
 export async function setMockScenario(page: Page, scenario: TestMockScenario) {
   if (page.url() === 'about:blank') await page.goto('/')

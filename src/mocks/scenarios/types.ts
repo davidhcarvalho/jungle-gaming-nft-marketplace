@@ -6,6 +6,9 @@ export const mockScenarioNames = [
   'catalog-error',
   'detail-error',
   'variable-latency',
+  'signup-conflict',
+  'session-expired',
+  'favorite-error',
 ] as const
 
 export type MockScenario = (typeof mockScenarioNames)[number]

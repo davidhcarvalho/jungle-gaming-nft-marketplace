@@ -185,3 +185,18 @@ Usar 12 itens por página no contrato/query inicial e remover o contador “19 o
 
 #### Consequências
 O estado default tem geometria mais próxima do Figma e mantém múltiplas páginas a partir das fixtures atuais. Testes E2E foram atualizados para 12 itens. As capturas pós-ajuste ainda precisam ser comparadas em browser.
+
+### ADR-007 — Sessão mockada persistente e isolamento de favoritos
+
+**Data:** 2026-10-31
+**Lote:** 03
+**Status:** Aceito
+
+#### Contexto
+Login, sessão após refresh, dois usuários e favoritos persistentes precisam funcionar sem backend privado. O mock deve permitir expiração determinística e não salvar senhas em texto claro.
+
+#### Decisão
+Guardar estado do backend simulado (contas, sessões e favoritos por userId) em uma chave `localStorage` controlada pelos handlers MSW. O cliente mantém somente o token fictício de sessão, envia-o via Bearer pelo Axios e recupera a sessão por `GET /api/auth/session`. As contas demo mantêm um digest SHA-256 determinístico e senhas de cadastro são transformadas em digest antes de persistir. Query keys privadas começam com `private`; logout, expiração e troca cancelam requests e removem esse prefixo. Favoritos usam optimistic update com snapshot para rollback.
+
+#### Consequências
+O reset MSW restaura contas demo, sessões e favoritos. Tokens e dados de mock não são credenciais de produção; a estratégia serve à simulação no browser. O contrato permite acrescentar merge do carrinho visitante sem apagar o namespace público/visitante, que será implementado no lote de carrinho.

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { NFTArtwork } from '@/features/catalog/components/nft-artwork'
 import { NFTCard } from '@/features/catalog/components/nft-card'
 import { useNFTCatalog, useNFTDetail } from '@/features/catalog/queries'
+import { FavoriteToggleButton } from '@/features/favorites/favorite-toggle-button'
 
 export function NFTDetailPage() {
   const { nftId } = useParams({ from: '/nfts/$nftId' })
@@ -61,7 +62,7 @@ export function NFTDetailPage() {
         <div className="detail-gallery">
           <div className="detail-mobile-actions">
             <Link className="round-icon-button" to="/" search={{ page: 1, sort: 'recent' }} aria-label="Voltar ao mercado">‹</Link>
-            <button className="round-icon-button favorite-disabled" type="button" disabled aria-label="Favoritos estarão disponíveis em uma etapa posterior">♡</button>
+            <FavoriteToggleButton nftId={nft.id} returnTo={`/nfts/${nft.id}`} compact />
           </div>
           <div className="detail-thumbnails" aria-label="Enquadramentos da arte">
             {[0, 1, 2, 3].map((view) => (
@@ -120,7 +121,7 @@ export function NFTDetailPage() {
             </div>
             <div className="detail-cta-row">
               <Button className="detail-buy-button" disabled={soldOut} onClick={() => { window.location.href = '/login?returnTo=%2Fcart' }}>{soldOut ? 'Edição esgotada' : 'Comprar NFT'}</Button>
-              <button className="favorite-button" type="button" disabled aria-label="Favoritos estarão disponíveis em uma etapa posterior"><span aria-hidden="true">♡</span> Favoritar</button>
+              <FavoriteToggleButton nftId={nft.id} returnTo={`/nfts/${nft.id}`} />
             </div>
           </div>
           <p className={`detail-limit-note${soldOut ? ' is-sold-out' : ''}`} role="status" aria-label="Limite de compra">{soldOut ? 'Esta edição não possui unidades disponíveis.' : `${available} disponíveis · limite de ${maxQuantity} unidade${maxQuantity === 1 ? '' : 's'} por compra.`}</p>

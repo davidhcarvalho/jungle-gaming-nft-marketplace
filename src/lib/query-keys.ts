@@ -1,4 +1,7 @@
 export const queryKeys = {
+  auth: {
+    session: ['auth', 'session'] as const,
+  },
   foundation: {
     health: ['foundation', 'health'] as const,
   },

@@ -1,11 +1,26 @@
 # Handoff entre Sessões/Agentes
 
+## Atualização mais recente — 2026-10-31
+
+- **LOT 03 STATUS: PASS.** Runner host validou `spec:auth-favorites` (25 PASS, 2 SKIPPED; Request ID `1793454652-239275-7`) e `full` (typecheck/lint/build/build com mocks PASS; E2E 68 PASS, 4 SKIPPED, 0 FAIL; Request ID `1793454821-239275-8`). Os testes de Lotes 01 e 02 passaram na regressão completa. Lote 04 não iniciado.
+- Causa real corrigida: `AuthPage` chamava `router.history.push` sem `router` no escopo; o `ReferenceError` era capturado sem mensagem e bloqueava redirect de login/signup. `useRouter` foi restaurado.
+- Capturas e comparação final de Login/Cadastro desktop/mobile estão em `evidence/lot-03/`; resumo e desvios estão em `evidence/lot-03/visual-review.md`.
+
+- Workflow de validação externa local adicionado: `scripts/ai-local-runner.sh` e `AI_LOCAL_VALIDATION.md`. O script foi validado sintaticamente e não foi iniciado no sandbox. Depois do usuário iniciá-lo uma vez no host, agentes devem consultar o lock, mandar target whitelist em `.ai/runner/request` e aguardar `Request ID` novo em `latest.md` antes de ler status/log.
+
+- Lote 02 aprovado externamente: 45 testes encontrados, 43 PASS, 2 SKIPPED (somente capturas tablet deliberadamente não executadas), 0 FAIL; os fluxos funcionais em tablet passaram. Revisão visual aprovou Home/Detalhe mobile e desktop.
+- Desvios de Lote 02 aceitos: NFTs adicionais sem asset original próprio usam fallback entre os quatro PNGs, fonte exata do Figma não identificada e Detalhe Desktop um pouco mais compacto verticalmente.
+- Estado atualizado após reexecução: `LOT_03_AUTH_FAVORITES`, **PASS**; não iniciar Lote 04 sem instrução explícita.
+- Referências revisadas: `design-reference/Desktop/Login.png`, `Cadastro.png`, e as respectivas telas Mobile. Desktop representa painel modal sobre Home; mobile apresenta composição de tela inteira, com logo KURIO, campos e CTA predominantes.
+- Situação encontrada antes de implementar: login e signup são placeholders de rota; existem `User`, `Session`, `Favorite`, query key privada por userId e Axios central. Não há handlers/fixtures de auth/favorites nem testes dos fluxos.
+- Plano e riscos iniciais, comandos e critérios estão registrados no início da seção Lote 03 em `PROGRESS.md`. Não mexer em comportamento aprovado de catálogo/detalhe salvo evidência de regressão concreta.
+
 ## Estado atual
 
-- Lote atual: Lote 02 — Catálogo e Detalhe (**BLOCKED**). Não iniciar Lote 03.
-- Execução local externa informada nesta retomada: 42 testes, 34 PASS, 6 FAIL, 2 SKIPPED. Assets originais foram integrados e o locator de quantity foi estreitado; o 404 do helper permanece sem causa concreta confirmada. Ainda não houve execução browser pós-alteração.
-- Node `24.22.1` e npm `11.19.1` via mise. Browser Playwright está no cache `.cache/ms-playwright`.
-- Git permanece em `main`, checkpoint `f5fecf1`; não criar commit/remote nem fazer push.
+- Lote 02: **PASS**, aprovação externa registrada acima; resultados atuais prevalecem sobre os relatos históricos deste handoff.
+- Lote atual: `LOT_03_AUTH_FAVORITES` (**PASS**, após execução E2E no host via runner); Lote 04 não iniciado.
+- Node `24.22.1` e npm `11.19.1` via mise. O cache Chromium está em `.cache/ms-playwright`.
+- O checkout está na branch `main`; não criar commit/remote nem fazer push.
 
 ## Correções desta retomada
 
@@ -26,7 +41,17 @@
 
 ## Próximo passo
 
-Executar os testes focados e a suíte completa em ambiente que permita bind na porta 4180. Confirmar reset/default/empty/catalog-error/detail-error/slow, skeleton e limite mobile no browser; revisar as capturas visuais pós-correção nos viewports exigidos. Só então fechar o Lote 02. Não iniciar Lote 03.
+Em ambiente com bind local permitido, executar `PLAYWRIGHT_BROWSERS_PATH="$PWD/.cache/ms-playwright" mise exec node@24.22.1 -- npm run test:e2e`, revisar os fluxos auth/favorites e capturas `evidence/lot-03/`, então atualizar o gate. Repetir typecheck/lint/build se houver correções. Não iniciar Lote 04.
+
+## Lote 03 — execução desta sessão (2026-10-31)
+
+- Implementados handlers REST/MSW para signup, login, sessão, logout e favoritos; estado demo por usuário; token fictício via Axios Bearer; proteção das rotas previstas; preservação/sanitização de `returnTo`; limpeza de queries privadas em logout/troca; favoritos otimistas com rollback. Login/signup receberam composições desktop em dialog e mobile em tela inteira.
+- Testes em `tests/auth-favorites.spec.ts` cobrem formulários, conflitos, persistência sem senha em texto claro, sessão e refresh, intenção protegida, isolamento de favoritos entre duas contas, logout, rollback, expiração e ciclo de foco. `playwright test --list` encontrou 72 execuções distribuídas nos projetos existentes.
+- Node 24.22.1: typecheck PASS; lint PASS; build PASS (244 módulos); build com mocks PASS (485 módulos). Vite manual e Playwright focado foram tentados; Vite falha antes de servir por `listen EPERM: operation not permitted 127.0.0.1:4180`, então nenhum caso browser executou. Nenhum screenshot auth/rollback foi produzido nesta sessão.
+- Governança: estado de Lote 02 corrigido para PASS externo; Lote 03 registrado como BLOCKED, com gate faltante e próximo passo descritos em `PROGRESS.md`, `TASKS.md` e `OPEN_QUESTIONS.md`.
+- Ao inspecionar o focus trap, descobri que o seletor incluía links mobile com `display:none`; o modal agora filtra itens sem caixa renderizada e há caso Playwright para ciclo de foco/Escape. O teste de expiração também foi corrigido para selecionar o cenário antes do login, preservando um token a ser rejeitado pelo endpoint de sessão.
+- Revalidação final com Node 24.22.1: typecheck, lint, build e build com mocks PASS. Playwright completo foi tentado e não iniciou o servidor; `listen EPERM` na porta `127.0.0.1:4180`. Nenhum E2E ou screenshot foi executado. A entrada de expiração foi corrigida para escolher cenário antes do login, de modo que o token emitido enfrente o 401 de sessão expirada; continua sem confirmação em browser.
+- Runner local criado nesta retomada. Próximo passo: após runner ativo no host, solicitar `spec:auth-favorites` e depois `full`; verificar IDs novos, revisar traces/screenshots, corrigir e repetir. Não avançar ao Lote 04.
 
 ## Retomada mais recente
 

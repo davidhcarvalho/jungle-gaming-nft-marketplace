@@ -10,7 +10,7 @@ Este arquivo é uma visão rápida. Os critérios completos estão em `lots/`.
 - [x] atualizar progresso e handoff
 
 ## 01 — Foundation
-> Foundation aprovada com quality gate consolidado em `PROGRESS.md`. Não iniciar o Lote 02 sem nova instrução.
+> PASS — aprovada externamente; quality gate consolidado em `PROGRESS.md`.
 - [x] Router
 - [x] Query
 - [x] Axios
@@ -23,31 +23,33 @@ Este arquivo é uma visão rápida. Os critérios completos estão em `lots/`.
 - [x] not-found
 
 ## 02 — Catálogo/Detalhe
-> BLOCKED no gate runtime/visual. Última execução externa informada: 42 testes, 37 PASS, 3 FAIL e 2 SKIPPED, com as três falhas replicadas no mesmo teste de recuperação de erro. Inspeção confirmou que mudar `q` cria nova query key; `placeholderData` preserva dados somente durante a transição, e sem dados válidos para a nova key a UI corretamente mostra erro principal. Assertion corrigida e cobertura separada adicionada para falha real de refetch em background. Typecheck/lint/build/build-mocks PASS nesta retomada; Playwright bloqueado antes dos testes por `listen EPERM` no bind local. Não marcar o lote concluído. Consulte `PROGRESS.md` e Q6. Não iniciar o Lote 03.
-- [ ] hero/home
-- [ ] search
-- [ ] filtros
-- [ ] sort
-- [ ] paginação
-- [ ] URL state
-- [ ] race handling
-- [ ] detail
-- [ ] 404 NFT
-- [ ] editions/quantity
-- [ ] skeleton
-- [ ] E2E
-- [ ] visual compare
+> PASS — revisão externa final: 45 testes encontrados, 43 PASS, 2 SKIPPED deliberadamente (somente capturas tablet), 0 FAIL. Fluxos funcionais em 768 px passaram. Revisão visual aprovou Home e Detalhe mobile/desktop. Desvios conhecidos: fallback visual para NFTs sem asset próprio, fonte exata desconhecida e detalhe desktop levemente mais compacto. Lote 03 iniciado mediante instrução explícita; consulte `PROGRESS.md`.
+- [x] hero/home
+- [x] search
+- [x] filtros
+- [x] sort
+- [x] paginação
+- [x] URL state
+- [x] race handling
+- [x] detail
+- [x] 404 NFT
+- [x] editions/quantity
+- [x] skeleton
+- [x] E2E
+- [x] visual compare
 
 ## 03 — Auth/Favoritos
-- [ ] signup
-- [ ] login
-- [ ] session refresh
-- [ ] expiration
-- [ ] logout/switch
-- [ ] guards
-- [ ] favorite optimistic
-- [ ] rollback
-- [ ] E2E
+> PASS — `spec:auth-favorites` PASS (25 PASS, 2 SKIPPED); `full` PASS (typecheck, lint, build, build com mocks e E2E: 68 PASS, 4 SKIPPED, 0 FAIL). Capturas Login/Cadastro revisadas contra desktop/mobile; regressão completa dos Lotes 01/02 passou. Lote 04 não iniciado.
+- [x] signup
+- [x] login
+- [x] session refresh
+- [x] expiration
+- [x] logout/switch
+- [x] guards
+- [x] favorite optimistic
+- [x] rollback
+- [x] E2E
+- [x] revisão visual desktop/mobile
 
 ## 04 — Cart/Quote
 - [ ] add/update/remove

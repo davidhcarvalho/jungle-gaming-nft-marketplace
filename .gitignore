@@ -14,3 +14,12 @@ coverage/
 !public/mockServiceWorker.js
 
 .cache/
+
+# Local host validation runner protocol/results (keep the runner script tracked).
+.ai/runner/request
+.ai/runner/request.processing
+.ai/runner/request.tmp
+.ai/runner/runner.lock/
+.ai/runner/latest.md.tmp
+.ai/runner/latest.log
+.ai/runner/latest.md

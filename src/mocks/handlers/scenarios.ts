@@ -3,12 +3,14 @@ import { http, HttpResponse } from 'msw'
 import { createFoundationHealth } from '@/mocks/fixtures/foundation'
 import { resetMockState } from '@/mocks/scenarios/state'
 import { isMockScenario } from '@/mocks/scenarios/types'
+import { resetAuthMockState } from '@/mocks/state/auth-store'
 
 export const scenarioHandlers = [
   http.post('/api/test-scenarios/reset', async ({ request }) => {
     const body: unknown = await request.json().catch(() => undefined)
     const scenario = readScenario(body)
     const { scenario: activeScenario } = resetMockState(scenario)
+    resetAuthMockState()
     return HttpResponse.json(createFoundationHealth(activeScenario))
   }),
 ]

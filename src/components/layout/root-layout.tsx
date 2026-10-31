@@ -1,12 +1,34 @@
-import { Link, Outlet, useRouterState } from '@tanstack/react-router'
+import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
+import { useEffect } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+
+import { clearSessionToken } from '@/lib/session-token'
+import { clearPrivateQueries, useLogout, useSession } from '@/features/auth/queries'
+import { queryKeys } from '@/lib/query-keys'
 
 export function RootLayout() {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const isHome = pathname === '/'
   const isDetail = pathname.startsWith('/nfts/')
+  const isAuthRoute = pathname === '/login' || pathname === '/signup'
+
+  useEffect(() => {
+    function handleSessionExpired() {
+      const location = window.location
+      const returnTo = `${location.pathname}${location.search}${location.hash}`
+      clearSessionToken()
+      void clearPrivateQueries(queryClient)
+      queryClient.setQueryData(queryKeys.auth.session, null)
+      if (!isAuthRoute) void navigate({ to: '/login', search: { returnTo }, replace: true })
+    }
+    window.addEventListener('kurio:session-expired', handleSessionExpired)
+    return () => window.removeEventListener('kurio:session-expired', handleSessionExpired)
+  }, [isAuthRoute, navigate, queryClient])
 
   return (
-    <div className={`app-frame${isHome ? ' is-home-route' : ''}${isDetail ? ' is-detail-route' : ''}`}>
+    <div className={`app-frame${isHome ? ' is-home-route' : ''}${isDetail ? ' is-detail-route' : ''}${isAuthRoute ? ' is-auth-route' : ''}`}>
       <a className="skip-link" href="#main-content">Pular para o conteúdo</a>
       <header className="site-header">
         <div className="site-header-inner">
@@ -20,13 +42,30 @@ export function RootLayout() {
           <div className="header-actions">
             <a className="header-icon-link" href="/#catalog" aria-label="Ir para busca e catálogo"><SearchIcon /></a>
             <Link className="header-icon-link cart-header-link" to="/cart" aria-label="Abrir carrinho"><CartIcon /></Link>
-            <Link className="header-action" to="/login"><span aria-hidden="true">↪</span> Entrar</Link>
+            <AuthHeaderActions />
           </div>
         </div>
       </header>
       <main id="main-content" className="main-content"><Outlet /></main>
       <SiteFooter />
       {isHome && <MobileNavigation />}
+    </div>
+  )
+}
+
+function AuthHeaderActions() {
+  const session = useSession()
+  const logout = useLogout()
+  const navigate = useNavigate()
+
+  if (!session.data) return <Link className="header-action" to="/login" search={{ returnTo: '/' }}><span aria-hidden="true">↪</span> Entrar</Link>
+
+  return (
+    <div className="signed-in-actions">
+      <Link className="header-action" to="/profile" aria-label={`Perfil de ${session.data.user.displayName}`}>{session.data.user.displayName}</Link>
+      <button className="header-logout" type="button" disabled={logout.isPending} onClick={() => logout.mutate(undefined, { onSettled: () => void navigate({ to: '/', search: { page: 1, sort: 'recent' } }) })}>
+        {logout.isPending ? 'Saindo…' : 'Sair'}
+      </button>
     </div>
   )
 }
