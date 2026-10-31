@@ -3,7 +3,7 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
-  { ignores: ['dist/**', 'node_modules/**', 'public/mockServiceWorker.js', 'test-results/**', 'playwright-report/**'] },
+  { ignores: ['.cache/**', 'dist/**', 'node_modules/**', 'public/mockServiceWorker.js', 'test-results/**', 'playwright-report/**'] },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {

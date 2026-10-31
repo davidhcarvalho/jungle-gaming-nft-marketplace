@@ -8,6 +8,9 @@ import { RootLayout } from '@/components/layout/root-layout'
 import { FoundationSmokePage } from '@/features/foundation/foundation-smoke-page'
 import { PlaceholderPage } from '@/routes/placeholder-page'
 import { NotFoundPage } from '@/routes/not-found-page'
+import { HomePage } from '@/features/catalog/home-page'
+import { NFTDetailPage } from '@/features/nft/nft-detail-page'
+import { validateCatalogSearch } from '@/features/catalog/model'
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -17,13 +20,14 @@ const rootRoute = createRootRoute({
 const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: () => <PlaceholderPage title="Início" />,
+  validateSearch: (search) => validateCatalogSearch(search),
+  component: HomePage,
 })
 
 const nftRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/nfts/$nftId',
-  component: () => <PlaceholderPage title="Detalhe do NFT" />,
+  component: NFTDetailPage,
 })
 
 const cartRoute = createRoute({

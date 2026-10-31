@@ -33,6 +33,62 @@ Qual problema exigiu decisão?
 
 ## Decisões já conhecidas
 
+### ADR-004 — Substitutos locais para artwork do catálogo
+
+**Data:** 2026-10-30
+**Lote:** 02
+**Status:** Parcialmente substituído; assets principais originais recebidos
+
+#### Contexto
+Na implementação inicial não havia arte original. Depois foram exportados do Figma quatro assets principais: Emerald Ape, Golden Beat, Neon Vessel e Sage Nomad. Screenshots de tela continuam proibidas como assets de interface.
+
+#### Opções consideradas
+1. Usar screenshots ou recortes delas, violando as regras de assets.
+2. Deixar os cards sem arte, causando grande quebra de composição.
+3. Criar artwork de substituição local e explicitamente provisória.
+
+#### Decisão
+Usar os PNGs originais recebidos para as identidades correspondentes: Emerald Ape, Golden Beat, Neon Vessel e Sage Nomad. Manter eventuais imagens de fallback apenas para outras fixtures sem asset correspondente, deixando sua condição provisória explícita. Não utilizar screenshots como assets.
+
+#### Por quê
+Os arquivos exportados são os assets de origem e correspondem às quatro identidades principais visíveis nas referências. Todas as quatro imagens são 500×500 RGBA; CSS controla crop e proporção sem distorção.
+
+#### Consequências
+Os quatro NFTs principais não têm mais diferença de asset. Fixtures adicionais sem arte específica ainda usam imagens disponíveis apenas como fallback visual: Sage Nomad é reutilizado em Cosmic Bloom, Violet Nomad, Sage Afterglow e Generative Mist; Emerald Ape em Sunset Ape e Rare Keeper; Golden Beat em Fast Current, Golden Signal, Golden Hour e Golden Dawn; Neon Vessel em Ivory Baron, Quiet Orbit, Ivory Echo e Silent Voyager. Esses dados são placeholders visuais, não afirmações sobre a arte original das obras. O diretório atual não continha arquivos WebP físicos para remoção; as referências WebP da aplicação foram eliminadas.
+
+#### Como explicar em entrevista
+O fallback inicial foi substituído pelos arquivos originais exportados para as quatro identidades principais. As fixtures adicionais continuam determinísticas, mas não fingem possuir arte original própria.
+
+### ADR-005 — Playwright inicia um servidor Vite isolado
+
+**Data:** 2026-10-30
+**Lote:** 02
+**Status:** Aceito
+
+#### Contexto
+O Playwright reutilizava qualquer servidor encontrado na porta padrão. Um processo antigo poderia servir uma versão sem o reset MSW atual e produzir 404 incompatíveis com o código em validação.
+
+#### Decisão
+O webServer do Playwright usa porta própria (4180 por padrão, ajustável por `PLAYWRIGHT_PORT`) e `reuseExistingServer: false`, para validar o bundle MSW desta checkout.
+
+#### Consequências
+Uma porta ocupada ou um ambiente que proíba bind local falhará antes dos testes, em vez de validar contra um processo alheio. Neste sandbox a execução continua bloqueada por `listen EPERM`.
+
+### ADR-006 — Um contrato MSW para seleção e reset de cenários
+
+**Data:** 2026-10-30
+**Lote:** 02
+**Status:** Aceito
+
+#### Contexto
+O smoke da foundation e os testes de catálogo/detalhe usavam caminhos de reset diferentes. Assim, o smoke não comprovava que a rota usada pelos testes estava registrada no worker.
+
+#### Decisão
+Usar somente `POST /api/test-scenarios/reset`, servido pelo handler MSW de cenários. O smoke foundation chama o mesmo contrato por Axios; o helper Playwright chama a mesma rota por HTTP e valida status, content-type, JSON e cenário.
+
+#### Consequências
+O bundle de mocks contém uma única rota de reset. A execução Playwright ainda precisa confirmar a interceptação em browser; os builds, por si só, não provam esse comportamento.
+
 ### ADR-003 — Aprovação restrita do postinstall do MSW
 
 **Data:** 2026-10-30  
@@ -99,3 +155,33 @@ Qualquer adaptação relevante deverá ser documentada e validada em 390 px e 41
 
 ### Como explicar em entrevista
 O comportamento foi preservado e a adaptação visual seguiu o sistema visual existente, em vez de inventar uma nova linguagem.
+
+### ADR-005 — Readiness MSW para reset de cenários no browser
+
+**Data:** 2026-10-30  
+**Lote:** 02  
+**Status:** Sincronização mantida; não comprovada como causa do 404
+
+#### Contexto
+O helper E2E envia o reset de cenário por fetch, enquanto o smoke da foundation usa Axios por interação da UI. Um sinal de readiness foi adicionado após uma análise de timing anterior, mas a execução local posterior continuou retornando 404.
+
+#### Decisão
+Esperar `worker.start({ waitUntilReady: true })` no bootstrap e publicar `data-msw-ready=true` em `html` no ambiente de desenvolvimento depois que a inicialização terminar. O helper E2E aguarda esse sinal e só então faz `POST /api/test-scenarios/reset` no contexto da página.
+
+#### Consequências
+O helper aguarda o bootstrap antes do fetch e não usa atraso fixo ou `page.request`. Essa sincronização é mantida como garantia de inicialização, mas não é tratada como explicação ou solução do 404. A origem do 404 segue aberta: comparação estática não encontrou diferença concreta de path/import/scope; próxima execução deve comparar registros e responses reais.
+
+### ADR-006 — Densidade default do catálogo visual
+
+**Data:** 2026-10-30  
+**Lote:** 02  
+**Status:** Aceito; validação visual final pendente
+
+#### Contexto
+O frame Home Desktop apresenta quatro linhas de três NFTs e o frame mobile apresenta uma grade de duas colunas, sem contador acima do grid. O catálogo inicial da implementação retornava nove itens, deixando uma linha ausente no estado default desktop.
+
+#### Decisão
+Usar 12 itens por página no contrato/query inicial e remover o contador “19 obras” da composição do catálogo.
+
+#### Consequências
+O estado default tem geometria mais próxima do Figma e mantém múltiplas páginas a partir das fixtures atuais. Testes E2E foram atualizados para 12 itens. As capturas pós-ajuste ainda precisam ser comparadas em browser.

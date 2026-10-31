@@ -1,6 +1,10 @@
 import { defineConfig } from '@playwright/test'
 
-const baseURL = 'http://127.0.0.1:4179'
+const port = Number(process.env.PLAYWRIGHT_PORT ?? 4180)
+if (!Number.isInteger(port) || port < 1 || port > 65_535) {
+  throw new Error('PLAYWRIGHT_PORT deve ser uma porta TCP válida.')
+}
+const baseURL = `http://127.0.0.1:${port}`
 
 export default defineConfig({
   testDir: './tests',
@@ -20,9 +24,9 @@ export default defineConfig({
     { name: 'desktop-1440', use: { viewport: { width: 1440, height: 900 } } },
   ],
   webServer: {
-    command: 'npm run dev -- --host 127.0.0.1 --port 4179 --strictPort',
+    command: `npm run dev -- --host 127.0.0.1 --port ${port} --strictPort`,
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 30_000,
     env: {
       VITE_ENABLE_MOCKS: 'true',

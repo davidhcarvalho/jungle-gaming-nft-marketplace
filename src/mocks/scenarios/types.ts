@@ -1,4 +1,12 @@
-export const mockScenarioNames = ['default', 'slow', 'api-error'] as const
+export const mockScenarioNames = [
+  'default',
+  'slow',
+  'api-error',
+  'empty',
+  'catalog-error',
+  'detail-error',
+  'variable-latency',
+] as const
 
 export type MockScenario = (typeof mockScenarioNames)[number]
 

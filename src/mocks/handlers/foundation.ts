@@ -1,9 +1,7 @@
 import { delay, http, HttpResponse } from 'msw'
 
 import { createFoundationHealth } from '@/mocks/fixtures/foundation'
-import { getMockScenario, resetMockState } from '@/mocks/scenarios/state'
-import { isMockScenario } from '@/mocks/scenarios/types'
-import type { MockScenario } from '@/mocks/scenarios/types'
+import { getMockScenario } from '@/mocks/scenarios/state'
 
 export const foundationHandlers = [
   http.get('/api/foundation/health', async () => {
@@ -18,15 +16,4 @@ export const foundationHandlers = [
 
     return HttpResponse.json(createFoundationHealth(scenario))
   }),
-  http.post('/api/foundation/reset', async ({ request }) => {
-    const body: unknown = await request.json().catch(() => undefined)
-    const requestedScenario = readScenario(body)
-    const state = resetMockState(requestedScenario)
-    return HttpResponse.json(createFoundationHealth(state.scenario))
-  }),
 ]
-
-function readScenario(value: unknown): MockScenario | undefined {
-  if (typeof value !== 'object' || value === null || !('scenario' in value)) return undefined
-  return isMockScenario(value.scenario) ? value.scenario : undefined
-}

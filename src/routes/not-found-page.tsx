@@ -6,7 +6,7 @@ export function NotFoundPage() {
       <p className="eyebrow">Erro 404</p>
       <h1 id="not-found-title">Página não encontrada</h1>
       <p>O endereço não corresponde a uma rota disponível.</p>
-      <Link className="text-link" to="/">Voltar ao início</Link>
+      <Link className="text-link" to="/" search={{ page: 1, sort: 'recent' }}>Voltar ao início</Link>
     </section>
   )
 }

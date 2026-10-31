@@ -13,17 +13,33 @@ export interface Session {
 
 export interface NFTEdition {
   id: string
-  number: number
+  label: string
   supply: number
   available: number
+  maxPerOrder: number
+  priceEth: EthAmount
 }
 
 export interface NFT {
   id: string
   name: string
+  tokenId: string
   collectionId: string
+  collectionName: string
+  category: string
+  network: string
   priceEth: EthAmount
+  compareAtPriceEth?: EthAmount
+  imageUrl: string
+  description: string
+  attributes: string[]
   editions: NFTEdition[]
+  rating: number
+  reviewCount: number
+  popularity: number
+  listedAt: string
+  isFeatured: boolean
+  isNew: boolean
   version: number
 }
 

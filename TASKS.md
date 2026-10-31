@@ -23,6 +23,7 @@ Este arquivo é uma visão rápida. Os critérios completos estão em `lots/`.
 - [x] not-found
 
 ## 02 — Catálogo/Detalhe
+> BLOCKED no gate runtime/visual. Última execução externa informada: 42 testes, 37 PASS, 3 FAIL e 2 SKIPPED, com as três falhas replicadas no mesmo teste de recuperação de erro. Inspeção confirmou que mudar `q` cria nova query key; `placeholderData` preserva dados somente durante a transição, e sem dados válidos para a nova key a UI corretamente mostra erro principal. Assertion corrigida e cobertura separada adicionada para falha real de refetch em background. Typecheck/lint/build/build-mocks PASS nesta retomada; Playwright bloqueado antes dos testes por `listen EPERM` no bind local. Não marcar o lote concluído. Consulte `PROGRESS.md` e Q6. Não iniciar o Lote 03.
 - [ ] hero/home
 - [ ] search
 - [ ] filtros

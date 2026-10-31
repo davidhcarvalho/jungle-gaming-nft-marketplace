@@ -6,6 +6,7 @@ export const queryKeys = {
     all: ['catalog'] as const,
     list: (params: Readonly<Record<string, string | number | undefined>>) =>
       ['catalog', 'list', params] as const,
+    featured: ['catalog', 'featured'] as const,
   },
   nft: {
     detail: (nftId: string) => ['nft', nftId] as const,

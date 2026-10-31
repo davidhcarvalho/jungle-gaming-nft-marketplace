@@ -8,6 +8,6 @@ export async function getFoundationHealth(signal?: AbortSignal) {
 }
 
 export async function resetFoundationScenario(scenario?: MockScenario) {
-  const response = await apiClient.post<FoundationHealth>('/foundation/reset', { scenario })
+  const response = await apiClient.post<FoundationHealth>('/test-scenarios/reset', { scenario })
   return response.data
 }
