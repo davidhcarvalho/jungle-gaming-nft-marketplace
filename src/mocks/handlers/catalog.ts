@@ -1,6 +1,6 @@
 import { delay, http, HttpResponse } from 'msw'
 
-import { nftFixtures } from '@/features/catalog/fixtures'
+import { getCatalogNFTs } from '@/mocks/state/catalog-price-overrides'
 import { catalogPageSize } from '@/features/catalog/api'
 import type { CatalogSort } from '@/features/catalog/model'
 import { getMockScenario } from '@/mocks/scenarios/state'
@@ -34,7 +34,8 @@ export const catalogHandlers = [
     const page = readPositiveInteger(url.searchParams.get('page'), 1)
     const pageSize = Math.min(readPositiveInteger(url.searchParams.get('pageSize'), catalogPageSize), 30)
 
-    let items = scenario === 'empty' ? [] : nftFixtures.filter((nft) => {
+    const catalog = getCatalogNFTs()
+    let items = scenario === 'empty' ? [] : catalog.filter((nft) => {
       const haystack = [nft.name, nft.collectionName, nft.category, ...nft.attributes]
         .join(' ')
         .toLocaleLowerCase('pt-BR')
@@ -54,15 +55,15 @@ export const catalogHandlers = [
 
     return HttpResponse.json({
       items: items.slice(start, start + pageSize),
-      featured: nftFixtures.find((nft) => nft.isFeatured) ?? nftFixtures[0],
+      featured: catalog.find((nft) => nft.isFeatured) ?? catalog[0],
       page,
       pageSize,
       totalItems,
       totalPages,
       facets: {
-        categories: countBy(nftFixtures, (nft) => nft.category),
-        collections: countBy(nftFixtures, (nft) => nft.collectionId),
-        networks: countBy(nftFixtures, (nft) => nft.network),
+        categories: countBy(catalog, (nft) => nft.category),
+        collections: countBy(catalog, (nft) => nft.collectionId),
+        networks: countBy(catalog, (nft) => nft.network),
       },
     })
   }),
@@ -75,7 +76,7 @@ export const catalogHandlers = [
       )
     }
     if (scenario === 'slow') await delay(800)
-    const nft = nftFixtures.find((item) => item.id === params.nftId)
+    const nft = getCatalogNFTs().find((item) => item.id === params.nftId)
     if (!nft) {
       return HttpResponse.json(
         { code: 'not_found', message: 'Este NFT não está disponível no catálogo.' },

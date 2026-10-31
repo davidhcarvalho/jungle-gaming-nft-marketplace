@@ -2,9 +2,9 @@
 
 Este arquivo contém apenas lacunas reais. Não usar como desculpa para interromper trabalho que pode ser derivado com segurança.
 
-## Estado do Lote 04
+## Estado dos Lotes 04–05
 
-O Lote 04 foi validado e aprovado. Não há questão aberta específica sobre carrinho/quote; as lacunas gerais Q1–Q5 abaixo continuam válidas e não bloquearam este lote.
+Os Lotes 04 e 05 foram validados e aprovados. No Lote 05, `spec:checkout-orders` passou (46 PASS, 2 SKIPPED) e `full` passou (152 PASS, 7 SKIPPED, sem falhas; gates estáticos verdes). Não há bloqueio específico de checkout/pedidos. As lacunas gerais Q1–Q5 abaixo continuam válidas; Lote 06 não iniciado.
 
 ## Q1 — Fonte exata
 

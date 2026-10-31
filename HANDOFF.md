@@ -1,5 +1,15 @@
 # Handoff entre Sessões/Agentes
 
+## Fechamento — Lote 05 (2026-10-31)
+
+- Lote atual concluído: `LOT_05_CHECKOUT_ORDERS` (**PASS**). `spec:checkout-orders`: 46 PASS, 2 SKIPPED, 0 FAIL (Request ID `1793465465-257338-29`); `spec:foundation`: 6 PASS (Request ID `1793466312-257338-31`); `full`: typecheck/lint/build/build com mocks PASS e E2E 152 PASS, 7 SKIPPED, 0 FAIL (Request ID `1793466343-257338-32`).
+- Runtime do Local Validation Runner: Node 24.22.1 / npm 11.19.1. Build com mocks mantém warning não bloqueante de chunk principal ~503.81 kB.
+- Implementado checkout/orders REST via Query/Axios/MSW: guard auth reaproveitado, wallets simuladas, validação, quote revalidada, mudanças exigem confirmação nova, idempotência por tentativa com replay/conflict e timeout-after-create, estados pending/confirmed/rejected, refresh REST, isolamento por userId, snapshot receipt e cart cleanup após confirmed. Não há conexão ou eventos Socket.IO.
+- Testes e quatro capturas finais do Lote 05 estão em `tests/checkout-orders.spec.ts` e `evidence/lot-05/`. O recibo é testado após alteração de preço via MSW; a evidência aguarda estado `confirmed`. Revisão contra Pagamento desktop/mobile e Confirmação desktop em `evidence/lot-05/visual-review.md`.
+- Correções recentes: teste mobile valida item na rota Carrinho (linhas ficam ocultas no checkout mobile por referência); owner test aguarda token `mock.user-leo.*` e redirect antes de trocar para deep link; testes confirmam terminalidade REST para confirmed/rejected; recibo mobile mantém todos os valores; layout desktop/mobile corrigido.
+- Evidências históricas regravadas pelo E2E em `evidence/lot-02/` e `evidence/lot-03/` foram restauradas do HEAD; `evidence/lot-01/` permaneceu intacta. Não houve commit, remote ou push.
+- Lotes 01–05 aprovados; Lote 06 e Lote 07 não iniciados. Não avançar sem instrução explícita.
+
 ## Atualização mais recente — 2026-10-31
 
 - **LOT 04 STATUS: PASS.** `spec:cart` no Local Validation Runner: 38 PASS, 1 SKIPPED, 0 FAIL (Request ID `1793457838-257338-8`). `full`: typecheck, lint, build, build com mocks PASS; E2E 106 PASS, 5 SKIPPED, 0 FAIL de 111 casos (Request ID `1793457992-257338-9`). Runtime Node 24.22.1/npm 11.19.1.

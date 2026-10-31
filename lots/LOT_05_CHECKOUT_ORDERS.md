@@ -36,14 +36,14 @@ Fechar o fluxo de compra com validação, quote revalidation, idempotência e re
 
 ## Critérios de aceite
 
-- [ ] double click não duplica;
-- [ ] timeout recupera mesma ordem;
-- [ ] key reutilizada com payload diferente conflita;
-- [ ] quote desatualizada bloqueia confirmação;
-- [ ] rejected não mostra sucesso;
-- [ ] receipt não muda após catálogo;
-- [ ] carrinho correto após success/failure;
-- [ ] E2E passa.
+- [x] double click não duplica;
+- [x] timeout recupera mesma ordem;
+- [x] key reutilizada com payload diferente conflita;
+- [x] quote desatualizada bloqueia confirmação;
+- [x] rejected não mostra sucesso;
+- [x] receipt não muda após catálogo;
+- [x] carrinho correto após success/failure;
+- [x] E2E passa.
 
 ## Evidência obrigatória
 

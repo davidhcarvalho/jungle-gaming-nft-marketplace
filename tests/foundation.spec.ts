@@ -40,8 +40,7 @@ test('TanStack Query → Axios → MSW health request and scenario reset', async
   await page.getByRole('button', { name: 'Refazer GET' }).click()
   await expect(page.getByTestId('mock-scenario')).toHaveText('default')
 
-  const tailwindAccent = await page.getByRole('button', { name: 'Resetar cenário' }).evaluate((button) => getComputedStyle(button).backgroundColor)
-  expect(tailwindAccent).toBe('rgb(214, 151, 88)')
+  await expect(page.getByRole('button', { name: 'Resetar cenário' })).toHaveCSS('background-color', 'rgb(214, 151, 88)')
   await expect(page.getByTestId('mock-source')).toHaveText('msw')
 
   await page.screenshot({ path: testInfo.outputPath(`foundation-${testInfo.project.name}.png`), fullPage: true })

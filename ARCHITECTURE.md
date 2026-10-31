@@ -1,6 +1,6 @@
-# Arquitetura da solução — Lotes 01 a 04
+# Arquitetura da solução — Lotes 01 a 05
 
-Este documento registra as partes implementadas até o Lote 04. Checkout/pedidos, perfil completo, carteiras e real-time funcional seguem para lotes posteriores.
+Este documento registra as partes implementadas até o Lote 05. Perfil completo, CRUD de carteiras e real-time funcional seguem para lotes posteriores.
 
 ## Runtime e build
 
@@ -69,3 +69,17 @@ O identificador guest fica no localStorage e é enviado por `X-Guest-Cart-Id`; M
 `EthAmount` permanece string decimal em domínio/transporte. A camada de mock converte para unidades inteiras de 18 casas (`bigint`/wei), aplica quantidade, percentual e soma de taxas sem aritmética floating-point e serializa novamente como decimal string. A quote contém `id`, `cartVersion` e `validUntil` para permitir revalidação no Lote 05. Queries de quote são keyed por owner, versão do carrinho e código; cada mutation atualiza o cart e invalida quote.
 
 O resumo da cotação tem skeleton com shimmer durante leitura/refetch inicial; erro de cotação preserva itens e oferece retry. Falhas de mutation não usam update otimista, então o cache confirmado permanece coerente quando MSW rejeita a operação. As regras de estoque são verificadas no handler, não apenas nos controles da interface.
+
+## Checkout e pedidos — Lote 05
+
+`/checkout` e `/orders/$orderId` continuam protegidos pelo guard de sessão compartilhado do Lote 03. O checkout consulta carteiras do usuário via `GET /api/checkout/wallets`, conecta/desconecta a seleção via REST/MSW e pede uma nova quote autoritativa em `POST /api/checkout/revalidate` antes de cada tentativa. Mudança de valor, disponibilidade, cupom ou taxa interrompe a criação: a quote atualizada precisa de uma confirmação explícita posterior.
+
+`POST /api/orders` exige header `Idempotency-Key`. O cliente guarda uma chave por tentativa lógica no `sessionStorage`, reutiliza durante falha de transporte/retry e encerra a tentativa após resposta conclusiva ou conflito. O mock indexa a chave por usuário, compara o payload canônico e retorna o mesmo pedido quando a chave e payload coincidem; payload diferente conflita. O cenário timeout-after-create persiste um pedido pending antes de simular falha de rede, permitindo recuperar esse mesmo pedido na repetição.
+
+Pedidos são recuperados por `GET /api/orders/:orderId` e atualização controlada por `POST /api/orders/:orderId/refresh`. A máquina mock permite `pending → confirmed|rejected`; estados terminais não regridem. Esta recuperação usa REST e TanStack Query; `socket.io-client` permanece sem conexão/eventos reais até o Lote 07.
+
+Ao confirmar, o mock cria um snapshot de receipt com itens, edição, quantidades, preços de linha, quote, carteira, rede, referência simulada e timestamp. Esse snapshot fica no pedido e não consulta novamente catálogo para renderização. Pedido rejected/pending preserva o carrinho; confirmação remove apenas as quantidades efetivamente gravadas no pedido. ETH continua string decimal no contrato e os cálculos mock usam wei com `bigint` conforme ADR-007.
+
+O harness MSW expõe um endpoint de teste restrito para alterar preço de fixture (`POST /api/test-scenarios/catalog-price`); a mutação persiste no estado local de mock e é limpa pelo reset de cenário. Playwright usa essa rota para comprovar que o catálogo muda enquanto o recibo confirmado conserva os valores capturados.
+
+O formulário de colecionador reaproveita dados da sessão e envia erros de validação pelo contrato do pedido. O frame mobile não possui formulário de colecionador; a composição mobile deriva a prioridade de carteira/rede/total e CTA do Figma, enquanto o formulário completo permanece no desktop. Não existe conexão de blockchain real e referências do explorer usam domínio `.invalid` de simulação.

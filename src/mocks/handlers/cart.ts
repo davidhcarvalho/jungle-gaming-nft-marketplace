@@ -93,6 +93,7 @@ export const cartHandlers = [
       totalEth: weiToEth(totalWei),
       coupon: cart.couponCode ? { code: cart.couponCode } : undefined,
       version: cart.version,
+      items: cart.items.map((item) => ({ nftId: item.nftId, editionId: item.editionId, quantity: item.quantity, unitPriceEth: item.unitPriceEth, subtotalEth: item.lineTotalEth })),
     }
     return HttpResponse.json<QuoteResponse>(result)
   }),

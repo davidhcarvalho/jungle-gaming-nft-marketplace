@@ -87,7 +87,10 @@ export interface Quote {
   totalEth: EthAmount
   coupon?: Coupon
   version: number
+  items?: QuoteLine[]
 }
+
+export interface QuoteLine { nftId: string; editionId: string; quantity: number; unitPriceEth: EthAmount; subtotalEth: EthAmount }
 
 export interface Network {
   id: string
@@ -112,6 +115,8 @@ export interface OrderItem {
   quantity: number
   unitPriceEth: EthAmount
   subtotalEth: EthAmount
+  imageUrl: string
+  editionLabel: string
 }
 
 export interface Order {
@@ -122,14 +127,20 @@ export interface Order {
   quote: Quote
   version: number
   createdAt: string
+  wallet: Wallet
+  network: Network
+  receipt?: Receipt
 }
 
 export interface Receipt {
   orderId: string
   transactionReference: string
+  explorerUrl: string
   confirmedAt: string
   items: OrderItem[]
   quote: Quote
+  wallet: Wallet
+  network: Network
 }
 
 export interface VersionedSocketEvent<TResource, TPayload> {

@@ -1,4 +1,4 @@
-import type { Cart, CartItem, Favorite, Quote, Session } from '@/types/domain'
+import type { Cart, CartItem, Favorite, Network, Order, Quote, Receipt, Session, Wallet } from '@/types/domain'
 import type { MockScenario } from '@/mocks/scenarios/types'
 import type { NFT } from '@/types/domain'
 
@@ -55,6 +55,12 @@ export interface CartMergeSummary {
 }
 
 export type QuoteResponse = Quote
+
+export interface CheckoutWalletsResponse { wallets: Wallet[]; networks: Network[]; connectedWalletId?: string }
+export interface CheckoutRevalidationResponse { quote: Quote; changes: string[]; blocked?: string }
+export interface CheckoutCollectorDetails { displayName: string; email: string; username?: string; profileName?: string; walletAddress?: string; secondaryWallet?: string; walletType?: string; referralCode?: string; ensName?: string; note?: string }
+export interface CreateOrderPayload { quoteId: string; quote: Quote; items: Array<{ nftId: string; editionId: string; quantity: number }>; walletId: string; networkId: string; collector: CheckoutCollectorDetails }
+export interface OrderResponse { order: Order; receipt?: Receipt }
 
 export interface NFTListResponse {
   items: NFT[]

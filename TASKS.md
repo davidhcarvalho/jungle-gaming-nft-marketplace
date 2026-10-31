@@ -63,17 +63,18 @@ Este arquivo é uma visão rápida. Os critérios completos estão em `lots/`.
 - [x] E2E
 
 ## 05 — Checkout/Orders
-- [ ] forms
-- [ ] wallet/network
-- [ ] review
-- [ ] revalidate
-- [ ] idempotency
-- [ ] pending
-- [ ] confirmed
-- [ ] rejected
-- [ ] timeout recovery
-- [ ] receipt snapshot
-- [ ] E2E
+> PASS — `spec:checkout-orders`: 46 PASS, 2 SKIPPED, 0 FAIL (Request ID `1793465465-257338-29`); `full`: 152 PASS, 7 SKIPPED, 0 FAIL, com typecheck/lint/build/build com mocks PASS (Request ID `1793466343-257338-32`). Revisão em `evidence/lot-05/visual-review.md`. Não iniciar Lote 06.
+- [x] forms
+- [x] wallet/network
+- [x] review
+- [x] revalidate
+- [x] idempotency
+- [x] pending
+- [x] confirmed
+- [x] rejected
+- [x] timeout recovery
+- [x] receipt snapshot
+- [x] E2E
 
 ## 06 — Profile/Wallets
 - [ ] profile

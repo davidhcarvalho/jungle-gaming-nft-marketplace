@@ -4,8 +4,17 @@
 
 ## Estado atual
 
-- Lote atual: `04 — Carrinho e Cotação` (**PASS**; Lotes 01–03 também aprovados. Lote 05 e Lote 07 continuam não iniciados).
-- Último lote concluído: `04 — Carrinho e Cotação` (**PASS**; `spec:cart`: 38 PASS, 1 SKIPPED, 0 FAIL; `full`: 106 PASS, 5 SKIPPED, 0 FAIL; revisão visual desktop/mobile registrada em `evidence/lot-04/visual-review.md`).
+- Lote concluído: `05 — Checkout, Pedido e Confirmação` (**PASS**; Lotes 01–05 aprovados. Lote 06 e Lote 07 não iniciados).
+- Último lote concluído: `05 — Checkout, Pedido e Confirmação` (**PASS**; `spec:checkout-orders`: 46 PASS, 2 SKIPPED; `full`: 152 PASS, 7 SKIPPED, 0 FAIL. Revisão visual em `evidence/lot-05/visual-review.md`).
+
+### Lote 05 — plano registrado antes da implementação
+
+- **Inventário visual individual:** `design-reference/Desktop/Pagamento.png` (2880×3314; base ~1440×1657 CSS): header/breadcrumb; formulário de colecionador em duas colunas à esquerda com nome de exibição, usuário, rede, perfil, endereço/ENS, tipo de carteira, indicação, e-mail e observação; à direita resumo de três NFTs e valores, seleção de carteira/rede e CTA “Confirmar compra”; footer. `design-reference/Mobile/Pagamento.png` (828×1792; base 414×896): cabeçalho com voltar e “Pagamento com carteira”; carteira conectada e ação trocar, cartões de carteiras cadastradas com rede/primária-secundária, seleção MetaMask/WalletConnect/Coinbase, total e CTA ancorado embaixo; controles grandes e conteúdo empilhado. `design-reference/Desktop/Confirmação de Pedido.png` (2880×3314; base ~1440×1657): cartão compacto centralizado com ilustração de agradecimento, mensagem de sucesso, faixa de metadados (transação/data/total/carteira), itens, taxa/total, explicação da transação e ação de explorer; não existe frame mobile, que será derivado dessa hierarquia, com metadados e hash quebráveis em telas estreitas.
+- **Estado inspecionado antes do código:** `/checkout` e `/orders/$orderId` são placeholders, protegidos pelo `requireSession` já existente. Auth fornece sessão/token, Query privada e `returnTo`; Cart fornece endpoint/quote com `bigint` em wei e persistência por owner. Tipos preliminares `Wallet`, `Network`, `Order`, `Receipt` existem, mas não existem fixtures/endpoints/estado para carteiras, checkout ou pedidos. Página `/wallets` permanece placeholder e fora do escopo.
+- **Arquivos planejados:** `src/features/checkout/{api,queries,model,checkout-page}.ts(x)` e componentes para dados/revisão/carteira; `src/features/orders/{api,queries,order-page}.ts(x)`/recibo; fixtures e estado mock de checkout/wallets/orders; handlers MSW de wallets/conexão/revalidação/orders; contratos e cenários tipados; integração de rotas protegidas no Router; `tests/checkout-orders.spec.ts`; estilos em `src/styles/globals.css`; documentação real em `ARCHITECTURE.md`/`DECISIONS.md`; evidências isoladas em `evidence/lot-05/`.
+- **Critérios de aceite:** guard de sessão preserva `/checkout`; campos/rede/wallet validam e retornam erros acessíveis; conexão, recusa e desconexão simuladas via API; revalidação authoritative antes do pedido e alteração exige segunda confirmação; mesma chave+payload retorna pedido único, chave reutilizada com payload diferente conflita, retry após timeout reaproveita a chave; estados REST pending/confirmed/rejected e terminalidade; recuperação deep-link/refresh com isolamento por usuário; sucesso somente em confirmed; rejeição/erro preserva carrinho; confirmação remove somente quantidades compradas; receipt snapshot imutável; ETH permanece string no transporte e cálculos seguem `bigint`; E2E 390/768/1440 e comparação visual com Pagamento/Confirmação; `spec:checkout-orders` e `full` PASS pelo runner.
+- **Política técnica planejada:** API é a autoridade para quote/revalidação e criação. O cliente persiste uma chave por tentativa lógica autenticada antes do POST e reusa-a em double-click/retry/timeout; só uma ação explícita de reiniciar após resultado terminal gera nova chave. Store MSW indexa por `(userId, idempotencyKey)`, persiste payload canônico e pedido, e rejeita payload diferente. Estados fazem apenas `pending → confirmed|rejected`; nenhum retorno REST regride terminal. Snapshot mantém preço/edição/quantidade/cupom/taxa/total/wallet/rede/ref/horário sem dependência posterior do catálogo. Recuperação de status será REST explícita, sem eventos/cache setters de Socket.IO.
+- **Riscos iniciais:** contrato mínimo dos dados de colecionador e sua apresentação mobile, pois o frame mobile prioriza carteira e não repete o formulário desktop; evitar que a atualização da quote no primeiro aceite seja confundida com autorização para comprar; manter a mesma chave e payload após timeout sem permitir duplicação; remover linhas parcialmente compradas mantendo sobras; impedir pedido de outro user em deep link; transições mock determinísticas e resetáveis. Usar somente a sessão do Lote 03 e consulta de wallets para checkout, sem CRUD de Perfil/Carteiras.
 
 ### Lote 04 — plano registrado antes da implementação
 
@@ -31,7 +40,7 @@
 - [x] Lote 02 — Catálogo e Detalhe
 - [x] Lote 03 — Autenticação, Sessão e Favoritos (**PASS**; E2E/runtime e revisão visual concluídos em 2026-10-31)
 - [x] Lote 04 — Carrinho e Cotação (**PASS**; gates estáticos e E2E via runner concluídos)
-- [ ] Lote 05 — Checkout, Pedido e Confirmação
+- [x] Lote 05 — Checkout, Pedido e Confirmação
 - [ ] Lote 06 — Perfil e Carteiras
 - [ ] Lote 07 — Tempo Real e Cenários de Falha
 - [ ] Lote 08 — Quality Gate, Deploy e Documentação
@@ -187,11 +196,17 @@
 - Nenhum fluxo de checkout/pedido ou Socket.IO funcional foi implementado. Lotes 05/07 não iniciados.
 
 ### Lote 05
-- Status:
-- Comandos:
-- Testes:
-- Evidências:
-- Pendências:
+- Status: **PASS**.
+- Runtime do Local Validation Runner: Node 24.22.1 / npm 11.19.1. `spec:checkout-orders`: 46 PASS, 2 SKIPPED, 0 FAIL; Request ID `1793465465-257338-29`. `spec:foundation`: 6 PASS; Request ID `1793466312-257338-31`.
+- `full`: typecheck, lint, build, build com mocks PASS; E2E 152 PASS, 7 SKIPPED, 0 FAIL; Request ID `1793466343-257338-32`. Build com mocks reporta aviso Vite de chunk principal ~503.81 kB, sem falha.
+- Implementado: checkout autenticado com retorno e carrinho preservado; leitura/seleção/conexão/desconexão REST das wallets; validação dos dados desktop; revalidação autoritativa da quote; pending/confirmed/rejected; idempotência por tentativa e recuperação após timeout; isolamento por usuário; snapshot de receipt; limpeza seletiva do carrinho após confirmação. Nenhum fluxo de checkout depende de Socket.IO.
+- Testes `tests/checkout-orders.spec.ts` cobrem guard/returnTo, campos, wallet/network, recusa/desconexão, mudanças de preço/estoque/cupom/taxa, sucesso/rejeição, double-click, retry da mesma chave, conflito de payload, timeout-after-create, refresh de pending, ownership por userId, quote/receipt e overflow em 390/768/1440. Campo de colecionador é deliberadamente pulado apenas onde o frame mobile/tablet não o contém (2 skips).
+- Capturas finais revisadas em `evidence/lot-05/`: `checkout-mobile-390-review.png`, `checkout-desktop-1440-review.png`, `confirmation-mobile-390-review.png`, `confirmation-desktop-1440-review.png`. Confirmação gerada somente após estado `confirmed`; revisão e desvios registrados em `evidence/lot-05/visual-review.md`.
+- Ajustes após comparação: painel extra/form heading desktop removidos visualmente e labels com estrela inline; composição mobile coloca total depois da seção de wallets; CTA positivo duplicado removido; receipt mobile volta a mostrar subtotal, desconto, taxa e total; breadcrumb do receipt desktop removido e card alinhado mais abaixo.
+- Primeira execução de `full` (Request ID `1793463388-257338-22`): typecheck/lint/build/build com mocks PASS; E2E 149 PASS, 7 SKIPPED, 3 FAIL, todos no antigo teste L03 que acessava checkout sem carrinho e esperava o antigo placeholder “Pagamento”.
+- Teste L03 atualizado para preparar um NFT visitante antes de acessar `/checkout`, validar o retorno protegido na tela real e confirmar persistência após refresh. `spec:auth-favorites` passou em 25 PASS, 2 SKIPPED, 0 FAIL (Request ID `1793464166-257338-24`). O helper de cenário espera o catálogo montar antes do reset HTTP.
+- Foi adicionado teste explícito de imutabilidade do recibo após alteração de preço via MSW; a quote snapshot permaneceu estável após navegação e reload. O smoke Tailwind usa `toHaveCSS`, aguardando a transição de cor.
+- Evidências históricas regravadas pelo E2E em `evidence/lot-02/` e `evidence/lot-03/` foram restauradas do HEAD. `evidence/lot-01/` permaneceu intacta; não houve commits/remotes/pushes. Lote 06/07 não iniciados.
 
 ### Lote 06
 - Status:

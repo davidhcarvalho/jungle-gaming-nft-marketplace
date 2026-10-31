@@ -81,14 +81,17 @@ test('invalid login is reported by the API and remains on the login route', asyn
 
 test('login preserves protected intent and restores session after refresh', async ({ page }) => {
   await setMockScenario(page, 'default')
+  await page.goto(emeraldDetail)
+  await page.getByRole('button', { name: 'Comprar NFT', exact: true }).click()
+  await expect(page.getByTestId('cart-page')).toBeVisible()
   await page.goto('/checkout?step=review')
   await expect(page).toHaveURL(/\/login\?returnTo=%2Fcheckout%3Fstep%3Dreview/)
   await loginAs(page, ana)
   await expect(page).toHaveURL('/checkout?step=review')
-  await expect(page.getByRole('heading', { name: 'Pagamento' })).toBeVisible()
+  await expect(page.getByTestId('checkout-page')).toBeVisible()
   await page.reload()
   await expect(page).toHaveURL('/checkout?step=review')
-  await expect(page.getByRole('link', { name: 'Perfil de Ana Colecionadora' })).toBeVisible()
+  await expect(page.getByTestId('checkout-page')).toBeVisible()
 })
 
 test('favorites persist per account and logout removes private access', async ({ page }) => {

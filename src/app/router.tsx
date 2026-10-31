@@ -12,6 +12,8 @@ import { NotFoundPage } from '@/routes/not-found-page'
 import { HomePage } from '@/features/catalog/home-page'
 import { NFTDetailPage } from '@/features/nft/nft-detail-page'
 import { CartPage } from '@/features/cart/cart-page'
+import { CheckoutPage } from '@/features/checkout/checkout-page'
+import { OrderPage } from '@/features/orders/order-page'
 import { validateCatalogSearch } from '@/features/catalog/model'
 import { AuthPage } from '@/features/auth/auth-page'
 import { sanitizeReturnTo, validateAuthSearch } from '@/features/auth/model'
@@ -48,14 +50,14 @@ const checkoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/checkout',
   beforeLoad: requireSession,
-  component: () => <PlaceholderPage title="Pagamento" />,
+  component: CheckoutPage,
 })
 
 const orderRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/orders/$orderId',
   beforeLoad: requireSession,
-  component: () => <PlaceholderPage title="Confirmação de pedido" />,
+  component: OrderPage,
 })
 
 const loginRoute = createRoute({

@@ -227,3 +227,20 @@ Handlers MSW validam estoque/quantidade e persistem dados de demonstração loca
 
 #### Como explicar em entrevista
 ETH trafega como decimal string; o mock converte para wei com BigInt, aplica operações inteiras e retorna strings. No login, guest e user são combinados por identidade de edição e limitados ao estoque, preservando o carrinho privado por usuário.
+
+### ADR-008 — Idempotência, recuperação REST e snapshot de recibo
+
+**Data:** 2026-10-31  
+**Lote:** 05  
+**Status:** Aceito
+
+#### Contexto
+Checkout precisa suportar clique duplicado, falha de transporte após criação, reconsulta de pedido e recibo estável sem backend privado. O estado confirmado não pode depender de dados atuais do catálogo.
+
+#### Decisão
+O cliente gera uma `Idempotency-Key` por tentativa lógica e a guarda em `sessionStorage` até o resultado conclusivo. Timeout/retry reutiliza a chave; uma tentativa nova só recebe chave nova depois do fluxo anterior terminar. O handler MSW limita o escopo da chave ao usuário e guarda a serialização canônica do payload: replay igual retorna o pedido existente e payload diferente responde conflito.
+
+Pedidos seguem `pending → confirmed | rejected`; `confirmed` e `rejected` são terminais. Até o Lote 07, reconsulta/transição de demonstração ocorre somente por REST. Na confirmação, o store grava cópia imutável de itens, preços/quote, wallet, network, referência e horário no receipt. A limpeza do carrinho usa as quantidades do pedido confirmado.
+
+#### Consequências
+O fluxo não depende de atualização otimista para afirmar sucesso. Se a resposta se perde após a criação, a mesma chave recupera o mesmo pedido. Catálogo pode mudar depois sem reescrever o recibo. O domínio ainda não conecta blockchain nem emite eventos Socket.IO.

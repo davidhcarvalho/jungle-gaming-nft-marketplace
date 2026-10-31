@@ -14,6 +14,16 @@ export const mockScenarioNames = [
   'quote-error',
   'cart-existing',
   'cart-existing-mutation-error',
+  'checkout-price-changed',
+  'checkout-availability-changed',
+  'checkout-coupon-expired',
+  'checkout-fee-changed',
+  'wallet-rejected',
+  'wallet-disconnected',
+  'order-timeout-after-create',
+  'order-pending',
+  'order-rejected',
+  'order-server-error',
 ] as const
 
 export type MockScenario = (typeof mockScenarioNames)[number]

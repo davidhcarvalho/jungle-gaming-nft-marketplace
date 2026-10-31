@@ -5,6 +5,8 @@ import { resetMockState } from '@/mocks/scenarios/state'
 import { isMockScenario } from '@/mocks/scenarios/types'
 import { resetAuthMockState } from '@/mocks/state/auth-store'
 import { resetCartMockState } from '@/mocks/state/cart-store'
+import { resetOrderMockState } from '@/mocks/state/orders-store'
+import { resetCatalogPriceOverrides, setCatalogPriceOverride } from '@/mocks/state/catalog-price-overrides'
 
 export const scenarioHandlers = [
   http.post('/api/test-scenarios/reset', async ({ request }) => {
@@ -13,7 +15,18 @@ export const scenarioHandlers = [
     const { scenario: activeScenario } = resetMockState(scenario)
     resetAuthMockState()
     resetCartMockState(activeScenario === 'cart-existing' || activeScenario === 'cart-existing-mutation-error')
+    resetOrderMockState()
+    resetCatalogPriceOverrides()
     return HttpResponse.json(createFoundationHealth(activeScenario))
+  }),
+  http.post('/api/test-scenarios/catalog-price', async ({ request }) => {
+    const body: unknown = await request.json().catch(() => undefined)
+    if (typeof body !== 'object' || body === null || !('nftId' in body) || !('priceEth' in body)
+      || typeof body.nftId !== 'string' || typeof body.priceEth !== 'string'
+      || !setCatalogPriceOverride(body.nftId, body.priceEth)) {
+      return HttpResponse.json({ code: 'validation', message: 'NFT ou preço de cenário inválido.' }, { status: 422 })
+    }
+    return HttpResponse.json({ nftId: body.nftId, priceEth: body.priceEth })
   }),
 ]
 
