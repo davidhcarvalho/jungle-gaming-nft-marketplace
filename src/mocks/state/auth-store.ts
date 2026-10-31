@@ -102,6 +102,15 @@ export async function digestMockPassword(email: string, password: string) {
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
+export async function changeMockPassword(userId: string, currentPassword: string, newPassword: string) {
+  const state = readState()
+  const account = state.accounts.find((candidate) => candidate.id === userId)
+  if (!account || account.passwordDigest !== await digestMockPassword(account.email, currentPassword)) return false
+  account.passwordDigest = await digestMockPassword(account.email, newPassword)
+  writeState(state)
+  return true
+}
+
 export function getMockUser(sessionToken: string | null): User | undefined {
   return getMockSession(sessionToken)?.session.user
 }

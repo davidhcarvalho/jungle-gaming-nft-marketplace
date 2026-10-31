@@ -887,3 +887,97 @@ button:disabled { cursor: not-allowed; }
 .checkout-fields em { color: #e1836f; font-style: normal; }
 .checkout-secondary-wallet { grid-column: 1 / -1; display: flex !important; align-items: center; justify-content: flex-start; gap: 9px !important; }
 .checkout-secondary-wallet input { width: 16px; min-height: 16px; accent-color: #d69758; }
+
+/* Profile and wallet management (Lote 06) */
+.account-page { max-width: 1160px; margin: 0 auto; padding: 58px 0 88px; }
+.account-mobile-brand { display: none; }
+.account-layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); align-items: start; gap: 30px; }
+.account-sidebar { min-width: 0; border-radius: 4px; background: #241612; padding: 12px 10px; }
+.account-sidebar > h1 { margin: 0 0 8px; padding: 0 10px; color: #edecd2; font-size: 16px; line-height: 1.35; }
+.account-nav { display: grid; gap: 5px; border: 1px solid #493126; border-radius: 8px; background: #1b110d; padding: 10px; }
+.account-nav a { min-height: 44px; display: flex; align-items: center; border-radius: 4px; padding: 0 13px; color: #b7a28a; font-size: 12px; }
+.account-nav a:hover, .account-nav a.is-active { background: #302017; color: #e2a76b; }
+.account-logout { min-height: 42px; border: 0; border-top: 1px solid #38251c; background: transparent; padding: 8px 13px 0; color: #b7a28a; font-size: 11px; text-align: left; }
+.account-logout:hover { color: #e2a76b; }
+.account-content { min-width: 0; display: grid; gap: 20px; }
+.is-account-route .site-footer { display: none; }
+.account-panel { min-width: 0; border: 0; border-radius: 0; background: transparent; padding: 0; }
+.account-panel h2 { margin: 0; color: #edecd2; font-size: 18px; line-height: 1.35; }
+.profile-panel-heading, .account-section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 25px; }
+.account-section-heading > div > p:not(.eyebrow) { margin: 9px 0 0; color: #b7a28a; font-size: 11px; line-height: 1.65; }
+.avatar-editor { display: flex; align-items: center; gap: 13px; }
+.avatar-editor > div:last-child { display: grid; justify-items: start; gap: 7px; }
+.avatar-editor p { margin: 0; color: #9e876b; font-size: 9px; }
+.profile-avatar { width: 64px; height: 64px; overflow: hidden; display: grid; place-items: center; border: 1px solid #70503a; border-radius: 50%; background: #36241b; color: #e2a76b; font-size: 22px; }
+.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.account-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 18px; }
+.account-field { min-width: 0; display: grid; align-content: start; gap: 8px; color: #c4ad92; font-size: 10px; }
+.account-field input, .account-field select { width: 100%; min-width: 0; min-height: 45px; border: 1px solid #51382a; border-radius: 3px; background: #1b110d; padding: 0 13px; color: #edecd2; font-size: 11px; }
+.account-field input::placeholder { color: #806e5a; }
+.account-field input[aria-invalid="true"], .account-field select[aria-invalid="true"] { border-color: #d77e6f; }
+.account-form-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; padding-top: 3px; }
+.account-form-actions button { min-width: 175px; min-height: 45px; border-radius: 3px; font-size: 10px; }
+.account-error { grid-column: 1 / -1; margin: 0; color: #ffab9b; font-size: 10px; line-height: 1.5; }
+.account-field .account-error { grid-column: auto; }
+.account-success { margin: 0; color: #c0d6a0; font-size: 12px; }
+.password-form { max-width: 54%; grid-template-columns: 1fr; }
+.password-form .account-form-actions { justify-content: flex-start; }
+.account-loading { min-height: 150px; display: grid; place-items: center; color: #b7a28a; }
+.wallets-panel > .account-section-heading { align-items: center; }
+.wallet-card { display: grid; gap: 14px; border: 1px solid #50382a; border-radius: 5px; background: #1b110d; padding: 18px 20px; }
+.wallet-card + .wallet-card { margin-top: 12px; }
+.wallet-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; }
+.wallet-card-top h3 { margin: 9px 0 0; color: #edecd2; font-size: 13px; }
+.wallet-role { color: #d69758; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+.wallet-role.secondary { color: #b7a28a; }
+.wallet-network { border: 1px solid #493126; border-radius: 99px; padding: 6px 10px; color: #d0b89a; font-size: 9px; white-space: nowrap; }
+.wallet-address { min-width: 0; margin: 0; display: grid; gap: 7px; }
+.wallet-address dt { color: #9e876b; font-size: 9px; }
+.wallet-address dd { margin: 0; overflow: hidden; color: #edecd2; font-family: var(--font-mono); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.wallet-address dd[title] { overflow-wrap: anywhere; }
+.wallet-ens { margin: 0; color: #b7a28a; font-size: 10px; }
+.wallet-actions { display: flex; flex-wrap: wrap; gap: 9px; border-top: 1px solid #38251c; padding-top: 13px; }
+.wallet-actions button { font-size: 9px; }
+.wallet-editor { border-color: #745039; }
+.wallet-editor .account-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 900px) {
+  .account-page { padding-top: 34px; }
+  .account-layout { grid-template-columns: 1fr; gap: 18px; }
+  .account-sidebar { padding: 12px; }
+  .account-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .account-nav a { justify-content: center; text-align: center; padding-inline: 8px; }
+  .password-form { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .is-account-route .site-header { display: none; }
+  .is-account-route .site-footer { display: none; }
+  .is-account-route .main-content { width: 100%; }
+  .account-mobile-brand { display: inline-flex; margin-bottom: 20px; color: #edecd2; font-size: 12px; font-weight: 800; letter-spacing: .18em; }
+  .account-page { width: 100%; padding: 24px 18px 48px; }
+  .account-sidebar { background: transparent; padding: 0; }
+  .account-sidebar > h1 { margin: 0 0 10px; padding: 0; font-size: 22px; }
+  .account-layout { gap: 13px; }
+  .account-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px; padding: 5px; }
+  .account-nav a { min-height: 42px; font-size: 10px; }
+  .account-logout { grid-column: 1 / -1; min-height: 37px; text-align: center; }
+  .account-panel { border-radius: 0; padding: 0; }
+  .account-panel h2 { font-size: 16px; }
+  .profile-panel-heading { align-items: center; gap: 12px; }
+  .profile-panel-heading .eyebrow { display: none; }
+  .avatar-editor { gap: 9px; }
+  .profile-avatar { width: 48px; height: 48px; }
+  .avatar-editor button { min-height: 35px; padding-inline: 9px; font-size: 9px; }
+  .avatar-editor p { max-width: 125px; font-size: 8px; line-height: 1.4; }
+  .account-form, .password-form, .wallet-editor .account-form { max-width: 100%; grid-template-columns: 1fr; gap: 15px; }
+  .account-form-actions { grid-column: auto; }
+  .account-form-actions button { width: 100%; }
+  .account-section-heading { align-items: flex-start !important; gap: 12px; }
+  .account-section-heading > button { flex: 0 0 auto; min-height: 40px; padding-inline: 11px; font-size: 9px; }
+  .wallet-card { padding: 15px 13px; }
+  .wallet-card-top { gap: 8px; }
+  .wallet-card-top h3 { max-width: 180px; overflow-wrap: anywhere; }
+  .wallet-network { font-size: 8px; }
+  .wallet-address dd { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .wallet-actions { gap: 5px; }
+  .wallet-actions button { flex: 1 1 auto; padding-inline: 8px; }
+}

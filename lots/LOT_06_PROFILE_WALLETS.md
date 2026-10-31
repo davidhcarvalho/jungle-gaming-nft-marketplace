@@ -33,13 +33,13 @@ Implementar conta persistente e adaptar telas não desenhadas no mobile sem queb
 
 ## Critérios de aceite
 
-- [ ] alterações persistem;
-- [ ] senha tratada sem armazenamento em claro;
-- [ ] wallets isoladas por usuário;
-- [ ] mobile funciona em 390;
-- [ ] mobile mantém linguagem visual;
-- [ ] erros associados aos campos;
-- [ ] E2E passa.
+- [x] alterações persistem;
+- [x] senha tratada sem armazenamento em claro;
+- [x] wallets isoladas por usuário;
+- [x] mobile funciona em 390;
+- [x] mobile mantém linguagem visual;
+- [x] erros associados aos campos;
+- [x] E2E passa — `spec:profile-wallets` 70 PASS/2 SKIPPED; regressão `full` 222 PASS/9 SKIPPED.
 
 ## Evidência obrigatória
 

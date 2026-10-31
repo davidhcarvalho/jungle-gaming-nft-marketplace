@@ -18,6 +18,7 @@ export function RootLayout() {
   const isCart = pathname === '/cart'
   const isCheckout = pathname === '/checkout'
   const isOrder = pathname.startsWith('/orders/')
+  const isAccount = pathname === '/profile' || pathname === '/wallets'
   const isAuthRoute = pathname === '/login' || pathname === '/signup'
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export function RootLayout() {
   }, [isAuthRoute, navigate, queryClient])
 
   return (
-    <div className={`app-frame${isHome ? ' is-home-route' : ''}${isDetail ? ' is-detail-route' : ''}${isCart ? ' is-cart-route' : ''}${isCheckout ? ' is-checkout-route' : ''}${isOrder ? ' is-order-route' : ''}${isAuthRoute ? ' is-auth-route' : ''}`}>
+    <div className={`app-frame${isHome ? ' is-home-route' : ''}${isDetail ? ' is-detail-route' : ''}${isCart ? ' is-cart-route' : ''}${isCheckout ? ' is-checkout-route' : ''}${isOrder ? ' is-order-route' : ''}${isAuthRoute ? ' is-auth-route' : ''}${isAccount ? ' is-account-route' : ''}`}>
       <a className="skip-link" href="#main-content">Pular para o conteúdo</a>
       <header className="site-header">
         <div className="site-header-inner">

@@ -1,5 +1,14 @@
 # Handoff entre Sessões/Agentes
 
+## Fechamento — Lote 06 (2026-10-31)
+
+- **LOT 06 STATUS: PASS.** `spec:profile-wallets`: 70 PASS, 2 SKIPPED, 0 FAIL (Request ID `1793469615-257338-37`). `full`: typecheck/lint/build/build com mocks PASS; E2E 222 PASS, 9 SKIPPED, 0 FAIL (Request ID `1793469885-257338-38`). Runner host Node 24.22.1/npm 11.19.1.
+- Implementados `/profile` e `/wallets` com guard existente, Query/Axios/REST/MSW, persistência e isolamento por usuário. Perfil, avatar (incluindo remoção) e mudança de senha usam handlers dedicados; credenciais são comparadas/armazenadas como SHA-256 digest, nunca texto claro.
+- Store de carteiras única por usuário agora serve a página `/wallets` e checkout L05. Handler valida formato EVM, rede e duplicidade; promover principal rebaixa a anterior atomicamente. Mutations invalidam o cache de wallets do checkout.
+- Frames desktop comparados; não há frames mobile. ADR-009 documenta o reflow mobile. Quatro capturas e revisão estão em `evidence/lot-06/`.
+- A suíte completa regenerou alguns arquivos binários dos Lotes 02, 03 e 05; foram restaurados do checkpoint. `evidence/lot-01/` permaneceu intocada. Nenhum commit/remote/push foi criado.
+- Lotes 01–06 aprovados. Lote 07 permanece não iniciado; não implementar Socket.IO/eventos até solicitação explícita.
+
 ## Fechamento — Lote 05 (2026-10-31)
 
 - Lote atual concluído: `LOT_05_CHECKOUT_ORDERS` (**PASS**). `spec:checkout-orders`: 46 PASS, 2 SKIPPED, 0 FAIL (Request ID `1793465465-257338-29`); `spec:foundation`: 6 PASS (Request ID `1793466312-257338-31`); `full`: typecheck/lint/build/build com mocks PASS e E2E 152 PASS, 7 SKIPPED, 0 FAIL (Request ID `1793466343-257338-32`).
@@ -8,7 +17,7 @@
 - Testes e quatro capturas finais do Lote 05 estão em `tests/checkout-orders.spec.ts` e `evidence/lot-05/`. O recibo é testado após alteração de preço via MSW; a evidência aguarda estado `confirmed`. Revisão contra Pagamento desktop/mobile e Confirmação desktop em `evidence/lot-05/visual-review.md`.
 - Correções recentes: teste mobile valida item na rota Carrinho (linhas ficam ocultas no checkout mobile por referência); owner test aguarda token `mock.user-leo.*` e redirect antes de trocar para deep link; testes confirmam terminalidade REST para confirmed/rejected; recibo mobile mantém todos os valores; layout desktop/mobile corrigido.
 - Evidências históricas regravadas pelo E2E em `evidence/lot-02/` e `evidence/lot-03/` foram restauradas do HEAD; `evidence/lot-01/` permaneceu intacta. Não houve commit, remote ou push.
-- Lotes 01–05 aprovados; Lote 06 e Lote 07 não iniciados. Não avançar sem instrução explícita.
+- Lotes 01–06 aprovados; Lote 07 não iniciado. Não avançar sem instrução explícita.
 
 ## Atualização mais recente — 2026-10-31
 

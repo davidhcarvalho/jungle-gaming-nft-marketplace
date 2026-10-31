@@ -6,8 +6,8 @@ Formato:
 
 ## ADR-XXX — Título
 
-**Data:**  
-**Lote:**  
+**Data:**
+**Lote:**
 **Status:** Proposto | Aceito | Substituído
 
 ### Contexto
@@ -32,6 +32,59 @@ Qual problema exigiu decisão?
 ---
 
 ## Decisões já conhecidas
+
+### ADR-009 — Derivação mobile para Perfil e Carteiras
+
+**Data:** 2026-10-31
+**Lote:** 06
+**Status:** Aceito
+
+#### Contexto
+O Figma contém frames desktop para Perfil do Colecionador e Carteiras, mas não define versões mobile. O produto precisa manter as duas rotas utilizáveis em 390/768 px sem inventar campos ou perder ações.
+
+#### Opções consideradas
+1. Reduzir a sidebar e os formulários desktop até caberem em mobile.
+2. Derivar os fluxos com a linguagem mobile já aprovada: navegação de conta refluída, formulários em uma coluna e carteiras em cartões responsivos.
+
+#### Decisão
+Adotar a segunda opção. No mobile, a navegação de conta será uma região compacta e operável por teclado; os formulários passam a uma coluna; cada carteira será cartão com rede, função, ações e endereço quebrável/truncado visualmente, mantendo o endereço integral acessível. Em tablet, o layout transita sem overflow entre o desktop e o mobile.
+
+#### Por quê
+Preserva hierarquia e conteúdo do frame desktop, enquanto se alinha à densidade, aos controles e aos espaçamentos das telas mobile aprovadas. Não há frame que sustente uma composição mobile mais específica.
+
+#### Consequências
+A composição derivada será comparada com os tokens e padrões mobile existentes, mas não poderá ser chamada de correspondência pixel a pixel a uma referência inexistente. Não serão adicionados campos sem apoio nos contratos e no desafio.
+
+#### Como explicar em entrevista
+Onde o Figma não especificou o breakpoint, mantive o conteúdo e reordenei a navegação/formulário para uma coluna, preservando acessibilidade e sem introduzir novos campos de domínio.
+
+### ADR-010 — Store única de carteiras e invariável de principal
+
+**Data:** 2026-10-31
+**Lote:** 06
+**Status:** Aceito
+
+#### Contexto
+O checkout do Lote 05 já consulta carteiras, e o Lote 06 precisa oferecer sua manutenção. Stores independentes fariam o checkout mostrar dados antigos e permitiriam perfis com mais de uma principal.
+
+#### Decisão
+Usar `wallets-store` como fonte mock persistida por `userId`, compartilhada pelos handlers de perfil/carteiras e checkout. A operação de promover carteira altera a nova principal e rebaixa a anterior dentro da mesma operação do handler. Identidade/IDs das wallets já existentes no checkout são mantidos.
+
+#### Consequências
+Queries de wallets permanecem isoladas por usuário; após mutation, o cache de `checkoutWallets` daquele usuário é invalidado. Toda resposta válida contém exatamente uma wallet `primary`. Endereços são verificados por formato/rede, sem consultar blockchain.
+
+### ADR-011 — Persistência mock de avatar e senha
+
+**Data:** 2026-10-31
+**Lote:** 06
+**Status:** Aceito
+
+#### Decisão
+Avatar de demonstração é validado (PNG/JPEG/WebP e limite de tamanho), convertido em data URL e persistido pelo endpoint MSW de perfil; upload e remoção são requests REST. Mudança de senha compara o digest SHA-256 atual e grava somente o digest da nova senha no estado local mock. O texto da senha fica somente em trânsito durante a chamada e nos campos temporários do formulário.
+
+#### Consequências
+Refresh recupera o perfil/avatar pela API; reset restaura os dados demo. A estratégia é local de teste/demonstração e não representa armazenamento de produção ou serviço externo.
+
 
 ### ADR-004 — Substitutos locais para artwork do catálogo
 
@@ -91,8 +144,8 @@ O bundle de mocks contém uma única rota de reset. A execução Playwright aind
 
 ### ADR-003 — Aprovação restrita do postinstall do MSW
 
-**Data:** 2026-10-30  
-**Lote:** 01  
+**Data:** 2026-10-30
+**Lote:** 01
 **Status:** Aceito
 
 #### Contexto
@@ -109,8 +162,8 @@ A exceção foi limitada ao pacote cujo postinstall é necessário, depois de re
 
 ### ADR-002 — Runtime e fundação do marketplace
 
-**Data:** 2026-10-30  
-**Lote:** 01  
+**Data:** 2026-10-30
+**Lote:** 01
 **Status:** Aceito
 
 #### Contexto
@@ -158,8 +211,8 @@ O comportamento foi preservado e a adaptação visual seguiu o sistema visual ex
 
 ### ADR-005 — Readiness MSW para reset de cenários no browser
 
-**Data:** 2026-10-30  
-**Lote:** 02  
+**Data:** 2026-10-30
+**Lote:** 02
 **Status:** Sincronização mantida; não comprovada como causa do 404
 
 #### Contexto
@@ -173,8 +226,8 @@ O helper aguarda o bootstrap antes do fetch e não usa atraso fixo ou `page.requ
 
 ### ADR-006 — Densidade default do catálogo visual
 
-**Data:** 2026-10-30  
-**Lote:** 02  
+**Data:** 2026-10-30
+**Lote:** 02
 **Status:** Aceito; validação visual final pendente
 
 #### Contexto
@@ -204,8 +257,8 @@ O reset MSW restaura contas demo, sessões e favoritos. Tokens e dados de mock n
 
 ### ADR-007 — Precisão ETH e merge de carrinho visitante
 
-**Data:** 2026-10-31  
-**Lote:** 04  
+**Data:** 2026-10-31
+**Lote:** 04
 **Status:** Aceito
 
 #### Contexto
@@ -230,8 +283,8 @@ ETH trafega como decimal string; o mock converte para wei com BigInt, aplica ope
 
 ### ADR-008 — Idempotência, recuperação REST e snapshot de recibo
 
-**Data:** 2026-10-31  
-**Lote:** 05  
+**Data:** 2026-10-31
+**Lote:** 05
 **Status:** Aceito
 
 #### Contexto

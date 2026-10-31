@@ -63,7 +63,7 @@ Este arquivo é uma visão rápida. Os critérios completos estão em `lots/`.
 - [x] E2E
 
 ## 05 — Checkout/Orders
-> PASS — `spec:checkout-orders`: 46 PASS, 2 SKIPPED, 0 FAIL (Request ID `1793465465-257338-29`); `full`: 152 PASS, 7 SKIPPED, 0 FAIL, com typecheck/lint/build/build com mocks PASS (Request ID `1793466343-257338-32`). Revisão em `evidence/lot-05/visual-review.md`. Não iniciar Lote 06.
+> PASS — `spec:checkout-orders`: 46 PASS, 2 SKIPPED, 0 FAIL (Request ID `1793465465-257338-29`); `full`: 152 PASS, 7 SKIPPED, 0 FAIL, com typecheck/lint/build/build com mocks PASS (Request ID `1793466343-257338-32`). Revisão em `evidence/lot-05/visual-review.md`; Lote 06 foi iniciado após aprovação externa e está concluído abaixo.
 - [x] forms
 - [x] wallet/network
 - [x] review
@@ -77,14 +77,15 @@ Este arquivo é uma visão rápida. Os critérios completos estão em `lots/`.
 - [x] E2E
 
 ## 06 — Profile/Wallets
-- [ ] profile
-- [ ] avatar
-- [ ] password
-- [ ] wallets
-- [ ] validation
-- [ ] persistence
-- [ ] derived mobile
-- [ ] E2E
+> PASS — `spec:profile-wallets`: 70 PASS, 2 SKIPPED, 0 FAIL (Request ID `1793469615-257338-37`); `full`: 222 PASS, 9 SKIPPED, 0 FAIL, com typecheck/lint/build/build com mocks PASS (Request ID `1793469885-257338-38`). Revisão visual e desvios em `evidence/lot-06/visual-review.md`. Não iniciar Lote 07.
+- [x] profile
+- [x] avatar
+- [x] password
+- [x] wallets
+- [x] validation
+- [x] persistence
+- [x] derived mobile
+- [x] E2E
 
 ## 07 — Real-time/Failures
 - [ ] socket.io-client

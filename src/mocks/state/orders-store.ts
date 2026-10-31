@@ -1,23 +1,17 @@
 import { getMockCart, removeMockCartItem, updateMockCartItem } from '@/mocks/state/cart-store'
+import { getWalletsForUser, resetWalletMockState, setWalletConnection } from '@/mocks/state/wallets-store'
 import { multiplyEth, weiToEth } from '@/lib/eth-decimal'
 import type { CheckoutCollectorDetails, CreateOrderPayload } from '@/types/api'
 import type { Network, Order, OrderItem, Receipt, Wallet } from '@/types/domain'
 
 interface StoredOrders { version: 1; orders: Order[]; idempotency: Record<string, { payload: string; orderId: string }>; timedOutKeys: string[] }
 const storageKey = 'kurio:mock-orders-state'
-export function resetOrderMockState() { try { localStorage.removeItem(storageKey); localStorage.removeItem('kurio:checkout-wallet-state') } catch { /* deterministic in-memory fallback */ } }
+export function resetOrderMockState() { try { localStorage.removeItem(storageKey) } catch { /* deterministic in-memory fallback */ }; resetWalletMockState() }
 export function getCheckoutWallets(userId: string) {
-  const wallets: Wallet[] = [
-    { id: `${userId}:wallet-primary`, address: userId === 'user-leo' ? '0x9C8f2A4B7D1E6F305A8c2b9D4E7F1A6C3D5B8E20' : '0x71C7656EC7ab88b098defB751B7401B5f6d8976F', label: 'MetaMask · Principal', networkId: 'ethereum', role: 'primary' },
-    { id: `${userId}:wallet-secondary`, address: '0x3A4f09b2C1D7E6F8A5b4C3D2E1F0a9876543210B', label: 'Coinbase · Secundária', networkId: 'polygon', role: 'secondary' },
-  ]
-  const state = readWalletState()
-  return { wallets, networks: [{ id: 'ethereum', name: 'Ethereum', currency: 'ETH' as const }, { id: 'polygon', name: 'Polygon', currency: 'ETH' as const }], connectedWalletId: state[userId] }
+  return getWalletsForUser(userId)
 }
 export function setConnectedWallet(userId: string, walletId?: string) {
-  const state = readWalletState(); if (walletId) state[userId] = walletId; else delete state[userId]
-  try { localStorage.setItem('kurio:checkout-wallet-state', JSON.stringify(state)) } catch { /* no-op */ }
-  return getCheckoutWallets(userId)
+  return setWalletConnection(userId, walletId)
 }
 export function rememberTimeout(key: string) { const state = readState(); if (!state.timedOutKeys.includes(key)) state.timedOutKeys.push(key); writeState(state) }
 export function consumeTimeout(key: string) { const state = readState(); if (!state.timedOutKeys.includes(key)) return false; state.timedOutKeys = state.timedOutKeys.filter((candidate) => candidate !== key); writeState(state); return true }
@@ -83,6 +77,5 @@ function readState(): StoredOrders {
   return { version: 1, orders: [], idempotency: {}, timedOutKeys: [] }
 }
 function writeState(state: StoredOrders) { try { localStorage.setItem(storageKey, JSON.stringify(state)) } catch { /* memory-only is acceptable for mock fallback */ } }
-function readWalletState(): Record<string, string> { try { const raw = localStorage.getItem('kurio:checkout-wallet-state'); if (raw) return JSON.parse(raw) as Record<string, string> } catch { /* use empty */ } return {} }
 function isStored(value: unknown): value is StoredOrders { return typeof value === 'object' && value !== null && (value as StoredOrders).version === 1 && Array.isArray((value as StoredOrders).orders) && typeof (value as StoredOrders).idempotency === 'object' }
 export type { CheckoutCollectorDetails }

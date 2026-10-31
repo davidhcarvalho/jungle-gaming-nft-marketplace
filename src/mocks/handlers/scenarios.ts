@@ -7,6 +7,7 @@ import { resetAuthMockState } from '@/mocks/state/auth-store'
 import { resetCartMockState } from '@/mocks/state/cart-store'
 import { resetOrderMockState } from '@/mocks/state/orders-store'
 import { resetCatalogPriceOverrides, setCatalogPriceOverride } from '@/mocks/state/catalog-price-overrides'
+import { resetProfileMockState } from '@/mocks/state/profile-store'
 
 export const scenarioHandlers = [
   http.post('/api/test-scenarios/reset', async ({ request }) => {
@@ -16,6 +17,7 @@ export const scenarioHandlers = [
     resetAuthMockState()
     resetCartMockState(activeScenario === 'cart-existing' || activeScenario === 'cart-existing-mutation-error')
     resetOrderMockState()
+    resetProfileMockState()
     resetCatalogPriceOverrides()
     return HttpResponse.json(createFoundationHealth(activeScenario))
   }),

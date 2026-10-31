@@ -1,4 +1,4 @@
-import type { MockScenario } from '@/mocks/scenarios/types'
+import { isMockScenario, type MockScenario } from '@/mocks/scenarios/types'
 
 const configuredScenario = import.meta.env.VITE_MOCK_SCENARIO
 const initialScenario: MockScenario = isConfiguredScenario(configuredScenario)
@@ -9,7 +9,7 @@ const scenarioStorageKey = 'kurio:mock-scenario'
 let currentScenario = readStoredScenario() ?? initialScenario
 
 function isConfiguredScenario(value: string | undefined): value is MockScenario {
-  return value !== undefined && ['default', 'slow', 'api-error', 'empty', 'catalog-error', 'detail-error', 'variable-latency', 'signup-conflict', 'session-expired', 'favorite-error', 'cart-error', 'cart-mutation-error', 'quote-error', 'cart-existing', 'cart-existing-mutation-error', 'checkout-price-changed', 'checkout-availability-changed', 'checkout-coupon-expired', 'checkout-fee-changed', 'wallet-rejected', 'wallet-disconnected', 'order-timeout-after-create', 'order-pending', 'order-rejected', 'order-server-error'].includes(value)
+  return isMockScenario(value)
 }
 
 export function getMockScenario() {

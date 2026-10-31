@@ -4,8 +4,18 @@
 
 ## Estado atual
 
-- Lote concluído: `05 — Checkout, Pedido e Confirmação` (**PASS**; Lotes 01–05 aprovados. Lote 06 e Lote 07 não iniciados).
-- Último lote concluído: `05 — Checkout, Pedido e Confirmação` (**PASS**; `spec:checkout-orders`: 46 PASS, 2 SKIPPED; `full`: 152 PASS, 7 SKIPPED, 0 FAIL. Revisão visual em `evidence/lot-05/visual-review.md`).
+- Lote concluído: `06 — Perfil e Carteiras` (**PASS**; Lotes 01–06 aprovados. Lote 07 não iniciado).
+- Último lote concluído: `06 — Perfil e Carteiras` (**PASS**; `spec:profile-wallets`: 70 PASS, 2 SKIPPED; `full`: 222 PASS, 9 SKIPPED, 0 FAIL. Gates estáticos PASS. Revisão visual em `evidence/lot-06/visual-review.md`).
+
+### Lote 06 — plano registrado antes da implementação
+
+- **Status final:** PASS; Lotes 01–06 aprovados. Escopo limitado a Perfil e Carteiras; nenhum Socket.IO funcional foi implementado.
+- **Inventário visual individual:** `design-reference/Desktop/Perfil do Colecionador.png` (2880×3314; base 1440×1657 CSS): header global, navegação de conta à esquerda, conteúdo principal à direita; título “Meu perfil”, avatar e ações alterar/remover; formulário em duas colunas para nome de exibição, username, e-mail, ENS e apelido de carteira; bloco de alteração de senha com senha atual/nova/confirmação e ação salvar. `design-reference/Desktop/Carteiras.png` (2880×3314; base 1440×1657 CSS): mesma navegação de conta e painel; seção “Carteira principal”, instrução e formulário/cadastro com nome, apelido, rede, endereço e dados opcionais de identidade ENS; seção secundária e ação adicionar. Em ambas, fundo escuro, contornos quentes, campos retangulares e CTA âmbar; o frame não define breakpoint móvel.
+- **Derivação mobile observada:** não há frames móveis de Perfil/Carteiras. A proposta será reaproveitar o header e tokens móveis aprovados, trocar a sidebar por navegação de conta horizontal/empilhada, reflow dos formulários para uma coluna, cartões de carteira e endereços visualmente truncados sem perder o valor acessível; evitar copiar a tabela/composição desktop para 390 px.
+- **Estado existente:** rotas `/profile` e `/wallets` protegidas pelo guard da sessão; `/profile` e `/wallets` eram placeholders antes do início deste lote. Sessão mock já mantém `passwordDigest` SHA-256 e query keys privadas já reservam `profile`, `wallets` e `checkoutWallets`. Checkout L05 serve duas carteiras estáticas separadas em `orders-store.ts`, logo precisa migrar para a store compartilhada sem alterar IDs/dados existentes.
+- **Arquivos previstos:** domínio/API; `src/features/profile/` e `src/features/wallets/` (API, queries, páginas e componentes); store e fixtures MSW compartilhados de perfil/carteiras; handlers de perfil/carteiras; integração do checkout à store compartilhada e reset de cenário; rotas protegidas; estilos responsivos; `tests/profile-wallets.spec.ts`; `evidence/lot-06/`; governança e revisão visual.
+- **Critérios de aceite:** perfil e avatar via Query→Axios→HTTP→MSW persistem no refresh; alteração de senha compara hash atual e salva somente hash; CRUD/lista de carteiras compartilhada com checkout, persistente e isolada por usuário; validação de rede/endereço e duplicidade no handler; uma principal por usuário aplicada na API; checkout reflete mutation; erros e sessão expirada tratados; fluxo responsivo 390/768/1440, acessível e comparado com referências; `spec:profile-wallets` e `full` PASS pelo Local Validation Runner sem regressões dos Lotes 01–05.
+- **Riscos iniciais:** preservar contratos/dados de carteira que L05 consome; evitar regressão em auth/session e cache privado; não armazenar senha em claro; aceitar apenas avatar de imagem de tamanho limitado; tratar endereços EVM sem alegar validação blockchain; executar Playwright somente via runner do host.
 
 ### Lote 05 — plano registrado antes da implementação
 
@@ -41,7 +51,7 @@
 - [x] Lote 03 — Autenticação, Sessão e Favoritos (**PASS**; E2E/runtime e revisão visual concluídos em 2026-10-31)
 - [x] Lote 04 — Carrinho e Cotação (**PASS**; gates estáticos e E2E via runner concluídos)
 - [x] Lote 05 — Checkout, Pedido e Confirmação
-- [ ] Lote 06 — Perfil e Carteiras
+- [x] Lote 06 — Perfil e Carteiras (**PASS**; spec 70 PASS/2 SKIPPED; full 222 PASS/9 SKIPPED)
 - [ ] Lote 07 — Tempo Real e Cenários de Falha
 - [ ] Lote 08 — Quality Gate, Deploy e Documentação
 - [ ] Lote 09 — Estudo e Defesa Técnica
@@ -206,15 +216,16 @@
 - Primeira execução de `full` (Request ID `1793463388-257338-22`): typecheck/lint/build/build com mocks PASS; E2E 149 PASS, 7 SKIPPED, 3 FAIL, todos no antigo teste L03 que acessava checkout sem carrinho e esperava o antigo placeholder “Pagamento”.
 - Teste L03 atualizado para preparar um NFT visitante antes de acessar `/checkout`, validar o retorno protegido na tela real e confirmar persistência após refresh. `spec:auth-favorites` passou em 25 PASS, 2 SKIPPED, 0 FAIL (Request ID `1793464166-257338-24`). O helper de cenário espera o catálogo montar antes do reset HTTP.
 - Foi adicionado teste explícito de imutabilidade do recibo após alteração de preço via MSW; a quote snapshot permaneceu estável após navegação e reload. O smoke Tailwind usa `toHaveCSS`, aguardando a transição de cor.
-- Evidências históricas regravadas pelo E2E em `evidence/lot-02/` e `evidence/lot-03/` foram restauradas do HEAD. `evidence/lot-01/` permaneceu intacta; não houve commits/remotes/pushes. Lote 06/07 não iniciados.
+- Evidências históricas regravadas pelo E2E em `evidence/lot-02/` e `evidence/lot-03/` foram restauradas do HEAD. `evidence/lot-01/` permaneceu intacta; não houve commits/remotes/pushes. Na data daquela execução, Lotes 06/07 ainda não iniciados.
 
 ### Lote 06
-- Status:
-- Comandos:
-- Testes:
-- Screenshots:
-- Evidências:
-- Pendências:
+- **Status: PASS** — Request `spec:profile-wallets` `1793469615-257338-37`: 70 PASS, 2 SKIPPED, 0 FAIL. Request `full` `1793469885-257338-38`: typecheck/lint/build/build com mocks PASS e Playwright E2E 222 PASS, 9 SKIPPED, 0 FAIL. Runner usou Node 24.22.1/npm 11.19.1.
+- **Implementado:** `/profile` e `/wallets` protegidas, Profile REST/MSW, edição e persistência dos dados, avatar (upload/remover) com validação de tipo/tamanho, troca de senha usando digest SHA-256 sem armazenar senha em claro; CRUD de wallets via REST/MSW, validação EVM/rede e duplicidade, store única por usuário compartilhada com checkout, persistência local mock e isolamento privado.
+- **Regra primária/secundária:** cada usuário mantém exatamente uma carteira principal; promover outra atualiza a anterior atomicamente na API mockada. As alterações invalidam dados privados de checkout e foram verificadas no checkout.
+- **Visual:** frames desktop abertos e comparados. A navegação de conta reflow para mobile, formulários usam uma coluna e carteiras aparecem em cartões com endereço truncado visualmente e completo no nome acessível. Não há frames mobile específicos; derivação documentada no ADR-009. Capturas: `profile-desktop-1440-review.png`, `profile-mobile-390-review.png`, `wallets-desktop-1440-review.png`, `wallets-mobile-390-review.png`; revisão em `evidence/lot-06/visual-review.md`.
+- **Comandos:** `npm run typecheck` PASS; `npm run lint` PASS; `npm run build` PASS; `VITE_ENABLE_MOCKS=true npm run build` PASS; via runner `spec:profile-wallets` PASS e `full` PASS.
+- **Desvios conhecidos:** nav de conta limitada às rotas/ações existentes no escopo; o frame Carteiras mostra formulário inicial sem carteiras, enquanto a captura demonstra os cartões primário/secundário reais exigidos pelo fluxo. O formulário de nova/edição contém somente label, rede, endereço e ENS suportados pelo contrato. Aviso Vite de bundle acima de 500 kB permanece conhecido e pertence ao Lote 08; não houve alteração ampla de performance.
+- Evidências de Lotes 02, 03 e 05 alteradas pela suíte completa foram restauradas do checkpoint. Nenhum commit, remote ou push foi criado. Lote 07 não iniciado.
 
 ### Lote 07
 - Status:

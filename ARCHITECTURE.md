@@ -83,3 +83,13 @@ Ao confirmar, o mock cria um snapshot de receipt com itens, edição, quantidade
 O harness MSW expõe um endpoint de teste restrito para alterar preço de fixture (`POST /api/test-scenarios/catalog-price`); a mutação persiste no estado local de mock e é limpa pelo reset de cenário. Playwright usa essa rota para comprovar que o catálogo muda enquanto o recibo confirmado conserva os valores capturados.
 
 O formulário de colecionador reaproveita dados da sessão e envia erros de validação pelo contrato do pedido. O frame mobile não possui formulário de colecionador; a composição mobile deriva a prioridade de carteira/rede/total e CTA do Figma, enquanto o formulário completo permanece no desktop. Não existe conexão de blockchain real e referências do explorer usam domínio `.invalid` de simulação.
+
+## Perfil e carteiras — Lote 06
+
+`/profile` e `/wallets` reutilizam o guard de sessão existente e usam APIs Axios/MSW (`GET/PATCH /api/profile`, `/api/profile/avatar`, `/api/profile/password` e `GET/POST/PATCH /api/wallets`). Queries privadas são keyed por `userId`. Mutations gravam os dados confirmados no cache do perfil/carteiras; alteração de carteira invalida especificamente a query privada de wallets usada pelo checkout.
+
+`src/mocks/state/wallets-store.ts` é a fonte única de carteiras para o perfil e para o checkout. Cada usuário tem exatamente uma principal; promover uma secundária troca as funções na mesma operação mock. Endereços EVM, rede e duplicidade são validados pelo handler. Persistência do estado mock sobrevive a refresh e o reset de cenários restaura os fixtures.
+
+O estado de perfil também é persistido por usuário na camada mock. Avatar é validado e transportado como data URL de imagem somente no ambiente de demonstração, com limite de tamanho e operação REST para upload/remoção. Senhas não são persistidas em claro: o handler verifica a senha atual e substitui o SHA-256 digest da conta mock. Isso continua sendo uma simulação local, sem storage externo nem serviço de autenticação de produção.
+
+Não há frames mobile de Perfil/Carteiras. ADR-009 registra a adaptação para uma coluna e a navegação refluída; os cartões de wallet mantêm o endereço integral em seu nome acessível mesmo quando o texto visual é truncado. O Lote 06 não adiciona conexão Socket.IO nem eventos; a implementação real continua reservada ao Lote 07.

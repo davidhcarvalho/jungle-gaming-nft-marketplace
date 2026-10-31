@@ -11,6 +11,16 @@ export interface Session {
   expiresAt: string
 }
 
+export interface CollectorProfile {
+  userId: string
+  displayName: string
+  username: string
+  email: string
+  ensName: string
+  walletNickname: string
+  avatarDataUrl?: string
+}
+
 export interface NFTEdition {
   id: string
   label: string
@@ -104,6 +114,7 @@ export interface Wallet {
   label: string
   networkId: string
   role: 'primary' | 'secondary'
+  ensName?: string
 }
 
 export type OrderStatus = 'pending' | 'confirmed' | 'rejected'

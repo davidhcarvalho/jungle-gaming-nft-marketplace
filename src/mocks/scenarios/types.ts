@@ -24,6 +24,12 @@ export const mockScenarioNames = [
   'order-pending',
   'order-rejected',
   'order-server-error',
+  'profile-error',
+  'profile-mutation-error',
+  'avatar-error',
+  'password-error',
+  'wallet-error',
+  'wallet-mutation-error',
 ] as const
 
 export type MockScenario = (typeof mockScenarioNames)[number]

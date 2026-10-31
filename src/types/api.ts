@@ -1,4 +1,4 @@
-import type { Cart, CartItem, Favorite, Network, Order, Quote, Receipt, Session, Wallet } from '@/types/domain'
+import type { Cart, CartItem, CollectorProfile, Favorite, Network, Order, Quote, Receipt, Session, Wallet } from '@/types/domain'
 import type { MockScenario } from '@/mocks/scenarios/types'
 import type { NFT } from '@/types/domain'
 
@@ -36,6 +36,13 @@ export interface FavoritesResponse {
   userId: string
   favorites: Favorite[]
 }
+
+export type ProfileResponse = CollectorProfile
+export type UpdateProfilePayload = Pick<CollectorProfile, 'displayName' | 'username' | 'email' | 'ensName' | 'walletNickname'>
+export interface UpdateAvatarPayload { avatarDataUrl: string }
+export interface ChangePasswordPayload { currentPassword: string; newPassword: string }
+export interface WalletsResponse { userId: string; wallets: Wallet[]; networks: Network[]; connectedWalletId?: string }
+export interface WalletPayload { address: string; label: string; networkId: string; ensName?: string; role?: Wallet['role'] }
 
 export type CartResponse = Cart
 

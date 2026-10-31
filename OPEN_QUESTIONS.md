@@ -2,9 +2,9 @@
 
 Este arquivo contém apenas lacunas reais. Não usar como desculpa para interromper trabalho que pode ser derivado com segurança.
 
-## Estado dos Lotes 04–05
+## Estado dos Lotes 04–06
 
-Os Lotes 04 e 05 foram validados e aprovados. No Lote 05, `spec:checkout-orders` passou (46 PASS, 2 SKIPPED) e `full` passou (152 PASS, 7 SKIPPED, sem falhas; gates estáticos verdes). Não há bloqueio específico de checkout/pedidos. As lacunas gerais Q1–Q5 abaixo continuam válidas; Lote 06 não iniciado.
+Os Lotes 04, 05 e 06 foram validados e aprovados. No Lote 06, `spec:profile-wallets` passou (70 PASS, 2 SKIPPED) e `full` passou (222 PASS, 9 SKIPPED, sem falhas; typecheck/lint/build/build com mocks verdes). Não há bloqueios ambientais ou funcionais em aberto para os Lotes 04–06. As lacunas gerais Q1–Q5 abaixo continuam válidas; Lote 07 ainda não iniciado.
 
 ## Q1 — Fonte exata
 
@@ -42,4 +42,4 @@ Cores aproximadas podem ser extraídas das screenshots, mas não são garantia d
 
 O Local Validation Runner executou `spec:auth-favorites` e `full` no host. O spec passou (25 PASS, 2 SKIPPED); o target full passou em typecheck/lint/build/build com mocks e na suíte E2E (68 PASS, 4 SKIPPED, 0 FAIL de 72). Capturas Login/Cadastro foram geradas e comparadas com as referências, com uma rodada de correção responsiva. Request IDs e detalhes estão em `PROGRESS.md`; revisão visual em `evidence/lot-03/visual-review.md`.
 
-Não há bloqueio de browser pendente. Lote 04 continua não iniciado.
+Não há bloqueio de browser pendente. Lotes 04–06 estão aprovados; Lote 07 continua não iniciado.

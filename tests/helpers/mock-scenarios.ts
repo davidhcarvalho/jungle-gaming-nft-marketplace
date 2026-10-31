@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 
-export type TestMockScenario = 'default' | 'slow' | 'empty' | 'catalog-error' | 'detail-error' | 'variable-latency' | 'signup-conflict' | 'session-expired' | 'favorite-error' | 'cart-error' | 'cart-mutation-error' | 'quote-error' | 'cart-existing' | 'cart-existing-mutation-error' | 'checkout-price-changed' | 'checkout-availability-changed' | 'checkout-coupon-expired' | 'checkout-fee-changed' | 'wallet-rejected' | 'wallet-disconnected' | 'order-timeout-after-create' | 'order-pending' | 'order-rejected' | 'order-server-error'
+export type TestMockScenario = 'default' | 'slow' | 'empty' | 'catalog-error' | 'detail-error' | 'variable-latency' | 'signup-conflict' | 'session-expired' | 'favorite-error' | 'cart-error' | 'cart-mutation-error' | 'quote-error' | 'cart-existing' | 'cart-existing-mutation-error' | 'checkout-price-changed' | 'checkout-availability-changed' | 'checkout-coupon-expired' | 'checkout-fee-changed' | 'wallet-rejected' | 'wallet-disconnected' | 'order-timeout-after-create' | 'order-pending' | 'order-rejected' | 'order-server-error' | 'profile-error' | 'profile-mutation-error' | 'avatar-error' | 'password-error' | 'wallet-error' | 'wallet-mutation-error'
 
 export async function setMockScenario(page: Page, scenario: TestMockScenario) {
   const isInitialNavigation = page.url() === 'about:blank'
