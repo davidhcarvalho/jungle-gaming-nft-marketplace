@@ -93,6 +93,44 @@ test('wallet selection, connection, network and disconnect are available', async
   await page.getByRole('button', { name: 'Desconectar' }).click()
 })
 
+test('manual wallet is used only for this purchase and saved selection returns when disabled', async ({ page }) => {
+  await prepare(page, 'default', false)
+  const walletSection = page.getByRole('region', { name: 'Carteira e rede' })
+  const savedWallet = walletSection.getByRole('radio', { name: /MetaMask · Principal/ })
+  await expect(savedWallet).toBeChecked()
+  await page.getByRole('checkbox', { name: 'Usar outra carteira?' }).check()
+  await expect(savedWallet).toHaveCount(0)
+  const provider = walletSection.getByRole('combobox', { name: 'Tipo de carteira manual' })
+  const address = walletSection.getByRole('textbox', { name: 'Endereço da carteira manual' })
+  await expect(provider).toBeVisible()
+  await expect(address).toBeVisible()
+  await address.fill('0x123')
+  await walletSection.getByRole('button', { name: 'Conectar carteira' }).click()
+  await expect(walletSection.getByRole('alert')).toContainText('42 caracteres')
+  const manualAddress = '0x1111111111111111111111111111111111111111'
+  await address.fill(manualAddress)
+  await provider.selectOption('WalletConnect')
+  await walletSection.getByRole('button', { name: 'Conectar carteira' }).click()
+  await expect(walletSection.getByRole('status')).toContainText('Carteira conectada')
+
+  const token = await page.evaluate(() => localStorage.getItem('kurio:session-token'))
+  const persistedWallets = await page.evaluate(async (sessionToken) => {
+    const response = await fetch('/api/wallets', { headers: { Authorization: `Bearer ${sessionToken ?? ''}` } })
+    return await response.json() as { wallets: Array<{ address: string }> }
+  }, token)
+  expect(persistedWallets.wallets.some((wallet) => wallet.address === manualAddress)).toBe(false)
+
+  await page.getByRole('checkbox', { name: 'Usar outra carteira?' }).uncheck()
+  await expect(walletSection.getByRole('radio', { name: /MetaMask · Principal/ })).toBeChecked()
+  await expect(walletSection.getByRole('status')).toHaveCount(0)
+  await page.getByRole('checkbox', { name: 'Usar outra carteira?' }).check()
+  await walletSection.getByRole('button', { name: 'Conectar carteira' }).click()
+  await expect(walletSection.getByRole('status')).toContainText('Carteira conectada')
+  await confirm(page)
+  await expect(page).toHaveURL(/\/orders\/order-/)
+  await expect(page.getByText(manualAddress, { exact: true })).toBeVisible()
+})
+
 test('revalidation change requires a second confirmation and displays the new authoritative quote', async ({ page }) => {
   await prepare(page, 'checkout-price-changed')
   await confirm(page)

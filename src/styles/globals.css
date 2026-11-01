@@ -341,10 +341,16 @@ button:disabled { cursor: not-allowed; }
 .footer-links-grid h2 { margin: 0 0 4px; color: #edecd2; font-size: 14px; }
 .footer-links-grid h3 { margin: 5px 0 0; color: #edecd2; font-size: 12px; }
 .footer-links-grid a:hover { color: #d69758; }
+.footer-action-link { border: 0; background: transparent; padding: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.footer-action-link:hover, .footer-action-link:focus-visible { color: #d69758; }
 .footer-socials { display: flex; gap: 6px; color: #d69758; }
-.footer-socials span { display: grid; width: 22px; height: 22px; place-items: center; border: 1px solid #986136; border-radius: 3px; font-size: 10px; font-weight: 700; }
+.footer-socials button { display: grid; width: 22px; height: 22px; place-items: center; border: 1px solid #986136; border-radius: 3px; background: transparent; color: inherit; font-size: 10px; font-weight: 700; cursor: pointer; }
+.footer-socials button:hover, .footer-socials button:focus-visible { background: #39241a; }
+.footer-unavailable-note { margin: 2px 0 0; color: #b7a28a; font-size: 9px; line-height: 1.4; }
 .wallet-labels { border: 1px solid #684628; border-radius: 4px; padding: 4px 6px; color: #d69758; font-size: 7px; }
 .footer-copyright { margin: 0; padding: 0 12px 18px; color: #b7a28a; text-align: center; font-size: 9px; }
+.site-announcement { position: fixed; z-index: 120; right: 20px; bottom: 20px; display: flex; max-width: min(420px, calc(100vw - 40px)); align-items: center; gap: 16px; border: 1px solid #745039; border-radius: 6px; background: #241612; padding: 11px 13px; color: #edecd2; box-shadow: 0 5px 20px #0008; font-size: 12px; line-height: 1.5; }
+.site-announcement button { flex: 0 0 auto; border: 0; background: transparent; color: #d69758; font-size: 20px; cursor: pointer; }
 
 /* Foundation smoke styles retained */
 .smoke-panel { border-color: #6f4a30; }
@@ -865,6 +871,8 @@ button:disabled { cursor: not-allowed; }
   .checkout-wallet-section .checkout-section-heading p { display: none; }
   .checkout-connected { font-size: 12px; }
   .collector-panel { display: none; }
+  .checkout-secondary-wallet { display: none !important; }
+  .checkout-manual-toggle-mobile { display: flex; }
   .checkout-panel h2, .checkout-summary h2 { font-size: 15px; }
   .checkout-wallet { min-height: 66px; padding: 8px; }
   .checkout-network { max-width: none; }
@@ -888,10 +896,25 @@ button:disabled { cursor: not-allowed; }
 .checkout-fields em { color: #e1836f; font-style: normal; }
 .checkout-secondary-wallet { grid-column: 1 / -1; display: flex !important; align-items: center; justify-content: flex-start; gap: 9px !important; }
 .checkout-secondary-wallet input { width: 16px; min-height: 16px; accent-color: #d69758; }
+.checkout-fields input[readonly] { color: #c9ae87; }
+.checkout-manual-wallet { display: grid; gap: 10px; border: 1px solid #493126; border-radius: 5px; margin: 12px 0 0; padding: 12px; }
+.checkout-manual-wallet[hidden] { display: none; }
+.checkout-manual-toggle { display: flex; align-items: center; gap: 9px; margin: 0 0 13px; color: #d6c9b5; font-size: 10px; cursor: pointer; }
+.checkout-manual-toggle-mobile { display: none; }
+@media (max-width: 640px) { .checkout-manual-toggle-mobile { display: flex; } }
+.checkout-manual-toggle input { accent-color: #d69758; }
+.checkout-manual-wallet legend { padding-inline: 5px; color: #d6c9b5; font-size: 10px; }
+.checkout-manual-wallet label { display: grid; gap: 6px; color: #b7a28a; font-size: 10px; }
+.checkout-manual-wallet select, .checkout-manual-wallet input { width: 100%; min-height: 42px; border: 1px solid #493126; border-radius: 4px; background: #1b110d; padding: 8px 10px; color: #edecd2; }
+.checkout-manual-wallet-help { margin: 0; color: #9e876b; font-size: 9px; line-height: 1.45; }
+.checkout-wallet-list.is-disabled { opacity: .48; }
+.checkout-wallet-list.is-disabled .checkout-wallet { cursor: not-allowed; }
+.checkout-manual-wallet-error { margin: 0; color: #ffb6a5; font-size: 10px; }
 
 /* Profile and wallet management (Lote 06) */
 .account-page { max-width: 1160px; margin: 0 auto; padding: 58px 0 88px; }
 .account-mobile-brand { display: none; }
+.account-mobile-back { display: none; }
 .account-layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); align-items: start; gap: 30px; }
 .account-sidebar { min-width: 0; border-radius: 4px; background: #241612; padding: 12px 10px; }
 .account-sidebar > h1 { margin: 0 0 8px; padding: 0 10px; color: #edecd2; font-size: 16px; line-height: 1.35; }
@@ -954,6 +977,9 @@ button:disabled { cursor: not-allowed; }
   .is-account-route .site-footer { display: none; }
   .is-account-route .main-content { width: 100%; }
   .account-mobile-brand { display: inline-flex; margin-bottom: 20px; color: #edecd2; font-size: 12px; font-weight: 800; letter-spacing: .18em; }
+  .account-mobile-back { display: inline-flex; min-height: 40px; align-items: center; gap: 7px; border: 0; background: transparent; padding: 0; color: #d69758; font: inherit; font-size: 12px; cursor: pointer; }
+  .account-mobile-back span { font-size: 23px; line-height: 1; }
+  .account-mobile-back + .account-mobile-brand { margin-left: 20px; }
   .account-page { width: 100%; padding: 24px 18px 48px; }
   .account-sidebar { background: transparent; padding: 0; }
   .account-sidebar > h1 { margin: 0 0 10px; padding: 0; font-size: 22px; }

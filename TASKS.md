@@ -114,7 +114,7 @@ Este arquivo é uma visão rápida. Os critérios completos estão em `lots/`.
 - [x] production deep links, refresh e assets essenciais
 
 ## 09 — Study
-- **PASS (conteúdo):** material baseado no código, ADRs, testes e evidências reais em `study/`; deploy do Lote 08 sincronizado com `7b82d92` antes do início. Commit local ainda pendente porque `.git/index` é somente leitura neste sandbox.
+- **PASS (conteúdo):** material baseado no código, ADRs, testes e evidências reais em `study/`; deploy do Lote 08 sincronizado com `7b82d92` antes do início. Commit local confirmado: `3936ae7 docs: add interview preparation materials`; `main` acompanha `origin/main`.
 - [x] architecture walkthrough
 - [x] request flow
 - [x] session
@@ -124,3 +124,13 @@ Este arquivo é uma visão rápida. Os critérios completos estão em `lots/`.
 - [x] tests
 - [x] trade-offs
 - [x] mock interview / autoensaio
+
+
+## Final polish — fechamento preparado
+- [x] retorno mobile seguro em Perfil/Carteiras
+- [x] auditoria de navegação, hashes e footer/social com feedback acessível
+- [x] carteira manual temporária do checkout, sincronizada com seleção salva e não persistida
+- [x] limpeza de ZIPs e batches Lighthouse superseded; evidências históricas restauradas
+- [x] `spec:checkout-orders`, `spec:profile-wallets`, `spec:catalog`, `spec:final-polish` e `full` passaram; `full`: 267 PASS, 33 SKIPPED, 0 FAIL; gates estáticos PASS
+- [x] Lighthouse final 12/12; relatório/medianas e limites atualizados em `evidence/lighthouse/analysis.md`
+- Estado Git inicial confirmado no início desta rodada: `3936ae7` em `main`, acompanhando `origin/main`; nenhuma alteração staged, commit/push/deploy final não realizados.

@@ -28,7 +28,7 @@ test('direct NFT access selects an edition and enforces quantity limit', async (
     await expect(purchaseSummary.getByRole('button', { name: 'Comprar NFT' })).toBeEnabled()
   } else {
     await expect(page.getByRole('status', { name: 'Limite de compra' })).toContainText(/limite de 3 unidades por compra/)
-    await expect(page.getByRole('button', { name: 'Comprar NFT' })).toBeEnabled()
+    await expect(page.getByTestId('nft-detail').getByRole('button', { name: 'Comprar NFT', exact: true })).toBeEnabled()
   }
 })
 

@@ -24,7 +24,7 @@
 
 ## Lote 09 — material de entrevista
 
-- **LOT 09 STATUS: PASS (conteúdo documental); checkpoint pendente no host.** Notas, mapa, roteiro de demo e perguntas de autoensaio estão em `study/`; nenhuma funcionalidade do produto foi alterada. Sandbox rejeitou `git add` ao criar `.git/index.lock` por filesystem read-only.
+- **LOT 09 STATUS: PASS.** Commit `3936ae7 docs: add interview preparation materials` está em `main`; no início desta rodada `origin/main` estava sincronizado e o working tree limpo. Notas, mapa, roteiro de demo e autoensaio permanecem em `study/`.
 - O próximo passo pessoal é treinar as perguntas sem assistência e revisar todo tema com confiança menor que 4/5. O ensaio oral não foi observado pelo agente.
 - A sincronização de produção L08 está confirmada em `7b82d92`; public smoke final `1793520674-575891-16` passou. Lighthouse não foi reexecutado após deploy idêntico.
 
@@ -140,3 +140,12 @@ Em ambiente com bind local permitido, executar `PLAYWRIGHT_BROWSERS_PATH="$PWD/.
 - `q` pertence aos parâmetros de `queryKeys.catalog.list`; `retry-this-request` portanto cria nova query key. `useNFTCatalog` usa `placeholderData: previousData`, que mantém os resultados anteriores durante o carregamento da nova key. Se a nova key falha antes de ter dados próprios, o estado terminal fica `isError && !data`; Home mostra o alerta primário “Não foi possível carregar o mercado.” e não mantém os cards da key anterior. A screenshot/error-context confirmou esse estado nos viewports. A assertion anterior sobre “Os resultados anteriores continuam visíveis” era semanticamente incorreta para essa falha de nova busca.
 - Teste corrigido para validar erro primário, limpar o cenário para `default`, clicar “Tentar novamente” e verificar o empty state esperado para `retry-this-request`. Foi adicionado caso separado para falha de refetch da mesma key após reconexão, cenário real sustentado por `refetchOnReconnect`; ele verifica manutenção dos 12 resultados, feedback de atualização e retry com recuperação.
 - Node 24.22.1: typecheck PASS; lint PASS; build PASS (236 módulos); build com `VITE_ENABLE_MOCKS=true` PASS (474 módulos). Teste Playwright focado foi tentado, mas webServer não iniciou; reprodução manual de Vite em porta alternativa confirmou `listen EPERM: operation not permitted 127.0.0.1:4199`. Nenhum teste browser executou após a correção; a suíte e o teste novo de background precisam reexecução externa. Lote 02 permanece BLOCKED; não iniciar Lote 03.
+
+
+## Handoff — Final Polish
+
+- Estado atual: polish concluído; não foram feitos commit, push ou deploy. Lote 01 permaneceu intacto.
+- Alterações: retorno mobile em Perfil/Carteiras; navegação sem hashes mortos; footer/social com feedback; seleção unificada de carteira no checkout e modo manual efêmero testado. Nenhuma tela/store de NFTs possuídos foi criada.
+- Quality: specs focados e `full` final PASS; E2E 267 PASS, 33 SKIPPED, 0 FAIL; Lighthouse 12/12 executado. Resultados de Performance abaixo do alvo e causas estão em `evidence/lighthouse/analysis.md`.
+- Evidências históricas de lotes 02–07 foram restauradas; baseline payment mobile atualizada intencionalmente; as novas capturas estão em `evidence/final-polish/`. Batch Lighthouse final único em `evidence/lighthouse/batch-2026-11-01T16-58-48-327Z/`. `study/` preservado.
+- O workspace está pronto para revisão e stage explícito. Verifique a lista de arquivos apresentada ao usuário; não stage/commit automaticamente.

@@ -4,14 +4,28 @@ import { multiplyEth, weiToEth } from '@/lib/eth-decimal'
 import type { CheckoutCollectorDetails, CreateOrderPayload } from '@/types/api'
 import type { Network, Order, OrderItem, Receipt, Wallet } from '@/types/domain'
 
-interface StoredOrders { version: 1; orders: Order[]; idempotency: Record<string, { payload: string; orderId: string }>; timedOutKeys: string[] }
+interface StoredOrders { version: 1; orders: Order[]; idempotency: Record<string, { payload: string; orderId: string }>; timedOutKeys: string[]; manualConnectionsByUser?: Record<string, Wallet> }
 const storageKey = 'kurio:mock-orders-state'
 export function resetOrderMockState() { try { localStorage.removeItem(storageKey) } catch { /* deterministic in-memory fallback */ }; resetWalletMockState() }
 export function getCheckoutWallets(userId: string) {
-  return getWalletsForUser(userId)
+  const savedWallets = getWalletsForUser(userId)
+  const connectedManualWallet = readState().manualConnectionsByUser?.[userId]
+  return { ...savedWallets, connectedWalletId: connectedManualWallet?.id ?? savedWallets.connectedWalletId, ...(connectedManualWallet ? { connectedManualWallet: structuredClone(connectedManualWallet) } : {}) }
 }
 export function setConnectedWallet(userId: string, walletId?: string) {
+  const state = readState()
+  if (state.manualConnectionsByUser) delete state.manualConnectionsByUser[userId]
+  writeState(state)
   return setWalletConnection(userId, walletId)
+}
+export function setConnectedManualWallet(userId: string, input: { provider: string; address: string; networkId: string }) {
+  setWalletConnection(userId)
+  const state = readState()
+  const wallet: Wallet = { id: `manual:${input.networkId}:${input.address.toLowerCase()}`, address: input.address, label: input.provider, networkId: input.networkId, role: 'secondary' }
+  state.manualConnectionsByUser ??= {}
+  state.manualConnectionsByUser[userId] = wallet
+  writeState(state)
+  return getCheckoutWallets(userId)
 }
 export function rememberTimeout(key: string) { const state = readState(); if (!state.timedOutKeys.includes(key)) state.timedOutKeys.push(key); writeState(state) }
 export function consumeTimeout(key: string) { const state = readState(); if (!state.timedOutKeys.includes(key)) return false; state.timedOutKeys = state.timedOutKeys.filter((candidate) => candidate !== key); writeState(state); return true }

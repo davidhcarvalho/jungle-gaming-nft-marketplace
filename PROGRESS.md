@@ -70,7 +70,7 @@
 - Conferência contra código e docs: Query keys privadas por owner; catálogo encaminha signal e usa `placeholderData`; Axios centraliza headers/timeout; login limpa cache privado; guest merge, BigInt wei, quote, idempotência, receipt snapshot, stores unificadas de wallets, binding Socket.IO/versionamento/reconnect foram descritos com fontes reais.
 - Limites declarados: backend/pagamento/blockchain simulados; fallback de arte, fonte desconhecida e Performance Lighthouse abaixo de 90 explícitos. Relatórios Lighthouse são referenciados pelo request/batch final; não houve nova auditoria após deploy de código idêntico.
 - Lote 08 confirmado PASS após redeploy do commit `7b82d92` (runner Request `1793520488-575891-14`) e public smoke PASS `1793520674-575891-16`, incluindo rotas profundas, refresh, MSW REST, Socket.IO e protected redirects.
-- **LOT 09 STATUS: PASS (conteúdo documental).** `git diff --check` passou; staging/commit solicitado falhou ao criar `.git/index.lock` por filesystem read-only. Isso não afirma que o ensaio oral do candidato foi observado; os exercícios sem IA estão em `study/WEAK_QUESTIONS.md`. Commit `docs: add interview preparation materials` deve ser feito no host.
+- **LOT 09 STATUS: PASS.** Commit `3936ae7 docs: add interview preparation materials` existe em `main`; `origin/main` estava sincronizado no início do Final Polish. O ensaio oral não foi observado pelo agente; os exercícios sem IA estão em `study/WEAK_QUESTIONS.md`.
 
 ## Evidências por lote
 
@@ -369,3 +369,16 @@ Para ser concluído deve, conforme aplicável:
 - Smoke pós-commit Request `1793520674-575891-16` PASS. Cobertura: Home/catalog REST/MSW, Socket.IO conectado, NFT detail direto/refresh, Cart/Login/Signup direto/refresh, guards Checkout/Order/Profile/Wallet com returnTo e refresh, sessão autenticada, assets essenciais, sem overflow e sem erros inesperados.
 - Uma primeira repetição após o redeploy teve resposta transitória 404 vazia em `/api/cart`; sem alteração de código, uma execução nova passou. A evidência final é a execução PASS `1793520674-575891-16`.
 - **LOT 08 STATUS: PASS**; Lote 09 liberado. Lighthouse não reexecutado: o código auditado não mudou após os relatórios versionados.
+
+
+## Final polish — 2026-11-01
+
+- Back mobile de `/profile` e `/wallets` usa o último contexto interno seguro conhecido e substitui a rota de conta para evitar loop; Home é fallback.
+- Navegação principal/mobile/footer auditada. Links Mercado agora serializam `#catalog` corretamente e os destinos existem/rolam após Home lazy mount. Favoritos sem listagem e ações editoriais/sociais sem destino real dão feedback acessível sem hashes/URLs inventados. “Enviar” anuncia indisponibilidade sem aumentar a altura permanente do footer. Owned NFTs continua explicitamente fora do escopo.
+- Checkout: cartão de carteira cadastrada é fonte de seleção; campos do formulário são read-only e derivados. “Usar outra carteira?” coleta provider, rede e endereço, valida/conecta pela API, usa a identidade efêmera no pedido e não grava em `/api/wallets`; desativar restaura a carteira salva.
+- Testes focados: `spec:checkout-orders` passou (51 testes descobertos; todos elegíveis passaram, 3 skips responsive intencionais); `spec:profile-wallets` passou; `spec:catalog` 20 PASS/1 SKIP; `spec:final-polish` 7 PASS/8 SKIP. O `full` final passou typecheck, lint, build normal, build com mocks e E2E 267 PASS/33 SKIPPED/0 FAIL. `test-results/.last-run.json` indica `passed`, sem error contexts.
+- Regressão visual: preservada a baseline histórica do mobile payment e atualizada apenas `evidence/lot-08/visual-baselines/payment-mobile-390.png` pelo novo checkbox requerido. Capturas finais Home/Profile/Wallets/Checkout em `evidence/final-polish/` foram abertas e comparadas; visual mobile e desktop conferido.
+- Lighthouse final Request `1793552324-575891-33`: 12/12 no production preview com mocks, 3 runs por página/perfil, emulação desktop 1440×900 e mobile 390×844. Medianas P 75/50/78/52, A 100/96, BP/SEO 100; LCP 3706.27/3806.70/3520.92/3919.36 ms, CLS 0/0.07/0/0.03, TBT 582/768/529.5/712.88 ms (Home mobile/desktop; detalhe mobile/desktop). Performance abaixo da meta justificada conforme README. Batch final em `evidence/lighthouse/batch-2026-11-01T16-58-48-327Z/`; batches anteriores e cópias raiz removidos.
+- Arquivos históricos de captura gerados pelo `full` nos Lotes 02–07 foram restaurados byte a byte de HEAD. Lote 01 permaneceu intacto. `study/` preservado.
+- ZIPs de revisão removidos: `lot-02-evidence.zip` e `lot-02-evidence-final.zip`. Nenhum diretório de build/cache local está versionado.
+- A rodada começou em `3936ae7 docs: add interview preparation materials`, `main` apontava para `origin/main` e working tree estava limpo. Nenhum commit, push ou deploy final foi feito.

@@ -351,6 +351,21 @@ Manter os PNG originais exportados do Figma como fonte e servir derivados WebP c
 Manter Lighthouse em `throttlingMethod: simulate`, no preview do build demo, com três medições por página/perfil e todas as funcionalidades da entrega habilitadas. A inicialização MSW continua anterior à montagem React para impedir requests iniciais fora do worker. Um experimento que montava React antes da inicialização (com gate no Axios) foi revertido porque elevou LCP simulado de aproximadamente 3,6 s para cerca de 5 s.
 
 #### Evidência e consequência
-Requests `1793501317-485327-4`, `1793502860-485327-11` e `1793508017-485327-23` registram as iterações iniciais da auditoria. O batch mais recente, Request `1793511419-550281-4`, completou 12/12 no production preview com mocks: Performance 69/49/76/52 (Home mobile/desktop, detalhe mobile/desktop); Accessibility 100/96; Best Practices/SEO 100; LCP 3.53–3.92 s; CLS 0–0.07; TBT 539–916.5 ms. Conforme a fonte de verdade README, as metas abaixo devem ser justificadas; Performance abaixo de 90, isoladamente, não é critério eliminatório. A análise atual e o diagnóstico completo estão em `evidence/lighthouse/analysis.md`; a auditoria manteve mocks e funcionalidades da entrega.
+A rodada final de polish, Request `1793552324-575891-33`, completou as 12 medições no preview otimizado com mocks. Medianas de Performance Home mobile/desktop e detalhe mobile/desktop: 75/50/78/52; Accessibility 100/96; Best Practices e SEO 100; LCP 3520.92–3919.36 ms; CLS 0–0.07; TBT 529.5–768 ms. LCP, breakdown, boot-up, long tasks, unused JavaScript, imagens e fontes estão analisados em `evidence/lighthouse/analysis.md`; os 12 HTML/JSON finais e summaries ficam em `evidence/lighthouse/batch-2026-11-01T16-58-48-327Z/`. As metas abaixo de Performance são justificadas e o resultado segue a interpretação do README. Batches anteriores e duplicatas raiz foram removidos como superseded.
 
 Os comandos Vercel e de atualização das baselines foram adicionados à whitelist fixa do Local Validation Runner; nenhum argumento de shell vem do arquivo request.
+
+### ADR-012 — Navegação sem destinos falsos e carteira manual do checkout
+
+**Data:** 2026-11-01
+**Lote:** Final polish
+**Status:** Aceito
+
+#### Contexto
+Na revisão manual, a navegação de retorno nas páginas de conta mobile estava ausente; ações de navegação e redes sociais apontavam para destinos indisponíveis; e o checkout permitia que dois controles selecionassem carteiras diferentes. O checkbox “Usar outra carteira?” não participava da conexão nem do pedido.
+
+#### Decisão
+Perfil e carteiras oferecem retorno ao último contexto seguro visitado pelo Router, com Home como fallback. Anchors apontam a seções existentes; destinos auxiliares fora do escopo e redes sociais sem URL fornecida preservam sua representação, mas respondem com um status acessível sem criar URLs fictícias. No checkout, cartões de carteiras salvas são o seletor autoritativo; os campos espelhados do formulário são somente leitura. O modo manual coleta provider, rede e endereço, valida na API mockada, permite conectar para a tentativa atual e nunca persiste a carteira em `/api/wallets`. Desativá-lo desconecta essa carteira e retorna à seleção salva.
+
+#### Consequências
+Os pedidos e recibos preservam a carteira efetivamente conectada no contrato REST; quote, revalidação e idempotência não mudam. A interface não promete uma área de coleção pessoal de NFTs possuídos, que permanece uma possível extensão futura.

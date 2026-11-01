@@ -1,10 +1,12 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 import { useLogout } from '@/features/auth/queries'
+import { navigateBackToAccountContext } from '@/lib/account-navigation'
 
 export function AccountLayout({ active, children }: { active: 'profile' | 'wallets'; children: ReactNode }) {
   const logout = useLogout(); const navigate = useNavigate()
   return <section className="account-page" aria-labelledby="account-title">
+    <button className="account-mobile-back" type="button" aria-label="Voltar à página anterior" onClick={() => navigateBackToAccountContext(navigate)}><span aria-hidden="true">‹</span> Voltar</button>
     <Link className="account-mobile-brand" to="/" search={{ page: 1, sort: 'recent' }} aria-label="KURIO, início">KURIO</Link>
     <div className="account-layout">
       <aside className="account-sidebar">

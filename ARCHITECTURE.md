@@ -84,6 +84,8 @@ O harness MSW expõe um endpoint de teste restrito para alterar preço de fixtur
 
 O formulário de colecionador reaproveita dados da sessão e envia erros de validação pelo contrato do pedido. O frame mobile não possui formulário de colecionador; a composição mobile deriva a prioridade de carteira/rede/total e CTA do Figma, enquanto o formulário completo permanece no desktop. Não existe conexão de blockchain real e referências do explorer usam domínio `.invalid` de simulação.
 
+A seleção de carteira no checkout tem uma única origem: os cartões escolhem carteiras cadastradas, e os campos de perfil à esquerda apenas refletem a carteira/rede ativa. “Usar outra carteira?” alterna para provider, endereço e rede validados por `POST /api/checkout/wallets/connect`; a conexão manual fica isolada ao pedido, não é salva em `/api/wallets` e é desconectada ao retornar ao modo salvo. A quote, revalidação, idempotência e snapshot do recibo continuam usando a carteira ativa do contrato REST.
+
 ## Sincronização realtime — Lote 07
 
 `src/realtime/socket-client.ts` cria uma conexão `socket.io-client@4.8.4` por contexto de sessão, com transporte WebSocket e reconexão habilitada. O import do cliente é dinâmico após o bootstrap MSW, para que o browser use o WebSocket interceptável. `RealtimeProvider` associa a conexão à sessão atual, instala listeners uma vez por lifecycle e remove listeners/desconecta em logout, troca de usuário e unmount.

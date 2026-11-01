@@ -56,11 +56,11 @@ O host instalou `@mswjs/socket.io-binding@0.2.0`. A inspeção direta de package
 
 ## Q9 — Deploy público obrigatório — RESOLVIDO
 
-Projeto Vercel `kurio-nft-marketplace` publicado no team `dusk15`; URL `https://kurio-nft-marketplace-zeta.vercel.app`. `public-smoke` passou em produção: rotas e refresh, MSW REST, Socket.IO, isolamento/redirect de rotas protegidas e ausência de erros inesperados. O Vercel não vinculou automaticamente GitHub por falta de Login Connection, mas deploy direto pelo CLI autorizado funcionou. Após criar o commit L08, publicar novamente e repetir smoke para associar o runtime ao código final commitado.
+Projeto Vercel `kurio-nft-marketplace` publicado no team `dusk15`; URL `https://kurio-nft-marketplace-zeta.vercel.app`. `public-smoke` passou em produção: rotas e refresh, MSW REST, Socket.IO, isolamento/redirect de rotas protegidas e ausência de erros inesperados. O Vercel não vinculou automaticamente GitHub por falta de Login Connection, mas deploy direto pelo CLI autorizado funcionou. Após o commit L08, a produção foi redeployada e o smoke pós-commit passou.
 
 ## Q10 — Performance Lighthouse
 
-Resolvido por interpretação conforme README: Request `1793511419-550281-4` completou três medições por página/perfil e registrou medianas, LCP/CLS/TBT e causas em `evidence/lighthouse/analysis.md`. Accessibility, Best Practices e SEO atingiram as metas. Performance mediana foi 69/49 (Home mobile/desktop) e 76/52 (detalhe mobile/desktop); abaixo da meta, mas não bloqueia isoladamente. Diagnóstico aponta JS/bootstrap + MSW sob throttling, render delay desktop e descoberta da arte Home mobile depois da API; não há falha de medição/configuração nem simplificação artificial.
+Resolvido por interpretação conforme README. A rodada final Request `1793552324-575891-33` completou 12/12, três medições por página/perfil, com mediana/LCP/CLS/TBT e causas em `evidence/lighthouse/analysis.md`. Accessibility 100/96, Best Practices 100 e SEO 100; Performance 75/50 (Home mobile/desktop) e 78/52 (detalhe mobile/desktop), abaixo do alvo mas justificada conforme o README. Relatórios individuais finais em `evidence/lighthouse/batch-2026-11-01T16-58-48-327Z/`; batches antigos removidos como superseded.
 
 ## Q11 — Commit/push do Lote 08 no host — RESOLVIDO
 

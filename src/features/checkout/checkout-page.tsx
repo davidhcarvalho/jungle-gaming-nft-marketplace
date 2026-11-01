@@ -9,8 +9,10 @@ import { useSession } from '@/features/auth/queries'
 import { useCart, useCartQuote } from '@/features/cart/queries'
 import { useConnectWallet, useCreateOrder, useDisconnectWallet, useRevalidateCheckout, useCheckoutWallets } from './queries'
 import { finishAttempt, getOrCreateAttemptKey } from './model'
-import type { CheckoutCollectorDetails, CreateOrderPayload } from '@/types/api'
-import type { Quote } from '@/types/domain'
+import type { CheckoutCollectorDetails, CreateOrderPayload, ManualCheckoutWalletPayload } from '@/types/api'
+import type { Quote, Wallet } from '@/types/domain'
+
+const manualProviders: ManualCheckoutWalletPayload['provider'][] = ['MetaMask', 'WalletConnect', 'Coinbase Wallet']
 
 export function CheckoutPage() {
   const session = useSession()
@@ -26,23 +28,67 @@ export function CheckoutPage() {
   const [walletId, setWalletId] = useState('')
   const [networkId, setNetworkId] = useState('ethereum')
   const [collector, setCollector] = useState<CheckoutCollectorDetails>({ displayName: session.data?.user.displayName ?? '', username: session.data?.user.email.split('@')[0] ?? '', profileName: session.data?.user.displayName ?? '', email: session.data?.user.email ?? '', ensName: '.eth', note: '' })
+  const [manualMode, setManualMode] = useState(false)
+  const [manualProvider, setManualProvider] = useState<ManualCheckoutWalletPayload['provider']>('MetaMask')
+  const [manualAddress, setManualAddress] = useState('')
   const [fieldError, setFieldError] = useState('')
+  const [manualError, setManualError] = useState('')
   const [freshQuote, setFreshQuote] = useState<Quote | undefined>()
   const [changes, setChanges] = useState<string[]>([])
   const [feedback, setFeedback] = useState('')
   const [submitted, setSubmitted] = useState(false)
-  const activeWalletId = walletId || wallets.data?.wallets[0]?.id || ''
-  const activeWallet = wallets.data?.wallets.find((wallet) => wallet.id === activeWalletId)
+
+  const savedWalletId = walletId || wallets.data?.wallets[0]?.id || ''
+  const selectedSavedWallet = wallets.data?.wallets.find((wallet) => wallet.id === savedWalletId)
+  const manualWallet: Wallet | undefined = manualMode && manualAddress
+    ? { id: `manual:${networkId}:${manualAddress.toLowerCase()}`, address: manualAddress, label: manualProvider, networkId, role: 'secondary' }
+    : undefined
+  const activeWallet = manualMode ? manualWallet : selectedSavedWallet
+  const connectedWalletId = wallets.data?.connectedWalletId
+  const isConnected = Boolean(!disconnect.isPending && activeWallet && connectedWalletId === activeWallet.id)
   const selectedQuote = freshQuote ?? quoteQuery.data
   const busy = revalidate.isPending || create.isPending
   const realtimeQuoteAffected = isNftRealtimeUpdateForItems(realtime, cart.data?.items.map((item) => item.nftId) ?? [])
   const realtimeReviewRequired = Boolean(realtimeQuoteAffected && realtime.lastNftUpdate
     && realtime.lastNftUpdate.version > (Number(sessionStorage.getItem(`kurio:realtime-reviewed-version:${realtime.lastNftUpdate.nftId}`)) || 0))
 
+  function changeManualMode(enabled: boolean) {
+    setManualMode(enabled)
+    setManualError('')
+    setFieldError('')
+    setFeedback('')
+    if (!enabled && wallets.data?.connectedManualWallet) disconnect.mutate(undefined, { onError: (error) => setFeedback(getApiError(error).message) })
+  }
+
+  function chooseSavedWallet(id: string) {
+    setWalletId(id)
+    const wallet = wallets.data?.wallets.find((candidate) => candidate.id === id)
+    if (wallet) setNetworkId(wallet.networkId)
+    setFeedback('')
+  }
+
+  function connectActiveWallet() {
+    if (!activeWallet) {
+      setManualError('Informe um endereço de carteira válido para esta compra.')
+      return
+    }
+    if (manualMode && !/^0x[\da-fA-F]{40}$/.test(manualAddress)) {
+      setManualError('Informe um endereço Ethereum válido com 42 caracteres.')
+      return
+    }
+    setManualError('')
+    connect.mutate(manualMode
+      ? { manualWallet: { provider: manualProvider, address: manualAddress, networkId } }
+      : { walletId: activeWallet.id }, {
+      onError: (error) => setFeedback(getApiError(error).message),
+    })
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setFieldError(''); setFeedback('')
     if (!collector.displayName.trim() || !collector.username?.trim() || !collector.profileName?.trim() || !/^\S+@\S+\.\S+$/.test(collector.email)) { setFieldError('Revise nome, usuário, perfil e e-mail do colecionador.'); return }
-    if (!activeWallet || wallets.data?.connectedWalletId !== activeWallet.id) { setFieldError('Conecte uma carteira cadastrada para continuar.'); return }
+    if (manualMode && !/^0x[\da-fA-F]{40}$/.test(manualAddress)) { setManualError('Informe um endereço Ethereum válido com 42 caracteres.'); return }
+    if (!activeWallet || !isConnected) { setFieldError('Conecte a carteira selecionada para continuar.'); return }
     if (!cart.data?.items.length || !selectedQuote) { setFieldError('Seu carrinho ou cotação ainda não está disponível.'); return }
     try {
       const fresh = await revalidate.mutateAsync({ quoteId: selectedQuote.id, networkId })
@@ -77,24 +123,32 @@ export function CheckoutPage() {
   if (cart.isError || quoteQuery.isError || wallets.isError || !cart.data || !quoteQuery.data) return <section className="checkout-page" role="alert"><h1>Não foi possível preparar o pagamento</h1><p>Revise o carrinho e tente novamente.</p><Button onClick={() => { void cart.refetch(); void quoteQuery.refetch(); void wallets.refetch() }}>Tentar novamente</Button></section>
   if (!cart.data.items.length) return <section className="checkout-page" data-testid="checkout-empty"><h1>Seu carrinho está vazio</h1><Link to="/cart">Voltar ao carrinho</Link></section>
 
+  const manualControls = <fieldset className="checkout-manual-wallet" disabled={!manualMode} aria-label="Carteira diferente para esta compra" hidden={!manualMode}>
+    <legend>Carteira somente nesta compra</legend>
+    <p className="checkout-manual-wallet-help">Esta carteira será usada apenas neste pedido e não será salva na sua conta.</p>
+    <label>Tipo de carteira<select aria-label="Tipo de carteira manual" value={manualProvider} onChange={(event) => setManualProvider(event.target.value as ManualCheckoutWalletPayload['provider'])}>{manualProviders.map((provider) => <option key={provider} value={provider}>{provider}</option>)}</select></label>
+    <label>Endereço da carteira<input aria-label="Endereço da carteira manual" autoComplete="off" inputMode="text" value={manualAddress} onChange={(event) => { setManualAddress(event.target.value); setManualError('') }} aria-invalid={Boolean(manualError)} aria-describedby={manualError ? 'manual-wallet-error' : undefined} /></label>
+    {manualError && <p id="manual-wallet-error" className="checkout-manual-wallet-error" role="alert">{manualError}</p>}
+  </fieldset>
+
   return <div className="checkout-page" data-testid="checkout-page">
     <nav className="checkout-breadcrumb" aria-label="Breadcrumb"><Link to="/cart">Carrinho</Link><span aria-hidden="true">/</span><span aria-current="page">Pagamento</span></nav>
-      <header className="checkout-heading"><Link to="/cart" aria-label="Voltar ao carrinho">‹</Link><div><p className="eyebrow">FINALIZAR COMPRA</p><h1><span className="checkout-title-desktop">Pagamento</span><span className="checkout-title-mobile">Pagamento com carteira</span></h1></div></header>
+    <header className="checkout-heading"><Link to="/cart" aria-label="Voltar ao carrinho">‹</Link><div><p className="eyebrow">FINALIZAR COMPRA</p><h1><span className="checkout-title-desktop">Pagamento</span><span className="checkout-title-mobile">Pagamento com carteira</span></h1></div></header>
     <form id="checkout-form" className="checkout-layout" onSubmit={handleSubmit} noValidate>
       <section className="checkout-main-column" aria-label="Dados e pagamento">
         <section className="checkout-panel collector-panel" aria-labelledby="collector-heading"><h2 id="collector-heading">Perfil do colecionador</h2><p>Confira as informações para registrar seu pedido.</p>
           <div className="checkout-fields">
             <label><span>Nome de exibição <em aria-hidden="true">*</em></span><input aria-describedby={fieldError ? 'collector-field-error' : undefined} aria-invalid={Boolean(fieldError)} autoComplete="name" value={collector.displayName} onChange={(e) => setCollector({ ...collector, displayName: e.target.value })} required /></label>
             <label><span>Nome de usuário <em aria-hidden="true">*</em></span><input aria-describedby={fieldError ? 'collector-field-error' : undefined} aria-invalid={Boolean(fieldError)} autoComplete="username" value={collector.username ?? ''} onChange={(e) => setCollector({ ...collector, username: e.target.value })} required /></label>
-            <label><span>Rede <em aria-hidden="true">*</em></span><select aria-label="Rede de pagamento" value={networkId} onChange={(e) => setNetworkId(e.target.value)}>{wallets.data.networks.map((network) => <option key={network.id} value={network.id}>{network.name}</option>)}</select></label>
+            <label><span>Rede <em aria-hidden="true">*</em></span><input value={wallets.data.networks.find((network) => network.id === networkId)?.name ?? networkId} readOnly aria-label="Rede selecionada" /></label>
             <label><span>Nome do perfil <em aria-hidden="true">*</em></span><input aria-describedby={fieldError ? 'collector-field-error' : undefined} aria-invalid={Boolean(fieldError)} value={collector.profileName ?? ''} onChange={(e) => setCollector({ ...collector, profileName: e.target.value })} required /></label>
             <label><span>Endereço da carteira <em aria-hidden="true">*</em></span><input value={activeWallet?.address ?? ''} readOnly aria-label="Endereço da carteira selecionada" /></label>
             <label><span>ENS ou carteira secundária <small>(opcional)</small></span><input value={collector.secondaryWallet ?? ''} onChange={(e) => setCollector({ ...collector, secondaryWallet: e.target.value })} /></label>
-            <label><span>Tipo de carteira <em aria-hidden="true">*</em></span><select aria-label="Tipo de carteira" value={activeWalletId} onChange={(e) => setWalletId(e.target.value)}>{wallets.data.wallets.map((wallet) => <option key={wallet.id} value={wallet.id}>{wallet.label}</option>)}</select></label>
+            <label><span>Tipo de carteira <em aria-hidden="true">*</em></span><input value={activeWallet?.label ?? ''} readOnly aria-label="Tipo da carteira selecionada" /></label>
             <label><span>Código de indicação <small>(opcional)</small></span><input value={collector.referralCode ?? ''} onChange={(e) => setCollector({ ...collector, referralCode: e.target.value })} /></label>
             <label><span>E-mail <em aria-hidden="true">*</em></span><input aria-describedby={fieldError ? 'collector-field-error' : undefined} aria-invalid={Boolean(fieldError)} type="email" autoComplete="email" value={collector.email} onChange={(e) => setCollector({ ...collector, email: e.target.value })} required /></label>
             <label><span>Nome ENS <small>(opcional)</small></span><select aria-label="Nome ENS" value={collector.ensName ?? '.eth'} onChange={(e) => setCollector({ ...collector, ensName: e.target.value })}><option value=".eth">.eth</option><option value=".art">.art</option><option value="none">Nenhum</option></select></label>
-            <label className="checkout-secondary-wallet"><input type="checkbox" checked={Boolean(collector.secondaryWallet)} onChange={(e) => setCollector({ ...collector, secondaryWallet: e.target.checked ? '' : undefined })} /> Usar outra carteira?</label>
+            <label className="checkout-secondary-wallet"><input type="checkbox" checked={manualMode} onChange={(e) => changeManualMode(e.target.checked)} /> Usar outra carteira?</label>
             <label className="checkout-note-field"><span>Observação do colecionador <small>(opcional)</small></span><textarea value={collector.note ?? ''} onChange={(e) => setCollector({ ...collector, note: e.target.value })} rows={3} /></label>
           </div>
         </section>
@@ -103,18 +157,20 @@ export function CheckoutPage() {
         {cart.data.couponCode && <p className="checkout-applied-coupon">Cupom aplicado: <strong>{cart.data.couponCode}</strong></p>}
         {selectedQuote && <QuoteLines quote={selectedQuote} />}
         {realtimeQuoteAffected && realtime.lastNftUpdate && <p className="checkout-quote-warning" role="status" aria-label="Atualização em tempo real" aria-live="polite">{realtime.lastNftUpdate.message}</p>}
-        <section className="checkout-wallet-section" aria-labelledby="wallet-heading"><div className="checkout-section-heading"><div><h2 id="wallet-heading">Carteira e rede</h2><p>Selecione uma carteira cadastrada na sua conta.</p></div>{wallets.data.connectedWalletId === activeWalletId && <Button variant="outline" type="button" onClick={() => disconnect.mutate()}>Desconectar</Button>}</div>
-          <div className="checkout-wallet-list">{wallets.data.wallets.map((wallet) => <label className={`checkout-wallet${activeWalletId === wallet.id ? ' is-selected' : ''}`} key={wallet.id}><input type="radio" name="wallet" value={wallet.id} checked={activeWalletId === wallet.id} onChange={() => setWalletId(wallet.id)} /><span className="checkout-wallet-icon" aria-hidden="true">◇</span><span><strong>{wallet.label}</strong><small>{wallet.address.slice(0, 8)}…{wallet.address.slice(-6)} · {wallet.role === 'primary' ? 'Principal' : 'Secundária'}</small></span><span className="checkout-wallet-check" aria-hidden="true">✓</span></label>)}</div>
+        <section className="checkout-wallet-section" aria-labelledby="wallet-heading"><div className="checkout-section-heading"><div><h2 id="wallet-heading">Carteira e rede</h2><p>{manualMode ? 'Informe a carteira que será usada somente nesta compra.' : 'Selecione uma carteira cadastrada na sua conta.'}</p></div>{isConnected && <Button variant="outline" type="button" onClick={() => disconnect.mutate()}>Desconectar</Button>}</div>
+          <label className="checkout-manual-toggle checkout-manual-toggle-mobile"><input type="checkbox" checked={manualMode} onChange={(event) => changeManualMode(event.target.checked)} /> Usar outra carteira?</label>
+          {!manualMode && <fieldset className="checkout-wallet-list" aria-label="Carteiras cadastradas"><legend className="sr-only">Carteiras cadastradas</legend>{wallets.data.wallets.map((wallet) => <label className={`checkout-wallet${savedWalletId === wallet.id ? ' is-selected' : ''}`} key={wallet.id}><input type="radio" name="wallet" value={wallet.id} checked={savedWalletId === wallet.id} onChange={() => chooseSavedWallet(wallet.id)} /><span className="checkout-wallet-icon" aria-hidden="true">◇</span><span><strong>{wallet.label}</strong><small>{wallet.address.slice(0, 8)}…{wallet.address.slice(-6)} · {wallet.role === 'primary' ? 'Principal' : 'Secundária'}</small></span><span className="checkout-wallet-check" aria-hidden="true">✓</span></label>)}</fieldset>}
+          {manualMode && manualControls}
           <label className="checkout-network" htmlFor="checkout-network">Rede<select id="checkout-network" aria-label="Rede de pagamento" value={networkId} onChange={(e) => setNetworkId(e.target.value)}>{wallets.data.networks.map((network) => <option key={network.id} value={network.id}>{network.name}</option>)}</select></label>
-        {wallets.data.connectedWalletId === activeWalletId ? <p className="checkout-connected" role="status">Carteira conectada (simulação).</p> : <Button type="button" variant="outline" disabled={connect.isPending} onClick={() => connect.mutate(activeWalletId, { onError: (error) => setFeedback(getApiError(error).message) })}>{connect.isPending ? 'Conectando…' : 'Conectar carteira'}</Button>}
+          {activeWallet && isConnected ? <p className="checkout-connected" role="status">Carteira conectada (simulação).</p> : <Button type="button" variant="outline" disabled={connect.isPending || disconnect.isPending} onClick={connectActiveWallet}>{disconnect.isPending ? 'Desconectando…' : connect.isPending ? 'Conectando…' : 'Conectar carteira'}</Button>}
         </section>
         {changes.length > 0 && <div className="checkout-quote-warning" role="status" aria-label="Cotação atualizada" aria-live="polite"><strong>Cotação atualizada</strong><ul>{changes.map((change) => <li key={change}>{change}</li>)}</ul><p>Confira os novos valores e confirme novamente.</p></div>}
         {fieldError && <p id="collector-field-error" className="checkout-error" role="alert">{fieldError}</p>}{feedback && <p className="checkout-feedback" role="alert">{feedback}</p>}{create.isError && <p className="checkout-error" role="alert">A resposta não foi recebida. Tente novamente para recuperar a mesma tentativa de pedido.</p>}
-        <Button className="checkout-submit" type="submit" disabled={busy || submitted || wallets.data.connectedWalletId !== activeWalletId}>{busy || submitted ? 'Processando…' : changes.length ? 'Confirmar novos valores' : 'Confirmar compra'}</Button>
+        <Button className="checkout-submit" type="submit" disabled={busy || submitted || !isConnected}>{busy || submitted ? 'Processando…' : changes.length ? 'Confirmar novos valores' : 'Confirmar compra'}</Button>
         <p className="checkout-simulation-note">Pagamento simulado. Nenhuma transação real será enviada à blockchain.</p><Link className="checkout-back-link" to="/cart">Voltar ao carrinho</Link>
       </aside>
     </form>
-    {createPortal(<Button className="checkout-submit-mobile" type="submit" form="checkout-form" disabled={busy || submitted || wallets.data.connectedWalletId !== activeWalletId}>{busy || submitted ? 'Processando…' : changes.length ? 'Confirmar novos valores' : 'Confirmar compra'}</Button>, document.body)}
+    {createPortal(<Button className="checkout-submit-mobile" type="submit" form="checkout-form" disabled={busy || submitted || !isConnected}>{busy || submitted ? 'Processando…' : changes.length ? 'Confirmar novos valores' : 'Confirmar compra'}</Button>, document.body)}
   </div>
 }
 function QuoteLines({ quote }: { quote: Quote }) { return <dl className="checkout-quote-lines"><div><dt>Subtotal</dt><dd>{quote.subtotalEth} ETH</dd></div><div><dt>Desconto</dt><dd>− {quote.discountEth} ETH</dd></div><div><dt>Taxa de rede</dt><dd>{quote.networkFeeEth} ETH</dd></div><div className="checkout-grand-total"><dt>Total</dt><dd>{quote.totalEth} ETH</dd></div></dl> }

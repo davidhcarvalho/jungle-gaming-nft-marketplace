@@ -67,7 +67,7 @@ export function CartPage() {
 
   return (
     <div className="cart-page" data-testid="cart-page">
-      <nav className="cart-breadcrumb" aria-label="Breadcrumb"><Link to="/" search={{ page: 1, sort: 'recent' }}>Início</Link><span aria-hidden="true">/</span><a href="/#catalog">Mercado</a><span aria-hidden="true">/</span><span aria-current="page">Carrinho</span></nav>
+      <nav className="cart-breadcrumb" aria-label="Breadcrumb"><Link to="/" search={{ page: 1, sort: 'recent' }}>Início</Link><span aria-hidden="true">/</span><Link to="/" search={{ page: 1, sort: 'recent' }} hash="catalog">Mercado</Link><span aria-hidden="true">/</span><span aria-current="page">Carrinho</span></nav>
       <header className="cart-page-heading">
         <Link className="cart-back-button" to="/" search={{ page: 1, sort: 'recent' }} aria-label="Voltar ao mercado">‹</Link>
         <div><p className="eyebrow">SUA COLEÇÃO</p><h1>Carrinho de NFTs</h1></div>

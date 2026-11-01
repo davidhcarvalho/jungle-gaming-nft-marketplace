@@ -1,4 +1,4 @@
-import { Link, useNavigate, useSearch } from '@tanstack/react-router'
+import { Link, useNavigate, useRouterState, useSearch } from '@tanstack/react-router'
 import { useEffect, useState, type FormEvent } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -25,11 +25,17 @@ const articles = [
 export function HomePage() {
   const search = useSearch({ from: '/' })
   const navigate = useNavigate({ from: '/' })
+  const hash = useRouterState({ select: (state) => state.location.hash })
   const catalog = useNFTCatalog(search)
   const [queryDraft, setQueryDraft] = useState(search.q ?? '')
   const [filtersOpen, setFiltersOpen] = useState(false)
 
   useEffect(() => setQueryDraft(search.q ?? ''), [search.q])
+
+  useEffect(() => {
+    const targetId = hash.replace(/^#/, '')
+    if (targetId) document.getElementById(targetId)?.scrollIntoView({ block: 'start' })
+  }, [hash])
 
   function updateSearch(patch: Partial<CatalogSearch>, resetPage = true) {
     void navigate({
@@ -157,7 +163,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="feature-banners" aria-label="Destaques do mercado">
+      <section className="feature-banners" id="features" aria-label="Destaques do mercado">
         <article className="feature-banner">
           <NFTArtwork src="/assets/nfts/optimized/emerald-ape.webp" alt="Arte da coleção Kurio Apes" />
           <div><p className="banner-kicker">Lançamentos gênesis de edição limitada</p><p>Colecione edições escassas diretamente dos criadores antes da revelação pública.</p><Link to="/nfts/$nftId" params={{ nftId: 'emerald-ape-042' }}>Explorar <span aria-hidden="true">→</span></Link></div>

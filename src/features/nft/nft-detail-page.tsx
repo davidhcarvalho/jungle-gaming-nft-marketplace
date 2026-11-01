@@ -66,7 +66,7 @@ export function NFTDetailPage() {
 
   return (
     <article className="nft-detail-page" data-testid="nft-detail">
-      <nav className="detail-breadcrumb" aria-label="Breadcrumb"><Link to="/" search={{ page: 1, sort: 'recent' }}>Início</Link><span aria-hidden="true">/</span><a href="/#catalog">Mercado</a><span aria-hidden="true">/</span><span aria-current="page">{nft.name}</span></nav>
+      <nav className="detail-breadcrumb" aria-label="Breadcrumb"><Link to="/" search={{ page: 1, sort: 'recent' }}>Início</Link><span aria-hidden="true">/</span><Link to="/" search={{ page: 1, sort: 'recent' }} hash="catalog">Mercado</Link><span aria-hidden="true">/</span><span aria-current="page">{nft.name}</span></nav>
 
       <section className="detail-main" aria-labelledby="detail-title">
         <div className="detail-gallery">

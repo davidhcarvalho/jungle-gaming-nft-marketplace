@@ -63,7 +63,9 @@ export interface CartMergeSummary {
 
 export type QuoteResponse = Quote
 
-export interface CheckoutWalletsResponse { wallets: Wallet[]; networks: Network[]; connectedWalletId?: string }
+export interface ManualCheckoutWalletPayload { provider: 'MetaMask' | 'WalletConnect' | 'Coinbase Wallet'; address: string; networkId: string }
+export type ConnectCheckoutWalletPayload = { walletId: string } | { manualWallet: ManualCheckoutWalletPayload }
+export interface CheckoutWalletsResponse { wallets: Wallet[]; networks: Network[]; connectedWalletId?: string; connectedManualWallet?: Wallet }
 export interface CheckoutRevalidationResponse { quote: Quote; changes: string[]; blocked?: string }
 export interface CheckoutCollectorDetails { displayName: string; email: string; username?: string; profileName?: string; walletAddress?: string; secondaryWallet?: string; walletType?: string; referralCode?: string; ensName?: string; note?: string }
 export interface CreateOrderPayload { quoteId: string; quote: Quote; items: Array<{ nftId: string; editionId: string; quantity: number }>; walletId: string; networkId: string; collector: CheckoutCollectorDetails }

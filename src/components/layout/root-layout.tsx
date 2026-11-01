@@ -1,5 +1,5 @@
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
-import { Suspense, useEffect } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { clearSessionToken } from '@/lib/session-token'
@@ -7,9 +7,11 @@ import { clearPrivateQueries, useLogout, useSession } from '@/features/auth/quer
 import { queryKeys } from '@/lib/query-keys'
 import { useCart } from '@/features/cart/queries'
 import { stopRealtimeSession } from '@/realtime/session-lifecycle'
+import { rememberSafeAccountReturnPath } from '@/lib/account-navigation'
 
 export function RootLayout() {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const href = useRouterState({ select: (state) => state.location.href })
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const cart = useCart()
@@ -21,6 +23,9 @@ export function RootLayout() {
   const isOrder = pathname.startsWith('/orders/')
   const isAccount = pathname === '/profile' || pathname === '/wallets'
   const isAuthRoute = pathname === '/login' || pathname === '/signup'
+  const [announcement, setAnnouncement] = useState('')
+
+  useEffect(() => rememberSafeAccountReturnPath(href), [href])
 
   useEffect(() => {
     function handleSessionExpired() {
@@ -44,7 +49,7 @@ export function RootLayout() {
           <Link className="brand" to="/" search={{ page: 1, sort: 'recent' }} aria-label="KURIO, início">KURIO</Link>
           <nav className="desktop-nav" aria-label="Navegação principal">
             <Link to="/" search={{ page: 1, sort: 'recent' }} activeProps={{ className: `nav-link${isHome ? ' is-active' : ''}` }} className={`nav-link${isHome ? ' is-active' : ''}`}>Início</Link>
-            <Link to="/" hash="#catalog" search={{ page: 1, sort: 'recent' }} activeProps={{ className: `nav-link${isDetail ? ' is-active' : ''}` }} className={`nav-link${isDetail ? ' is-active' : ''}`}>Mercado</Link>
+            <Link to="/" hash="catalog" search={{ page: 1, sort: 'recent' }} activeProps={{ className: `nav-link${isDetail ? ' is-active' : ''}` }} className={`nav-link${isDetail ? ' is-active' : ''}`}>Mercado</Link>
             <a className="nav-link" href="/#features">Criadores</a>
             <a className="nav-link" href="/#journal">Aprenda</a>
           </nav>
@@ -60,8 +65,9 @@ export function RootLayout() {
           <Outlet />
         </Suspense>
       </main>
-      <SiteFooter />
-      {isHome && <MobileNavigation />}
+      <SiteFooter onUnavailable={setAnnouncement} />
+      {isHome && <MobileNavigation onUnavailable={setAnnouncement} />}
+      {announcement && <div className="site-announcement" role="status" aria-label="Aviso de navegação" aria-live="polite"><span>{announcement}</span><button type="button" aria-label="Fechar aviso" onClick={() => setAnnouncement('')}>×</button></div>}
     </div>
   )
 }
@@ -87,32 +93,34 @@ function AuthHeaderActions() {
   )
 }
 
-function SiteFooter() {
+function SiteFooter({ onUnavailable }: { onUnavailable: (message: string) => void }) {
+  const unavailable = (label: string) => onUnavailable(`${label}: este recurso não faz parte desta demonstração.`)
+  const socialUnavailable = () => onUnavailable('Link externo não fornecido nesta demonstração.')
   return (
     <footer className="site-footer">
       <div className="footer-promises">
         <article><span className="footer-promise-mark">W</span><h2>Segurança da carteira</h2><p>Proteja sua carteira e colecione arte digital verificada com confiança.</p></article>
         <article><span className="footer-promise-mark">C</span><h2>Criadores em destaque</h2><p>Conheça artistas, estúdios e comunidades que moldam a cultura digital na rede.</p></article>
         <article><span className="footer-promise-mark">D</span><h2>Alertas de lançamentos</h2><p>Receba calendários de cunhagem, novidades de listas de acesso e análises de mercado.</p></article>
-        <article className="footer-newsletter"><h2>Antecipe-se ao próximo lançamento</h2><div className="newsletter-control"><label className="sr-only" htmlFor="newsletter-email">Seu e-mail</label><input id="newsletter-email" type="email" placeholder="digite seu e-mail..." disabled /><button type="button" disabled>Enviar</button></div><p>Receba lançamentos selecionados, histórias de criadores e novidades do mercado.</p></article>
+        <article className="footer-newsletter"><h2>Antecipe-se ao próximo lançamento</h2><div className="newsletter-control"><label className="sr-only" htmlFor="newsletter-email">Seu e-mail</label><input id="newsletter-email" type="email" placeholder="digite seu e-mail..." disabled /><button type="button" onClick={() => unavailable('Inscrições')}>Enviar</button></div><p>Receba lançamentos selecionados, histórias de criadores e novidades do mercado.</p></article>
       </div>
       <div className="footer-brand-strip"><strong>KURIO</strong><span>Feito para colecionadores,<br /> criadores e cultura</span><span>contato@email.com</span><span>+55 11 4002 8922</span></div>
       <div className="footer-links-grid">
-        <div><h2>Meu perfil</h2><span>Meu perfil</span><span>Minha coleção</span><span>Atividade</span><span>Estúdio do criador</span><span>Lista de interesse</span></div>
-        <div><h2>Central de ajuda</h2><span>Central de ajuda</span><span>Como comprar NFTs</span><span>Carteira e segurança</span><span>Política do mercado</span><span>Denunciar item</span></div>
-        <div><h2>Coleções</h2><a href="/#catalog">Arte digital</a><a href="/#catalog">Fotografia</a><a href="/#catalog">Música</a><a href="/#catalog">Arte 3D</a><a href="/#catalog">Utilidade</a></div>
-        <div><h2>Redes sociais</h2><div className="footer-socials" aria-label="Redes sociais"><span>f</span><span>◎</span><span>♥</span><span>in</span><span>▶</span></div><h3>Carteiras compatíveis</h3><span className="wallet-labels">METAMASK · WALLETCONNECT · COINBASE</span></div>
+        <div><h2>Meu perfil</h2><Link className="footer-action-link" to="/profile">Meu perfil</Link><button className="footer-action-link" type="button" onClick={() => unavailable('Minha coleção')}>Minha coleção</button><button className="footer-action-link" type="button" onClick={() => unavailable('Atividade')}>Atividade</button><button className="footer-action-link" type="button" onClick={() => unavailable('Estúdio do criador')}>Estúdio do criador</button><button className="footer-action-link" type="button" onClick={() => unavailable('Lista de interesse')}>Lista de interesse</button></div>
+        <div><h2>Central de ajuda</h2><button className="footer-action-link" type="button" onClick={() => unavailable('Central de ajuda')}>Central de ajuda</button><button className="footer-action-link" type="button" onClick={() => unavailable('Como comprar NFTs')}>Como comprar NFTs</button><button className="footer-action-link" type="button" onClick={() => unavailable('Carteira e segurança')}>Carteira e segurança</button><button className="footer-action-link" type="button" onClick={() => unavailable('Política do mercado')}>Política do mercado</button><button className="footer-action-link" type="button" onClick={() => unavailable('Denunciar item')}>Denunciar item</button></div>
+        <div><h2>Coleções</h2><Link to="/" search={{ page: 1, sort: 'recent', category: 'digital-art' }}>Arte digital</Link><Link to="/" search={{ page: 1, sort: 'recent', category: 'photography' }}>Fotografia</Link><Link to="/" search={{ page: 1, sort: 'recent', category: 'music' }}>Música</Link><Link to="/" search={{ page: 1, sort: 'recent', category: '3d-art' }}>Arte 3D</Link><Link to="/" search={{ page: 1, sort: 'recent', category: 'utility' }}>Utilidade</Link></div>
+        <div><h2>Redes sociais</h2><div className="footer-socials" aria-label="Redes sociais">{[['Facebook', 'f'], ['Instagram', '◎'], ['Twitter', '♥'], ['LinkedIn', 'in'], ['YouTube', '▶']].map(([name, icon]) => <button key={name} type="button" aria-label={name} onClick={socialUnavailable}>{icon}</button>)}</div><h3>Carteiras compatíveis</h3><span className="wallet-labels">METAMASK · WALLETCONNECT · COINBASE</span></div>
       </div>
       <p className="footer-copyright">© 2026 Kurio. Propriedade digital para todos.</p>
     </footer>
   )
 }
 
-function MobileNavigation() {
+function MobileNavigation({ onUnavailable }: { onUnavailable: (message: string) => void }) {
   return (
     <nav className="mobile-nav" aria-label="Navegação mobile">
       <Link className="mobile-nav-link is-active" to="/" search={{ page: 1, sort: 'recent' }} aria-label="Início"><HomeIcon /></Link>
-      <button className="mobile-nav-link" type="button" disabled aria-label="Favoritos disponíveis em uma etapa posterior"><HeartIcon /></button>
+      <button className="mobile-nav-link" type="button" aria-label="Favoritos" onClick={() => onUnavailable('Esta demonstração não possui uma lista de favoritos; favorite obras nas páginas dos NFTs.')}><HeartIcon /></button>
       <a className="mobile-nav-featured" href="#catalog" aria-label="Explorar catálogo"><CollectionIcon /></a>
       <Link className="mobile-nav-link" to="/cart" aria-label="Carrinho"><CartIcon /></Link>
       <Link className="mobile-nav-link" to="/profile" aria-label="Perfil"><UserIcon /></Link>

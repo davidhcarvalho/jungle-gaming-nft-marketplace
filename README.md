@@ -1,8 +1,178 @@
-# Desafio Frontend — Marketplace de NFTs
+# KURIO — NFT Marketplace
 
-Implemente o **NFT Marketplace** em React e TypeScript, seguindo o [layout no Figma](https://www.figma.com/design/Ff0SksUi7UFtPWUO8kyNtw/Frontend-Challenge?node-id=0-1).
+Implementação do desafio técnico de Frontend da **Jungle Gaming**, desenvolvida em React e TypeScript a partir do layout fornecido no Figma.
 
-O desafio avalia fidelidade visual, qualidade das interações, integração com APIs, gerenciamento de estado assíncrono, tempo real, acessibilidade e performance.
+O projeto cobre descoberta de NFTs, autenticação, favoritos, carrinho, checkout, pedidos, perfil, carteiras e atualizações em tempo real. APIs, autenticação, carteiras, pagamentos e eventos são simulados no browser com **MSW**, mantendo os fluxos reproduzíveis sem depender de backend privado ou serviços externos.
+
+## Demo
+
+- **Produção:** https://kurio-nft-marketplace-zeta.vercel.app
+- **Node:** 24.22.1
+- **npm:** 11+
+- **Figma:** https://www.figma.com/design/Ff0SksUi7UFtPWUO8kyNtw/Frontend-Challenge?node-id=0-1
+
+## Quick Start
+
+```bash
+nvm use                  # ou: mise use node@24.22.1
+npm ci
+cp .env.example .env.local
+npm run dev
+```
+
+Depois, abra a URL exibida pelo Vite no terminal.
+
+O arquivo `.env.example` já contém valores seguros para a demonstração local:
+
+```env
+VITE_ENABLE_MOCKS=true
+VITE_MOCK_SCENARIO=default
+VITE_API_BASE_URL=/api
+VITE_SOCKET_URL=
+```
+
+Com `VITE_ENABLE_MOCKS=true`, REST e Socket.IO são simulados no browser por MSW.
+
+### Contas de demonstração
+
+| Usuário | E-mail | Senha |
+|---|---|---|
+| Ana Colecionadora | `ana@kurio.test` | `KurioDemo24!` |
+| Leo Artista | `leo@kurio.test` | `Collector24!` |
+
+Também é possível criar uma nova conta pelo fluxo de cadastro.
+
+## Build de demonstração
+
+Para executar localmente a versão mais próxima do deploy público, incluindo os mocks REST e Socket.IO:
+
+```bash
+npm run build:demo
+npm run preview
+```
+
+## Comandos principais
+
+```bash
+npm run dev              # Vite; mocks seguem VITE_ENABLE_MOCKS
+npm run typecheck        # TypeScript
+npm run lint             # ESLint
+npm run test:e2e         # Playwright
+npm run build            # build de produção sem mocks por padrão
+npm run build:demo       # build de demonstração com MSW/Socket.IO
+npm run preview          # serve o conteúdo de dist/
+npm run lighthouse       # Home/Detalhe, 3x em mobile e desktop
+```
+
+Para executar os testes de browser pela primeira vez:
+
+```bash
+npx playwright install chromium
+```
+
+## Stack
+
+| Responsabilidade | Tecnologia |
+|---|---|
+| Interface | React |
+| Linguagem | TypeScript |
+| Roteamento | TanStack Router |
+| Estado remoto | TanStack Query |
+| Cliente HTTP | Axios |
+| Mocking | MSW |
+| Tempo real | Socket.IO / `socket.io-client` |
+| Estilização | Tailwind CSS |
+| Componentes | shadcn/ui |
+| E2E / regressão visual | Playwright |
+| Auditoria | Lighthouse |
+
+## Arquitetura e documentação
+
+A aplicação usa, em alto nível:
+
+```text
+UI / Routes
+    ↓
+Feature hooks
+    ↓
+TanStack Query
+    ↓
+Axios
+    ↓
+REST
+    ↓
+MSW
+
+MSW Socket.IO mock
+    ↓
+socket.io-client
+    ↓
+Realtime subscriptions
+    ↓
+TanStack Query / reconciliação REST
+    ↓
+UI
+```
+
+Documentação complementar:
+
+- [`ARCHITECTURE.md`](ARCHITECTURE.md) — contratos REST/eventos, cache, sessão e reconciliação.
+- [`DECISIONS.md`](DECISIONS.md) — decisões arquiteturais e trade-offs.
+- [`AI_LOCAL_VALIDATION.md`](AI_LOCAL_VALIDATION.md) — runner local de validação.
+- [`quality/FINAL_DELIVERY_CHECKLIST.md`](quality/FINAL_DELIVERY_CHECKLIST.md) — checklist final.
+- [`evidence/lighthouse/analysis.md`](evidence/lighthouse/analysis.md) — análise das auditorias Lighthouse.
+
+## Mocks, cenários e reset
+
+O worker oficial do MSW está versionado em `public/mockServiceWorker.js`.
+
+O estado simulado persiste no `localStorage` para sustentar refresh de sessão, favoritos, carrinho, perfil e carteiras.
+
+O smoke de rede `/__foundation/smoke` existe apenas em desenvolvimento. Ele demonstra o fluxo:
+
+```text
+TanStack Query → Axios → HTTP → MSW
+```
+
+e também permite restaurar o cenário inicial.
+
+Os testes em `tests/*.spec.ts` exercitam cenários determinísticos como:
+
+- conflito de cadastro;
+- sessão expirada;
+- falha de favorito com rollback;
+- catálogo vazio/erro/latência variável;
+- respostas fora de ordem;
+- cupom inválido ou expirado;
+- alteração de preço/disponibilidade;
+- timeout após criação do pedido;
+- recuperação por idempotência;
+- pagamento confirmado ou recusado;
+- eventos Socket.IO duplicados, antigos, disconnect e reconnect.
+
+## Demonstração e limitações
+
+A aplicação foi publicada para avaliação em:
+
+**https://kurio-nft-marketplace-zeta.vercel.app**
+
+O deploy usa o build de demonstração para manter os handlers MSW e o transporte Socket.IO simulados no browser. Deep links e refresh de rotas foram validados no ambiente publicado.
+
+Limitações conhecidas:
+
+- não existe backend de produção;
+- pagamentos e referências de transação são simulados;
+- carteiras não conectam a extensões reais;
+- não existe integração blockchain real;
+- alguns NFTs de fixtures reutilizam artes disponíveis como fallback;
+- a fonte exata do Figma não foi identificada;
+- Lighthouse atingiu as metas de Accessibility, Best Practices e SEO; Performance ficou abaixo da meta e está analisada em `evidence/lighthouse/analysis.md`.
+
+---
+
+# Requisitos do desafio
+
+O conteúdo abaixo preserva os requisitos funcionais e critérios de avaliação utilizados como fonte de verdade durante a implementação.
 
 ## 1. Escopo
 
@@ -46,6 +216,8 @@ As tecnologias devem participar efetivamente da solução. A ferramenta de build
 Implemente os frames desktop e mobile disponíveis. Perfil, carteiras e confirmação também devem funcionar em mobile, mesmo sem um frame específico.
 
 Páginas editoriais, suporte, atividade, ofertas e downloads não fazem parte da entrega. Links externos e ações auxiliares devem ter comportamento coerente; ações fora do escopo não devem aparentar sucesso funcional.
+
+Uma página de coleção pessoal de NFTs possuídos também não faz parte desta demonstração; pode ser considerada uma extensão futura do produto.
 
 ### Catálogo e detalhe
 
@@ -260,54 +432,3 @@ Documente os contratos REST e eventos, a política de sessão, o estado do carri
 Disponibilize comandos para desenvolvimento com mocks, build, preview, verificação de tipos, lint, testes Playwright e auditoria Lighthouse.
 
 A entrega deve executar a partir de um checkout limpo, sem depender de serviços privados ou do backend de produção.
-
-## Aplicação KURIO — setup e execução
-
-A aplicação é direcionada a Node `24.22.1` (`.nvmrc`, `engines`) e npm. Use `npm ci` para instalação reproduzível a partir do lockfile. Não há backend privado nem segredos reais.
-
-```bash
-nvm use                  # ou mise use node@24.22.1
-npm ci
-cp .env.example .env.local
-npm run dev
-```
-
-`VITE_ENABLE_MOCKS=true` habilita handlers REST e Socket.IO no browser e é o valor recomendado para desenvolvimento/demonstração local. `VITE_API_BASE_URL` define o prefixo REST; `VITE_MOCK_SCENARIO` seleciona o cenário inicial; `VITE_SOCKET_URL` permite configurar a origem do socket, vazia no setup local. Os valores de `.env.example` são seguros e não contêm credenciais.
-
-As imagens `.png` exportadas do Figma permanecem como originais. As quatro artes principais usam derivados WebP de qualidade 88 em `public/assets/nfts/optimized/`; os arquivos-fonte são preservados e os derivados foram revisados visualmente para reduzir bastante a transferência sem distorcer as artes. O HTML pré-carrega a arte principal da Home e do detalhe Emerald Ape.
-
-Comandos reproduzíveis:
-
-```bash
-npm run dev              # Vite; os mocks seguem VITE_ENABLE_MOCKS do ambiente
-npm run typecheck
-npm run lint
-npm run test:e2e
-npm run build            # build de produção sem mocks por padrão
-npm run build:demo       # build de produção com MSW/Socket.IO simulados
-npm run preview          # servir dist/; use build:demo para a demonstração completa
-npm run lighthouse       # build de demo e auditorias Home/Detalhe (3x, mobile/desktop)
-```
-
-O worker oficial está versionado em `public/mockServiceWorker.js`. Para testes browser, instale o Chromium do Playwright uma vez com `npx playwright install chromium`. O Local Validation Runner e seus targets fixos estão documentados em [AI_LOCAL_VALIDATION.md](AI_LOCAL_VALIDATION.md).
-
-O smoke de rede `/__foundation/smoke` existe apenas em desenvolvimento. Ele demonstra TanStack Query → Axios → HTTP → MSW e permite restaurar o cenário inicial. Catálogo, detalhe, autenticação, favoritos, carrinho/cotação, checkout/pedidos, perfil/carteiras e sincronização Socket.IO usam os contratos e mocks descritos em [ARCHITECTURE.md](ARCHITECTURE.md). As imagens de `design-reference/` são referências, não assets renderizados pela aplicação.
-
-## Contas fictícias e autenticação mockada
-
-Com `VITE_ENABLE_MOCKS=true`, use uma das contas abaixo no login:
-
-| Usuário | E-mail | Senha de demonstração |
-|---|---|---|
-| Ana Colecionadora | `ana@kurio.test` | `KurioDemo24!` |
-| Leo Artista | `leo@kurio.test` | `Collector24!` |
-
-O MSW também permite criar contas novas. O estado simulado persiste no `localStorage` para que sessão, favoritos, carrinhos, perfil e carteiras sobrevivam ao refresh; o reset em `/__foundation/smoke` e nos endpoints de cenário restaura um estado determinístico. Entre os cenários documentados nos specs estão `signup-conflict`, `session-expired`, `favorite-error`, falhas de catálogo/carrinho/pagamento e eventos realtime stale/duplicate/disconnect/reconnect. Senhas não são persistidas em texto claro: o mock guarda digest SHA-256 determinístico para as contas de demonstração e calcula digest de novos cadastros antes de salvar.
-
-As rotas privadas redirecionam para `/login?returnTo=...` e restauram a intenção após autenticação. Favoritos são escopados por usuário e atualizados otimisticamente, com rollback quando a API simulada falha. Checkout e dados de conta exigem sessão; operações de pedido usam idempotência, revalidação de quote e recibo snapshot. Login social e recuperação de senha aparecem desabilitados porque não fazem parte do desafio simulado.
-
-## Demonstração e limitações
-
-Todos os pagamentos, carteiras, referências de transação e eventos são simulações; não há conexão blockchain, gateway real ou autenticação de produção. A publicação Vercel usa o build de demonstração para manter handlers MSW e o binding Socket.IO no browser. Deep links e refresh foram verificados no deploy: **https://kurio-nft-marketplace-zeta.vercel.app**. O fallback SPA está configurado por `vercel.json` e `public/_redirects`.
-
-Consulte [ARCHITECTURE.md](ARCHITECTURE.md) para contratos REST/eventos, estado, cache e reconciliação. Os cenários determinísticos e seus resets também estão detalhados nos testes `tests/*.spec.ts` e handlers `src/mocks/`.

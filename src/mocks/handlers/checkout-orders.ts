@@ -3,7 +3,7 @@ import { ethToWei, percentageOfWei, weiToEth } from '@/lib/eth-decimal'
 import { getMockScenario } from '@/mocks/scenarios/state'
 import { getMockSession } from '@/mocks/state/auth-store'
 import { getMockCart } from '@/mocks/state/cart-store'
-import { consumeTimeout, createMockOrder, getCheckoutWallets, getOrderForUser, rememberTimeout, setConnectedWallet, transitionMockOrder } from '@/mocks/state/orders-store'
+import { consumeTimeout, createMockOrder, getCheckoutWallets, getOrderForUser, rememberTimeout, setConnectedManualWallet, setConnectedWallet, transitionMockOrder } from '@/mocks/state/orders-store'
 import type { ApiError, CheckoutRevalidationResponse, CreateOrderPayload, OrderResponse } from '@/types/api'
 import type { Quote } from '@/types/domain'
 
@@ -16,8 +16,21 @@ export const checkoutOrderHandlers = [
     const user = requireUser(request); if (!user) return apiError('unauthorized', 'Entre para conectar uma carteira.', 401)
     if (getMockScenario() === 'wallet-rejected') return apiError('conflict', 'A conexão da carteira foi recusada.', 409)
     const body = await readBody(request); const wallets = getCheckoutWallets(user.userId)
-    if (typeof body.walletId !== 'string' || !wallets.wallets.some((wallet) => wallet.id === body.walletId)) return apiError('validation', 'Selecione uma carteira cadastrada.', 422)
-    return HttpResponse.json(setConnectedWallet(user.userId, body.walletId))
+    if (typeof body.walletId === 'string') {
+      if (!wallets.wallets.some((wallet) => wallet.id === body.walletId)) return apiError('validation', 'Selecione uma carteira cadastrada.', 422)
+      return HttpResponse.json(setConnectedWallet(user.userId, body.walletId))
+    }
+    if (typeof body.manualWallet === 'object' && body.manualWallet !== null) {
+      const manual = body.manualWallet as Record<string, unknown>
+      const providers = ['MetaMask', 'WalletConnect', 'Coinbase Wallet']
+      if (typeof manual.provider !== 'string' || !providers.includes(manual.provider)
+        || typeof manual.address !== 'string' || !/^0x[\da-fA-F]{40}$/.test(manual.address)
+        || typeof manual.networkId !== 'string' || !wallets.networks.some((network) => network.id === manual.networkId)) {
+        return apiError('validation', 'Informe um provedor, endereço e rede válidos para a carteira desta compra.', 422)
+      }
+      return HttpResponse.json(setConnectedManualWallet(user.userId, { provider: manual.provider, address: manual.address, networkId: manual.networkId }))
+    }
+    return apiError('validation', 'Selecione uma carteira salva ou informe uma carteira para esta compra.', 422)
   }),
   http.post('/api/checkout/wallets/disconnect', ({ request }) => {
     const user = requireUser(request); if (!user) return apiError('unauthorized', 'Entre para desconectar a carteira.', 401)
@@ -47,12 +60,14 @@ export const checkoutOrderHandlers = [
     if (getMockScenario() === 'order-server-error') return apiError('server', 'O serviço de pagamento está temporariamente indisponível.', 503)
     const timeoutKey = `${user.userId}:${key}`
     if (getMockScenario() === 'order-timeout-after-create' && !consumeTimeout(timeoutKey)) {
-      const created = createMockOrder(user.userId, key, payload, { status: 'pending', ...wallets })
+      const orderWallets = wallets.connectedManualWallet ? [...wallets.wallets, wallets.connectedManualWallet] : wallets.wallets
+      const created = createMockOrder(user.userId, key, payload, { status: 'pending', wallets: orderWallets, networks: wallets.networks })
       if ('conflict' in created) return apiError('conflict', 'A tentativa não corresponde ao carrinho atual.', 409)
       rememberTimeout(timeoutKey)
       return HttpResponse.error()
     }
-    const result = createMockOrder(user.userId, key, payload, { status: 'pending', ...wallets })
+    const orderWallets = wallets.connectedManualWallet ? [...wallets.wallets, wallets.connectedManualWallet] : wallets.wallets
+    const result = createMockOrder(user.userId, key, payload, { status: 'pending', wallets: orderWallets, networks: wallets.networks })
     if ('conflict' in result) return apiError('conflict', 'Esta chave já foi usada com outros dados ou o carrinho mudou.', 409)
     return HttpResponse.json<OrderResponse>({ order: result.order }, { status: result.replayed ? 200 : 201 })
   }),

@@ -258,7 +258,7 @@ async function writeSummary() {
     node: process.version,
     lighthouseVersion,
     operatingSystem: `${os.type()} ${os.release()} ${os.arch()}`,
-    chromeExecutable: chromium.executablePath(),
+    chromeExecutable: path.basename(chromium.executablePath()),
     previewOrigin: origin,
     conditions: 'Vite production preview built with VITE_ENABLE_MOCKS=true; Lighthouse mobile emulation 390×844 and desktop emulation 1440×900; simulated throttling; three independent runs per page/profile.',
     thresholds,

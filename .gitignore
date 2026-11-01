@@ -15,6 +15,7 @@ coverage/
 
 .cache/
 .vercel/
+lot-*-evidence*.zip
 
 # Local host validation runner protocol/results (keep the runner script tracked).
 .ai/runner/request
@@ -24,4 +25,3 @@ coverage/
 .ai/runner/latest.md.tmp
 .ai/runner/latest.log
 .ai/runner/latest.md
-.vercel
