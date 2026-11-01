@@ -62,6 +62,6 @@ Projeto Vercel `kurio-nft-marketplace` publicado no team `dusk15`; URL `https://
 
 Resolvido por interpretação conforme README: Request `1793511419-550281-4` completou três medições por página/perfil e registrou medianas, LCP/CLS/TBT e causas em `evidence/lighthouse/analysis.md`. Accessibility, Best Practices e SEO atingiram as metas. Performance mediana foi 69/49 (Home mobile/desktop) e 76/52 (detalhe mobile/desktop); abaixo da meta, mas não bloqueia isoladamente. Diagnóstico aponta JS/bootstrap + MSW sob throttling, render delay desktop e descoberta da arte Home mobile depois da API; não há falha de medição/configuração nem simplificação artificial.
 
-## Q11 — Commit/push do Lote 08 no host
+## Q11 — Commit/push do Lote 08 no host — RESOLVIDO
 
-O deploy e os gates passaram, mas a gravação Git está bloqueada neste sandbox: a tentativa de staging explícito falhou criando `.git/index.lock` com `Read-only file system`, embora `test -w` retornasse sucesso. Nenhum arquivo foi staged e o lock não permaneceu. Ação mínima: executar o staging/commit/push explícito em um terminal host com escrita no `.git`; depois retomar para redeploy e smoke do SHA final. Lote 09 aguarda essa confirmação.
+O commit `7b82d92` foi criado/publicado em `origin/main`; o alias Vercel foi redeployado a partir do checkout limpo e o smoke público pós-commit passou (Requests `1793520488-575891-14` e `1793520674-575891-16`).

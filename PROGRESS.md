@@ -4,7 +4,7 @@
 
 ## Estado atual
 
-- Lotes 01–07 aprovados; commit Lote 07 `82d744e` confirmado. **Lote 08 BLOQUEADO somente pelo deploy público.** Node 24.22.1/npm 11.19.1. Lighthouse Request `1793511419-550281-4` completou 12/12 em production preview com mocks; Performance <90 está justificada conforme README e não bloqueia isoladamente. `clean-checkout` Request `1793511614-550281-6` passou com npm ci, typecheck/lint/builds, 257 E2E PASS/25 SKIPPED e preview routes/assets. `full` Request `1793513483-550281-8`: Playwright 282 total, 257 PASS, 25 SKIPPED, 0 inesperados; `test-results/.last-run.json` status passed. `static` Request `1793514394-550281-9` passou após ampliar smoke público. `vercel-check` Request `1793511592-550281-5` falhou porque `mise` não encontrou CLI; alvos Vercel corrigidos para PATH do host aguardam restart. Lote 09 não iniciado.
+- Lotes 01–08 aprovados; Lote 07 commit `82d744e`, Lote 08 commit `7b82d92` publicado em `origin/main`. **Lote 08 STATUS: PASS**, incluindo redeploy desse commit e public smoke PASS `1793520674-575891-16` em `https://kurio-nft-marketplace-zeta.vercel.app`. `full`: 257 PASS, 25 SKIPPED, 0 FAIL; Lighthouse completo em `evidence/lighthouse/` com medianas e justificativas conforme README. **Lote 09 STATUS: PASS** para o pacote documental; o ensaio oral deve ser feito pelo candidato.
 - Último lote concluído permanece `06 — Perfil e Carteiras` (**PASS**; `spec:profile-wallets`: 70 PASS, 2 SKIPPED; `full`: 222 PASS, 9 SKIPPED, 0 FAIL. Revisão visual em `evidence/lot-06/visual-review.md`).
 
 ### Lote 06 — plano registrado antes da implementação
@@ -52,9 +52,25 @@
 - [x] Lote 04 — Carrinho e Cotação (**PASS**; gates estáticos e E2E via runner concluídos)
 - [x] Lote 05 — Checkout, Pedido e Confirmação
 - [x] Lote 06 — Perfil e Carteiras (**PASS**; spec 70 PASS/2 SKIPPED; full 222 PASS/9 SKIPPED)
-- [ ] Lote 07 — Tempo Real e Cenários de Falha
-- [ ] Lote 08 — Quality Gate, Deploy e Documentação
-- [ ] Lote 09 — Estudo e Defesa Técnica
+- [x] Lote 07 — Tempo Real e Cenários de Falha (**PASS**, commit `82d744e`)
+- [x] Lote 08 — Quality Gate, Deploy e Documentação (**PASS**, commit `7b82d92`; produção sincronizada e validada)
+- [x] Lote 09 — Estudo e Defesa Técnica (**PASS**, materiais concluídos; commit em preparação)
+
+### Lote 09 — plano registrado antes dos materiais (2026-11-01)
+
+- **Status:** IN PROGRESS; Lote 08 concluído e commitado antes do início.
+- **Escopo:** transformar código, ADRs, arquitetura, testes e evidências reais em notas de entrevista, mapa de arquitetura, roteiro de demo e perguntas fracas para revisão. Não alterar runtime, design ou produto.
+- **Arquivos previstos:** `study/STUDY_NOTES.md`, `study/ARCHITECTURE_MAP.md`, `study/DEMO_SCRIPT.md`, `study/WEAK_QUESTIONS.md`, guia de estudo, `TASKS.md`, `PROGRESS.md`, `HANDOFF.md` e correção de documentação de produção se necessária.
+- **Critérios de aceite:** cada afirmação aponta para fonte real; cobrir os fluxos listados no lote, perguntas curtas e aprofundadas, trade-offs, bugs, limites de produção, glossário e roteiro de 5–10 min; incluir ensaios sem IA e lista de temas fracos; `git diff --check` limpo e commit de documentação.
+- **Riscos:** não apresentar MSW, wallet, pagamento, explorer ou Socket.IO mock como serviços reais; Lighthouse contém relatórios de batches históricos com números diferentes, então as notas citarão o batch final identificado por request, sem misturar medianas.
+
+### Lote 09 — materiais e consistência (2026-11-01)
+
+- Produzidos `study/STUDY_NOTES.md` (resumo, explicações curtas/aprofundadas, fluxos, perguntas, decisões, trade-offs, bugs, limitações, glossário e plano), `study/ARCHITECTURE_MAP.md` (diagramas request/session/cart/realtime e caminhos), `study/DEMO_SCRIPT.md` (roteiros de 5 e 7–9 minutos) e `study/WEAK_QUESTIONS.md` (autoensaio e escala de confiança). O guia existente agora aponta para esse pacote.
+- Conferência contra código e docs: Query keys privadas por owner; catálogo encaminha signal e usa `placeholderData`; Axios centraliza headers/timeout; login limpa cache privado; guest merge, BigInt wei, quote, idempotência, receipt snapshot, stores unificadas de wallets, binding Socket.IO/versionamento/reconnect foram descritos com fontes reais.
+- Limites declarados: backend/pagamento/blockchain simulados; fallback de arte, fonte desconhecida e Performance Lighthouse abaixo de 90 explícitos. Relatórios Lighthouse são referenciados pelo request/batch final; não houve nova auditoria após deploy de código idêntico.
+- Lote 08 confirmado PASS após redeploy do commit `7b82d92` (runner Request `1793520488-575891-14`) e public smoke PASS `1793520674-575891-16`, incluindo rotas profundas, refresh, MSW REST, Socket.IO e protected redirects.
+- **LOT 09 STATUS: PASS (conteúdo documental).** `git diff --check` passou; staging/commit solicitado falhou ao criar `.git/index.lock` por filesystem read-only. Isso não afirma que o ensaio oral do candidato foi observado; os exercícios sem IA estão em `study/WEAK_QUESTIONS.md`. Commit `docs: add interview preparation materials` deve ser feito no host.
 
 ## Evidências por lote
 
@@ -345,3 +361,11 @@ Para ser concluído deve, conforme aplicável:
 - A conexão GitHub automática do Vercel falhou por ausência de Login Connection; o CLI ainda criou o projeto e publicou diretamente conforme autorização. Após checkpoint Git, repetir deploy CLI e smoke para comprovar que a produção corresponde ao commit final.
 - README agora registra a URL pública e a regra SPA. `TASKS.md`, `HANDOFF.md` e `OPEN_QUESTIONS.md` atualizados. Lighthouse mantém 12 relatórios com medianas e métricas obrigatórias; os resultados abaixo da meta de Performance têm causas justificadas conforme README.
 - Acesso Git: `origin` e `origin/main` existem; base `82d744e`. Embora `test -w .git` e `test -w .git/index` tenham retornado sucesso, o `git add` real falhou ao criar `.git/index.lock` (`Read-only file system`). Nenhum staging parcial ocorreu e `index.lock` não ficou para trás. Lote 08 está com todos os gates funcionais/qualidade PASS, mas o checkpoint commit/push e redeploy do commit precisam ocorrer no host. Não iniciar L09 antes disso.
+
+### Lote 08 — sincronização confirmada após commit (2026-11-01)
+
+- `HEAD`, `origin/main` e deploy source alinhados em `7b82d92 chore: finalize quality performance and delivery`. Antes do deploy: `git status --short` vazio; branch `main` acompanha `origin/main`.
+- Redeploy de produção pelo Local Validation Runner: Request `1793520488-575891-14` PASS; deployment URL interna `https://kurio-nft-marketplace-ievvjc0vy-dusk15.vercel.app`, alias de produção preservado `https://kurio-nft-marketplace-zeta.vercel.app`.
+- Smoke pós-commit Request `1793520674-575891-16` PASS. Cobertura: Home/catalog REST/MSW, Socket.IO conectado, NFT detail direto/refresh, Cart/Login/Signup direto/refresh, guards Checkout/Order/Profile/Wallet com returnTo e refresh, sessão autenticada, assets essenciais, sem overflow e sem erros inesperados.
+- Uma primeira repetição após o redeploy teve resposta transitória 404 vazia em `/api/cart`; sem alteração de código, uma execução nova passou. A evidência final é a execução PASS `1793520674-575891-16`.
+- **LOT 08 STATUS: PASS**; Lote 09 liberado. Lighthouse não reexecutado: o código auditado não mudou após os relatórios versionados.

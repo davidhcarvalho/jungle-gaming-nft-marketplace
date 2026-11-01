@@ -101,7 +101,7 @@ Este arquivo é uma visão rápida. Os critérios completos estão em `lots/`.
 - [x] E2E realtime
 
 ## 08 — Quality/Deploy
-- **PASS — aguardando checkpoint Git:** Lighthouse 12/12 medições e medianas documentadas conforme README; `clean-checkout` PASS; `static` e `full` PASS (E2E 257 PASS, 25 SKIPPED, 0 FAIL); regressão visual PASS. Deploy Vercel de produção e smoke público PASS (Requests `1793516115-575891-11` e `1793516222-575891-12`); URL `https://kurio-nft-marketplace-zeta.vercel.app`. Próximo gate operacional: revisão final, commit e push normal para `origin/main`; não iniciar Lote 09 antes do commit/push e deploy associado ao commit.
+- **PASS:** Gates estáticos, full E2E (257 PASS, 25 SKIPPED, 0 FAIL), visual, clean checkout e Lighthouse conforme README aprovados. Commit final `7b82d92` publicado em `origin/main`; produção redeployada pelo runner (Request `1793520488-575891-14`) e smoke após redeploy PASS (Request `1793520674-575891-16`) na URL `https://kurio-nft-marketplace-zeta.vercel.app`. O Lote 09 foi concluído como documentação.
 - [x] full E2E após split realtime (257 PASS, 25 SKIPPED, 0 FAIL; Request `1793508169-485327-25`)
 - [x] visual regression final (8/8 comparações desktop/mobile elegíveis PASS; 16 skips de viewports sem baseline; confirmado no full)
 - [x] keyboard/focus (coberto pelo full)
@@ -114,13 +114,13 @@ Este arquivo é uma visão rápida. Os critérios completos estão em `lots/`.
 - [x] production deep links, refresh e assets essenciais
 
 ## 09 — Study
-- **NOT STARTED:** aguarda checkpoint Git e confirmação de deploy associado ao commit do Lote 08.
-- [ ] architecture walkthrough
-- [ ] request flow
-- [ ] session
-- [ ] cart
-- [ ] idempotency
-- [ ] realtime
-- [ ] tests
-- [ ] trade-offs
-- [ ] mock interview
+- **PASS (conteúdo):** material baseado no código, ADRs, testes e evidências reais em `study/`; deploy do Lote 08 sincronizado com `7b82d92` antes do início. Commit local ainda pendente porque `.git/index` é somente leitura neste sandbox.
+- [x] architecture walkthrough
+- [x] request flow
+- [x] session
+- [x] cart
+- [x] idempotency
+- [x] realtime
+- [x] tests
+- [x] trade-offs
+- [x] mock interview / autoensaio

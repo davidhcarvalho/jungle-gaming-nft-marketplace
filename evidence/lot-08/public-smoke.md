@@ -1,6 +1,6 @@
 # Public deployment smoke
 
-Checked: 2026-11-01T06:57:40.583Z
+Checked: 2026-11-01T08:11:51.094Z
 Origin: https://kurio-nft-marketplace-zeta.vercel.app
 
 - mobile-390: Home, catalog REST/MSW, Socket.IO connected, no horizontal overflow.

@@ -1,5 +1,14 @@
 # Guia de Estudo para a Entrevista
 
+Este índice curto complementa os materiais detalhados:
+
+- [Notas de estudo com respostas curtas/aprofundadas, decisões, trade-offs e glossário](STUDY_NOTES.md)
+- [Mapa final de arquitetura e evidências por fluxo](ARCHITECTURE_MAP.md)
+- [Roteiro de demonstração de 5–10 minutos](DEMO_SCRIPT.md)
+- [Perguntas fracas para autoensaio](WEAK_QUESTIONS.md)
+
+Ordem recomendada: desenhar sem consultar notas → walkthrough de código → perguntas fracas → demo cronometrada. Não apresente mocks como serviços reais.
+
 ## Bloco 1 — Arquitetura em 5 minutos
 
 Ser capaz de desenhar:

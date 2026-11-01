@@ -1,12 +1,15 @@
 # Handoff entre Sessões/Agentes
 
-## Estado atual — Lote 08 validado, checkpoint Git pendente (atualizado 2026-11-01)
+## Estado atual — Lotes 08 e 09 concluídos (atualizado 2026-11-01)
 
-- **LOT 08 STATUS: PASS — gates técnicos completos.** A publicação Vercel está em `https://kurio-nft-marketplace-zeta.vercel.app`; deploy `vercel-prod` Request `1793516115-575891-11` e `public-smoke` Request `1793516222-575891-12` passaram. O smoke verificou mobile 390/desktop 1440, Home/catálogo via REST/MSW, Socket.IO conectado, NFT direto + refresh, Cart/Login/Signup, redirects protegidos preservando `returnTo`, sessão autenticada e Profile/Wallet/Checkout/Order após refresh, sem overflow nem erros inesperados.
+- **LOT 08 STATUS: PASS.** Commit `7b82d92` está em `HEAD` e `origin/main`; checkpoint limpo antes do Lote 09. Produção redeployada a partir desse checkout pelo runner (Request `1793520488-575891-14`); smoke final pós-commit PASS (Request `1793520674-575891-16`) em `https://kurio-nft-marketplace-zeta.vercel.app`. Cobriu mobile 390/desktop 1440, Home/catálogo via REST/MSW, Socket.IO, rotas diretas e refresh, redirects protegidos com `returnTo`, sessão autenticada e Profile/Wallet/Checkout/Order, sem overflow nem erros inesperados.
 - Lighthouse `1793511419-550281-4`: 12/12; medianas, LCP/CLS/TBT e causas inferiores à meta registradas conforme o README em `evidence/lighthouse/analysis.md`. Performance abaixo da meta foi aceita segundo a regra documentada e não é gate eliminatório isolado.
 - `clean-checkout` `1793511614-550281-6`, `full` `1793513483-550281-8` (257 PASS, 25 SKIPPED, 0 FAIL), `static` `1793514394-550281-9` e regressão visual passaram. O smoke público teve correções no próprio harness para URL string, forms de auth cujo H1 é visualmente oculto em desktop e o 404 REST deliberado do pedido inexistente; cobertura final passou.
-- `vercel.json` cria o projeto `kurio-nft-marketplace` e configura build demo, assets e SPA rewrites. O Vercel não conseguiu conectar GitHub automaticamente por ausência de Login Connection; o deploy direto autorizado via CLI funcionou. A publicação final deverá ser repetida após o commit para vincular exatamente ao checkpoint entregue.
-- Branch `main`, `origin` preservado; base L07 `82d744e feat: implement realtime synchronization`. Lote 09 não iniciado. Working tree contém mudanças intencionais do Lote 08. Executar `git diff --check`, revisar status, commit `chore: finalize quality performance and delivery`, push normal e redeploy/smoke do commit; somente então avançar para L09.
+- `vercel.json` configura build demo, assets e SPA rewrites. O deploy direto autorizado pelo CLI foi repetido após o commit `7b82d92`; smoke público final passou. Lighthouse não foi reexecutado porque o código auditado não mudou.
+- Branch `main`, `origin` preservado. Lote 09 gerou apenas documentação em `study/`; ensaiar respostas em voz alta sem consultar as notas e revisar `study/WEAK_QUESTIONS.md`.
+
+## Histórico dos Lotes 07–08 (registros abaixo não representam o estado atual)
+
 - `LOT_07_REALTIME_FAILURES` está **PASS**; commit confirmado: `82d744e feat: implement realtime synchronization`. Branch `main`; mudanças atuais são do Lote 08 (working tree intencionalmente modificada), Lote 09 não iniciado.
 - Binding instalada no host e inspecionada em `node_modules`: `@mswjs/socket.io-binding@0.2.0`; export `toSocketIo(connection)`; conexão por `ws.link(url)`; peer MSW 2.15.0. O caminho de resposta/evento usa `SocketIo.client.emit`, igual ao padrão do README da binding; `SocketIo.server.emit` exigia uma conexão real do servidor e falhava por não estar aberta.
 - Implementados cliente Socket.IO dinâmico após bootstrap MSW, subscription por sessão, eventos versionados `nft.updated`/`order.updated`, deduplicação, descarte de versões antigas, invalidação/reconciliação REST após reconnect, quote stale, teardown e isolamento privado. Harness altera stores mock compartilhadas via `POST /api/test-scenarios/realtime`.
@@ -18,6 +21,12 @@
 - **Próximo passo:** reiniciar `./scripts/ai-local-runner.sh` atualizado no terminal host onde o Vercel CLI está autenticado e no PATH. Solicitar novo `vercel-check`, seguir com preview, smoke público e produção. A autorização GitHub/Vercel foi dada e `origin` não deve ser alterado. Se o CLI/autenticação não estiverem acessíveis após o restart, parar e pedir somente a ação mínima de acesso. Commit/push só depois de todos os gates L08, e L09 somente após deploy correspondente ao commit final.
 
 ## Histórico de bloqueio anterior — Lote 07 (resolvido em 2026-10-31)
+
+## Lote 09 — material de entrevista
+
+- **LOT 09 STATUS: PASS (conteúdo documental); checkpoint pendente no host.** Notas, mapa, roteiro de demo e perguntas de autoensaio estão em `study/`; nenhuma funcionalidade do produto foi alterada. Sandbox rejeitou `git add` ao criar `.git/index.lock` por filesystem read-only.
+- O próximo passo pessoal é treinar as perguntas sem assistência e revisar todo tema com confiança menor que 4/5. O ensaio oral não foi observado pelo agente.
+- A sincronização de produção L08 está confirmada em `7b82d92`; public smoke final `1793520674-575891-16` passou. Lighthouse não foi reexecutado após deploy idêntico.
 
 O registro abaixo descrevia a ausência da binding antes da instalação externa; foi superado pela retomada atual.
 

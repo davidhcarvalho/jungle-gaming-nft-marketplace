@@ -76,7 +76,7 @@
 
 ## Deploy
 - [x] URL pública — https://kurio-nft-marketplace-zeta.vercel.app
-- [ ] mesma versão do repo commitado (redeploy/smoke após commit final)
+- [x] mesma versão do repo commitado (`7b82d92` redeployada; smoke pós-commit PASS)
 - [x] mocks funcionando (public smoke)
 - [x] socket mock funcionando (client conectado no public smoke)
 - [x] deep links
