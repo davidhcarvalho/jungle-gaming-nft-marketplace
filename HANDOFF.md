@@ -1,5 +1,24 @@
 # Handoff entre Sessões/Agentes
 
+## Estado atual — Lote 07 gates PASS; fila pausada no commit local (2026-10-31)
+
+- Gates de `LOT_07_REALTIME_FAILURES` estão **PASS**; Lote 08 não iniciado. A fila está pausada porque o sandbox monta `.git` somente para leitura: `git add` falhou ao criar `.git/index.lock`. Nenhum arquivo foi staged ou committed. Faça o commit local autorizado no host e retome a fila após verificar o SHA e working tree.
+- Binding instalada no host e inspecionada em `node_modules`: `@mswjs/socket.io-binding@0.2.0`; export `toSocketIo(connection)`; conexão por `ws.link(url)`; peer MSW 2.15.0. O caminho de resposta/evento usa `SocketIo.client.emit`, igual ao padrão do README da binding; `SocketIo.server.emit` exigia uma conexão real do servidor e falhava por não estar aberta.
+- Implementados cliente Socket.IO dinâmico após bootstrap MSW, subscription por sessão, eventos versionados `nft.updated`/`order.updated`, deduplicação, descarte de versões antigas, invalidação/reconciliação REST após reconnect, quote stale, teardown e isolamento privado. Harness altera stores mock compartilhadas via `POST /api/test-scenarios/realtime`.
+- `spec:realtime-failures` PASS, 27/27 em 390/768/1440 (Request ID `1793478980-257338-45`); `spec:catalog` PASS após correção de retry (Request ID `1793480107-257338-47`); `full` PASS: typecheck/lint/build/build com mocks, E2E 249 PASS, 9 SKIPPED, 0 FAIL (Request ID `1793480213-257338-48`).
+- Revisão das capturas `evidence/lot-07/` feita contra padrões aprovados do carrinho e recibo; detalhes em `evidence/lot-07/visual-review.md`.
+- A primeira execução completa revelou que o status de atualização de catálogo bloqueava o botão retry; `pointer-events: none` removeu a interceptação sem esconder feedback. A captura/revisão do Lote 07 foi mantida e capturas históricas dos Lotes 02/03/05 foram restauradas individualmente de `HEAD`.
+- `git diff --check` passou e os arquivos foram revisados; a tentativa de staging explícito falhou por permissão de filesystem em `.git`, não por erro no projeto. Próximo passo no host: stage explícito dos arquivos do Lote 07 e commit `feat: implement realtime synchronization`; somente após verificar SHA e working tree, iniciar a leitura integral do Lote 08.
+
+## Histórico de bloqueio anterior — Lote 07 (resolvido em 2026-10-31)
+
+O registro abaixo descrevia a ausência da binding antes da instalação externa; foi superado pela retomada atual.
+
+- Lotes 01–06 aprovados externamente. Iniciado somente o `LOT_07_REALTIME_FAILURES`; Lote 08 não iniciado.
+- Leituras obrigatórias do Lote 07 e inspeção da arquitetura existentes realizadas. O cliente `socket.io-client` atual é apenas uma factory desconectada; MSW é 2.15.0 e `@mswjs/interceptors` 0.41.9. A binding obrigatória não está instalada/cacheada.
+- Tentativa versionada de obter `@mswjs/socket.io-binding@0.2.0` expirou; probe de `registry.npmjs.org` falhou em DNS (`Could not resolve host`). Não houve alterações de runtime, package.json ou lockfile. A API atual do GitHub difere da API documentada na publicação npm, então não foi feito código especulativo nem bypass de peer dependencies.
+- Única alteração: governança registrando plano e Q7. Nenhum gate L07 executado, pois o transporte obrigatório não pode ser implementado/verificado até resolver o registry. Para retomar, habilitar resolução/acesso ao npm registry no ambiente de instalação; instalar e inspecionar versão compatível, então implementar, solicitar `spec:realtime-failures` e depois `full` pelo runner. Não pedir execução manual de Playwright; não avançar ao Lote 08.
+
 ## Fechamento — Lote 06 (2026-10-31)
 
 - **LOT 06 STATUS: PASS.** `spec:profile-wallets`: 70 PASS, 2 SKIPPED, 0 FAIL (Request ID `1793469615-257338-37`). `full`: typecheck/lint/build/build com mocks PASS; E2E 222 PASS, 9 SKIPPED, 0 FAIL (Request ID `1793469885-257338-38`). Runner host Node 24.22.1/npm 11.19.1.

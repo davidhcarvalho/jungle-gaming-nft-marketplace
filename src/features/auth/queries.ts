@@ -2,6 +2,7 @@ import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/r
 
 import { queryKeys } from '@/lib/query-keys'
 import { getCurrentSession, login, logout, signup } from '@/features/auth/api'
+import { stopRealtimeSession } from '@/realtime/session-lifecycle'
 import type { AuthPayload, SignupPayload } from '@/types/api'
 import type { Session } from '@/types/domain'
 
@@ -21,6 +22,7 @@ export function useLogin() {
   return useMutation({
     mutationFn: (payload: AuthPayload) => login(payload),
     onSuccess: async ({ session }) => {
+      stopRealtimeSession()
       await clearPrivateQueries(queryClient)
       queryClient.setQueryData<Session | null>(queryKeys.auth.session, session)
     },
@@ -32,6 +34,7 @@ export function useSignup() {
   return useMutation({
     mutationFn: (payload: SignupPayload) => signup(payload),
     onSuccess: async ({ session }) => {
+      stopRealtimeSession()
       await clearPrivateQueries(queryClient)
       queryClient.setQueryData<Session | null>(queryKeys.auth.session, session)
     },
@@ -43,6 +46,7 @@ export function useLogout() {
   return useMutation({
     mutationFn: logout,
     onSettled: async () => {
+      stopRealtimeSession()
       await clearPrivateQueries(queryClient)
       queryClient.setQueryData<Session | null>(queryKeys.auth.session, null)
     },

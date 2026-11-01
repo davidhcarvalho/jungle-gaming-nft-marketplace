@@ -5,6 +5,7 @@ import { getApiError } from '@/api/errors'
 import { Button } from '@/components/ui/button'
 import { NFTCard } from '@/features/catalog/components/nft-card'
 import { useNFTCatalog } from '@/features/catalog/queries'
+import { isNftRealtimeUpdateForItems, useRealtimeSnapshot } from '@/realtime/realtime-provider'
 import {
   useApplyCartCoupon,
   useCart,
@@ -23,6 +24,7 @@ export function CartPage() {
   const applyCoupon = useApplyCartCoupon()
   const removeCoupon = useRemoveCartCoupon()
   const recommendations = useNFTCatalog({ sort: 'popular', page: 1 })
+  const realtime = useRealtimeSnapshot()
   const [couponInput, setCouponInput] = useState('')
   const [feedback, setFeedback] = useState('')
   const firstMutationError = [updateQuantity.error, removeItem.error, applyCoupon.error, removeCoupon.error].find(Boolean)
@@ -59,6 +61,7 @@ export function CartPage() {
   }
 
   const items = cart.data.items
+  const realtimeUpdateAffectsCart = isNftRealtimeUpdateForItems(realtime, items.map((item) => item.nftId))
   const busy = updateQuantity.isPending || removeItem.isPending || applyCoupon.isPending || removeCoupon.isPending
   const recommendedItems = (recommendations.data?.items ?? []).filter((item) => !items.some((cartItem) => cartItem.nftId === item.id)).slice(0, 5)
 
@@ -72,6 +75,7 @@ export function CartPage() {
 
       {activeError && <p className="cart-mutation-error" role="alert">{activeError.message}</p>}
       {feedback && <p className="cart-feedback" role="status">{feedback}</p>}
+      {realtimeUpdateAffectsCart && realtime.lastNftUpdate && <p className="cart-realtime-feedback" role="status" aria-label="Atualização de NFT" aria-live="polite">{realtime.lastNftUpdate.message}</p>}
 
       {items.length === 0 ? (
         <section className="cart-empty" data-testid="cart-empty" aria-labelledby="cart-empty-title">

@@ -161,3 +161,15 @@ export interface VersionedSocketEvent<TResource, TPayload> {
   resource: TResource
   payload: TPayload
 }
+
+export type NftUpdateReason = 'price' | 'availability'
+
+export type NftUpdatedEvent = VersionedSocketEvent<
+  NFT,
+  { reason: NftUpdateReason; changedEditionIds: string[] }
+>
+
+export type OrderUpdatedEvent = VersionedSocketEvent<
+  Order,
+  { previousStatus: OrderStatus; status: OrderStatus }
+>

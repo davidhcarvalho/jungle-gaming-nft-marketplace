@@ -8,12 +8,14 @@ import { resetCartMockState } from '@/mocks/state/cart-store'
 import { resetOrderMockState } from '@/mocks/state/orders-store'
 import { resetCatalogPriceOverrides, setCatalogPriceOverride } from '@/mocks/state/catalog-price-overrides'
 import { resetProfileMockState } from '@/mocks/state/profile-store'
+import { disconnectMockSockets } from '@/mocks/socket/server'
 
 export const scenarioHandlers = [
   http.post('/api/test-scenarios/reset', async ({ request }) => {
     const body: unknown = await request.json().catch(() => undefined)
     const scenario = readScenario(body)
     const { scenario: activeScenario } = resetMockState(scenario)
+    disconnectMockSockets()
     resetAuthMockState()
     resetCartMockState(activeScenario === 'cart-existing' || activeScenario === 'cart-existing-mutation-error')
     resetOrderMockState()

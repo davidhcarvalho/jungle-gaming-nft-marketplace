@@ -2,9 +2,9 @@
 
 Este arquivo contém apenas lacunas reais. Não usar como desculpa para interromper trabalho que pode ser derivado com segurança.
 
-## Estado dos Lotes 04–06
+## Estado dos Lotes 04–07
 
-Os Lotes 04, 05 e 06 foram validados e aprovados. No Lote 06, `spec:profile-wallets` passou (70 PASS, 2 SKIPPED) e `full` passou (222 PASS, 9 SKIPPED, sem falhas; typecheck/lint/build/build com mocks verdes). Não há bloqueios ambientais ou funcionais em aberto para os Lotes 04–06. As lacunas gerais Q1–Q5 abaixo continuam válidas; Lote 07 ainda não iniciado.
+Os Lotes 04–07 foram validados e aprovados. No Lote 07, `spec:realtime-failures` e `full` passaram; o full terminou com 249 PASS, 9 SKIPPED e 0 FAIL, além de typecheck/lint/build/build com mocks PASS. Não há bloqueios funcionais ou ambientais em aberto para os Lotes 04–07. As lacunas gerais Q1–Q5 abaixo continuam válidas.
 
 ## Q1 — Fonte exata
 
@@ -42,4 +42,14 @@ Cores aproximadas podem ser extraídas das screenshots, mas não são garantia d
 
 O Local Validation Runner executou `spec:auth-favorites` e `full` no host. O spec passou (25 PASS, 2 SKIPPED); o target full passou em typecheck/lint/build/build com mocks e na suíte E2E (68 PASS, 4 SKIPPED, 0 FAIL de 72). Capturas Login/Cadastro foram geradas e comparadas com as referências, com uma rodada de correção responsiva. Request IDs e detalhes estão em `PROGRESS.md`; revisão visual em `evidence/lot-03/visual-review.md`.
 
-Não há bloqueio de browser pendente. Lotes 04–06 estão aprovados; Lote 07 continua não iniciado.
+Não há bloqueio de browser pendente. Lotes 04–07 estão aprovados; a instalação da binding resolveu o Q7.
+
+## Q7 — Instalação da binding Socket.IO/MSW — RESOLVIDA
+
+O host instalou `@mswjs/socket.io-binding@0.2.0`. A inspeção direta de package.json/README/source/typings confirmou o export `toSocketIo(WebSocketHandlerConnection)` e compatibilidade de peer com MSW `^2.10.2`; versão consta no manifesto e lock. O uso nesta versão não é `SocketIo` nem `ws.link(..., { protocol })`.
+
+**Evidência da resolução:** `node_modules/@mswjs/socket.io-binding/{package.json,README.md,src/index.ts,build/index.d.ts,build/index.js}`; versão 0.2.0. Limitações: wrapper com namespace padrão, sem rooms/broadcasting/ack complexo e anexos binários. Integração comprovada pelo spec realtime e pelo E2E completo do Lote 07.
+
+## Q8 — Commit local do Lote 07 no ambiente host
+
+Os gates do Lote 07 passaram, mas o ambiente agente não pode escrever no diretório `.git`: `git add` falhou ao criar `.git/index.lock` com `Read-only file system`. Nenhum arquivo foi staged e nenhum commit foi criado. O Lote 08 só pode começar após stage/commit local no host com a mensagem `feat: implement realtime synchronization` e verificação do SHA/working tree.

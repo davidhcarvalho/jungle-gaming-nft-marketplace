@@ -77,7 +77,7 @@ Este arquivo é uma visão rápida. Os critérios completos estão em `lots/`.
 - [x] E2E
 
 ## 06 — Profile/Wallets
-> PASS — `spec:profile-wallets`: 70 PASS, 2 SKIPPED, 0 FAIL (Request ID `1793469615-257338-37`); `full`: 222 PASS, 9 SKIPPED, 0 FAIL, com typecheck/lint/build/build com mocks PASS (Request ID `1793469885-257338-38`). Revisão visual e desvios em `evidence/lot-06/visual-review.md`. Não iniciar Lote 07.
+> PASS — `spec:profile-wallets`: 70 PASS, 2 SKIPPED, 0 FAIL (Request ID `1793469615-257338-37`); `full`: 222 PASS, 9 SKIPPED, 0 FAIL, com typecheck/lint/build/build com mocks PASS (Request ID `1793469885-257338-38`). Revisão visual e desvios em `evidence/lot-06/visual-review.md`.
 - [x] profile
 - [x] avatar
 - [x] password
@@ -88,16 +88,17 @@ Este arquivo é uma visão rápida. Os critérios completos estão em `lots/`.
 - [x] E2E
 
 ## 07 — Real-time/Failures
-- [ ] socket.io-client
-- [ ] mock transport
-- [ ] nft.updated
-- [ ] order.updated
-- [ ] event version
-- [ ] duplicate/stale
-- [ ] cleanup
-- [ ] reconnect REST
-- [ ] failure scenarios
-- [ ] E2E realtime
+- **PASS (gates):** `spec:realtime-failures` 27 PASS (Request ID `1793478980-257338-45`); `spec:catalog` PASS após correção de interação (Request ID `1793480107-257338-47`); `full` typecheck/lint/build/build com mocks PASS e E2E 249 PASS, 9 SKIPPED, 0 FAIL (Request ID `1793480213-257338-48`). Regressões históricas de screenshots restauradas; revisão visual em `evidence/lot-07/visual-review.md`. Commit local autorizado ainda pendente porque `.git` está montado somente para leitura neste ambiente; não iniciar Lote 08 antes do commit.
+- [x] socket.io-client
+- [x] mock transport via MSW binding
+- [x] nft.updated
+- [x] order.updated
+- [x] event version
+- [x] duplicate/stale
+- [x] cleanup e isolamento
+- [x] reconnect REST
+- [x] failure scenarios
+- [x] E2E realtime
 
 ## 08 — Quality/Deploy
 - [ ] full E2E

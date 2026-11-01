@@ -1,4 +1,4 @@
-import { nftFixtures } from '@/features/catalog/fixtures'
+import { getCatalogNFTs } from '@/mocks/state/catalog-price-overrides'
 import { multiplyEth, weiToEth } from '@/lib/eth-decimal'
 import type { Cart, CartItem } from '@/types/domain'
 
@@ -165,11 +165,10 @@ function toCartItem(line: StoredLine): CartItem {
 }
 
 function findEdition(nftId: string, editionId: string) {
-  const nft = nftFixtures.find((candidate) => candidate.id === nftId)
+  const nft = getCatalogNFTs().find((candidate) => candidate.id === nftId)
   if (!nft) throw new CartStoreError('not_found', 'Este NFT não está disponível.')
   const edition = nft.editions.find((candidate) => candidate.id === editionId)
   if (!edition) throw new CartStoreError('not_found', 'Esta edição não está disponível.')
-  if (edition.available <= 0) throw new CartStoreError('availability', 'Esta edição está esgotada.')
   return { nft, edition }
 }
 

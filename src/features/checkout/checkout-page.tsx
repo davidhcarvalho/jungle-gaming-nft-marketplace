@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { createPortal } from 'react-dom'
 import axios from 'axios'
 import { getApiError } from '@/api/errors'
+import { isNftRealtimeUpdateForItems, useRealtimeSnapshot } from '@/realtime/realtime-provider'
 import { Button } from '@/components/ui/button'
 import { useSession } from '@/features/auth/queries'
 import { useCart, useCartQuote } from '@/features/cart/queries'
@@ -20,6 +21,7 @@ export function CheckoutPage() {
   const disconnect = useDisconnectWallet()
   const revalidate = useRevalidateCheckout()
   const create = useCreateOrder()
+  const realtime = useRealtimeSnapshot()
   const navigate = useNavigate()
   const [walletId, setWalletId] = useState('')
   const [networkId, setNetworkId] = useState('ethereum')
@@ -33,6 +35,9 @@ export function CheckoutPage() {
   const activeWallet = wallets.data?.wallets.find((wallet) => wallet.id === activeWalletId)
   const selectedQuote = freshQuote ?? quoteQuery.data
   const busy = revalidate.isPending || create.isPending
+  const realtimeQuoteAffected = isNftRealtimeUpdateForItems(realtime, cart.data?.items.map((item) => item.nftId) ?? [])
+  const realtimeReviewRequired = Boolean(realtimeQuoteAffected && realtime.lastNftUpdate
+    && realtime.lastNftUpdate.version > (Number(sessionStorage.getItem(`kurio:realtime-reviewed-version:${realtime.lastNftUpdate.nftId}`)) || 0))
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setFieldError(''); setFeedback('')
@@ -45,7 +50,13 @@ export function CheckoutPage() {
       const valuesChanged = selectedQuote.subtotalEth !== fresh.quote.subtotalEth || selectedQuote.discountEth !== fresh.quote.discountEth || selectedQuote.networkFeeEth !== fresh.quote.networkFeeEth || selectedQuote.totalEth !== fresh.quote.totalEth || JSON.stringify(selectedQuote.items) !== JSON.stringify(fresh.quote.items)
       const changeMessages = fresh.changes.length ? fresh.changes : valuesChanged ? ['Os valores do pedido foram atualizados.'] : []
       if (changeMessages.length && fresh.quote.id !== freshQuote?.id) {
-        setFreshQuote(fresh.quote); setChanges(changeMessages); setFeedback('Os valores foram atualizados. Revise as alterações e confirme novamente.'); return
+        setFreshQuote(fresh.quote); setChanges(changeMessages); if (realtimeQuoteAffected && realtime.lastNftUpdate) sessionStorage.setItem(`kurio:realtime-reviewed-version:${realtime.lastNftUpdate.nftId}`, String(realtime.lastNftUpdate.version)); setFeedback('Os valores foram atualizados. Revise as alterações e confirme novamente.'); return
+      }
+      if (realtimeReviewRequired && realtime.lastNftUpdate) {
+        sessionStorage.setItem(`kurio:realtime-reviewed-version:${realtime.lastNftUpdate.nftId}`, String(realtime.lastNftUpdate.version))
+        setFreshQuote(fresh.quote); setChanges(['A cotação foi revalidada após uma alteração no NFT. Confirme novamente para continuar.'])
+        setFeedback('A cotação foi atualizada. Revise e confirme novamente.')
+        return
       }
       setFreshQuote(fresh.quote); setChanges([]); setSubmitted(true)
       const payload: CreateOrderPayload = {
@@ -91,6 +102,7 @@ export function CheckoutPage() {
       <aside className="checkout-summary" aria-labelledby="checkout-summary-heading"><h2 id="checkout-summary-heading">Seus NFTs</h2><div className="checkout-summary-items">{cart.data.items.map((item) => <div className="checkout-summary-item" key={item.id}><img src={item.imageUrl} alt="" /><div><strong>{item.nftName}</strong><span>{item.editionLabel} · {item.quantity} unidade(s)</span></div></div>)}</div>
         {cart.data.couponCode && <p className="checkout-applied-coupon">Cupom aplicado: <strong>{cart.data.couponCode}</strong></p>}
         {selectedQuote && <QuoteLines quote={selectedQuote} />}
+        {realtimeQuoteAffected && realtime.lastNftUpdate && <p className="checkout-quote-warning" role="status" aria-label="Atualização em tempo real" aria-live="polite">{realtime.lastNftUpdate.message}</p>}
         <section className="checkout-wallet-section" aria-labelledby="wallet-heading"><div className="checkout-section-heading"><div><h2 id="wallet-heading">Carteira e rede</h2><p>Selecione uma carteira cadastrada na sua conta.</p></div>{wallets.data.connectedWalletId === activeWalletId && <Button variant="outline" type="button" onClick={() => disconnect.mutate()}>Desconectar</Button>}</div>
           <div className="checkout-wallet-list">{wallets.data.wallets.map((wallet) => <label className={`checkout-wallet${activeWalletId === wallet.id ? ' is-selected' : ''}`} key={wallet.id}><input type="radio" name="wallet" value={wallet.id} checked={activeWalletId === wallet.id} onChange={() => setWalletId(wallet.id)} /><span className="checkout-wallet-icon" aria-hidden="true">◇</span><span><strong>{wallet.label}</strong><small>{wallet.address.slice(0, 8)}…{wallet.address.slice(-6)} · {wallet.role === 'primary' ? 'Principal' : 'Secundária'}</small></span><span className="checkout-wallet-check" aria-hidden="true">✓</span></label>)}</div>
           <label className="checkout-network" htmlFor="checkout-network">Rede<select id="checkout-network" aria-label="Rede de pagamento" value={networkId} onChange={(e) => setNetworkId(e.target.value)}>{wallets.data.networks.map((network) => <option key={network.id} value={network.id}>{network.name}</option>)}</select></label>

@@ -28,6 +28,7 @@ export const checkoutOrderHandlers = [
     if (getMockScenario() === 'checkout-availability-changed') return apiError('availability', 'A disponibilidade desta edição mudou. Revise seu carrinho.', 409)
     const cart = getMockCart(`user:${user.userId}`)
     if (!cart.items.length) return apiError('validation', 'Seu carrinho está vazio.', 422)
+    if (cart.items.some((item) => item.quantity > item.available)) return apiError('availability', 'A disponibilidade mudou e não cobre mais as quantidades do carrinho. Ajuste os itens antes de continuar.', 409)
     const body = await readBody(request)
     return HttpResponse.json<CheckoutRevalidationResponse>(getRevalidatedQuote(cart, typeof body.networkId === 'string' ? body.networkId : 'ethereum'))
   }),

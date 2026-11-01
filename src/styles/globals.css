@@ -183,7 +183,7 @@ button:disabled { cursor: not-allowed; }
 .catalog-sort-label select { max-width: 144px; border: 0; background: transparent; color: #d6c9b5; font-size: 10px; }
 .catalog-sort-label option { background: #241612; }
 .catalog-results { position: relative; min-height: 240px; }
-.catalog-update-status { position: absolute; top: 0; right: 0; z-index: 1; margin: 0; border-radius: 3px; background: #241612; padding: 5px 8px; color: #d6c9b5; font-size: 10px; }
+.catalog-update-status { position: absolute; top: 0; right: 0; z-index: 1; margin: 0; border-radius: 3px; background: #241612; padding: 5px 8px; color: #d6c9b5; font-size: 10px; pointer-events: none; }
 .catalog-background-error { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 10px; border: 1px solid #82572f; background: #241612; padding: 9px 11px; color: #d6c9b5; font-size: 10px; line-height: 1.5; }
 .catalog-background-error button { flex: 0 0 auto; border: 0; background: transparent; padding: 0; color: #e2a76b; font-size: 10px; text-decoration: underline; }
 .catalog-result-meta { min-height: 22px; display: flex; justify-content: space-between; color: #9c8067; font-size: 10px; }
@@ -657,6 +657,7 @@ button:disabled { cursor: not-allowed; }
 .cart-recommendation-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px; }
 .cart-feedback, .cart-mutation-error { margin: 0 0 14px; border-radius: 5px; padding: 10px 12px; font-size: 11px; }
 .cart-feedback { border: 1px solid #526b43; background: #1b2818; color: #c4df9c; }
+.cart-realtime-feedback { margin: 0 0 14px; border: 1px solid #8b5b2b; border-radius: 5px; padding: 10px 12px; background: #24170f; color: #f0b36f; font-size: 11px; }
 .cart-mutation-error { border: 1px solid #734336; background: #2a1712; color: #ffb6a5; }
 .cart-empty { display: grid; min-height: 360px; justify-items: center; align-content: center; border: 1px solid #493126; border-radius: 10px; background: #241612; padding: 30px; text-align: center; }
 .cart-empty-mark { color: #d69758; font-size: 42px; }
@@ -741,7 +742,7 @@ button:disabled { cursor: not-allowed; }
   .cart-loading-heading { width: 180px; height: 22px; margin: 0 auto 24px; }
   .cart-item-skeleton { height: 116px; }
   .cart-summary-skeleton { min-height: 238px; padding: 20px 17px; }
-  .cart-feedback, .cart-mutation-error { font-size: 10px; }
+  .cart-feedback, .cart-mutation-error, .cart-realtime-feedback { font-size: 10px; }
 }
 
 /* Checkout and immutable order receipt */

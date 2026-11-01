@@ -33,6 +33,27 @@ Qual problema exigiu decisão?
 
 ## Decisões já conhecidas
 
+### ADR-012 — Socket.IO mockado via binding MSW e reconciliação REST
+
+**Data:** 2026-10-31
+**Lote:** 07
+**Status:** Aceito
+
+#### Contexto
+O challenge exige que atualizações realtime atravessem `socket.io-client`, mantendo os mocks de rede determinísticos e consistentes com REST. A API instalada de `@mswjs/socket.io-binding@0.2.0` é diferente de exemplos antigos: exporta `toSocketIo(connection)` e adapta uma conexão `ws.link(...)`.
+
+#### Decisão
+Usar `ws.link(window.location.origin)` com `toSocketIo(connection)` para o mock no namespace/path padrão; importar `socket.io-client` dinamicamente após o bootstrap MSW; manter uma conexão/listeners por sessão e removê-los no teardown. Eventos versionados são aplicados apenas quando mais novos; duplicatas/versões antigas são ignoradas. Reconnect invalida recursos ativos para reconciliação por REST. REST segue autoritativo para quote, disponibilidade e pedido.
+
+#### Por quê
+Exercita o cliente Socket.IO real no browser sem substituir o transporte por setters, mantendo o estado simulado único entre handlers HTTP e eventos. A binding instalada trata handshake e protocolo, evitando implementação manual de framing.
+
+#### Consequências
+O mock suporta somente namespace padrão e não cobre rooms reais, broadcast distribuído, acks complexos ou attachments binários. Cenários de teste alteram stores MSW persistidas e publicam notificações; pedidos privados são filtrados pela sessão autenticada. Atualização de NFT invalida quote; checkout precisa revalidar via REST e pedir confirmação explícita quando houver mudança.
+
+#### Como explicar em entrevista
+Socket.IO informa que um recurso mudou, mas o REST decide qual é o estado atual. Versionamento impede regressão por eventos atrasados; após reconnect, invalido queries ativas porque o cliente pode ter perdido eventos durante a desconexão.
+
 ### ADR-009 — Derivação mobile para Perfil e Carteiras
 
 **Data:** 2026-10-31

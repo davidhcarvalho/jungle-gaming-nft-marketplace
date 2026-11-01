@@ -6,6 +6,7 @@ import { clearSessionToken } from '@/lib/session-token'
 import { clearPrivateQueries, useLogout, useSession } from '@/features/auth/queries'
 import { queryKeys } from '@/lib/query-keys'
 import { useCart } from '@/features/cart/queries'
+import { stopRealtimeSession } from '@/realtime/session-lifecycle'
 
 export function RootLayout() {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
@@ -26,6 +27,7 @@ export function RootLayout() {
       const location = window.location
       const returnTo = `${location.pathname}${location.search}${location.hash}`
       clearSessionToken()
+      stopRealtimeSession()
       void clearPrivateQueries(queryClient)
       queryClient.setQueryData(queryKeys.auth.session, null)
       if (!isAuthRoute) void navigate({ to: '/login', search: { returnTo }, replace: true })

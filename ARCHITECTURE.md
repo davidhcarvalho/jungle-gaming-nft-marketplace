@@ -1,4 +1,4 @@
-# Arquitetura da solução — Lotes 01 a 05
+# Arquitetura da solução — Lotes 01 a 07
 
 Este documento registra as partes implementadas até o Lote 05. Perfil completo, CRUD de carteiras e real-time funcional seguem para lotes posteriores.
 
@@ -21,7 +21,7 @@ Este documento registra as partes implementadas até o Lote 05. Perfil completo,
 - `src/features/favorites`: API, query por usuário e mutation otimista com rollback.
 - `src/features/cart`: identidade guest, API Axios, queries/mutations de carrinho e cotação, resumo e layout responsivo.
 - `src/mocks`: worker, handlers, fixture e cenário resetável.
-- `src/realtime`: factory inicial de `socket.io-client`, sem conexão ou eventos nesta etapa.
+- `src/realtime`: conexão por sessão com `socket.io-client`, consumidor tipado/versionado de eventos, invalidação/reconciliação REST e teardown no logout/troca de usuário.
 - `src/routes`: placeholders explícitos e tratamento de rota não encontrada.
 - `src/types`: contratos iniciais de API e domínio, com ETH modelado como string decimal.
 
@@ -76,13 +76,23 @@ O resumo da cotação tem skeleton com shimmer durante leitura/refetch inicial; 
 
 `POST /api/orders` exige header `Idempotency-Key`. O cliente guarda uma chave por tentativa lógica no `sessionStorage`, reutiliza durante falha de transporte/retry e encerra a tentativa após resposta conclusiva ou conflito. O mock indexa a chave por usuário, compara o payload canônico e retorna o mesmo pedido quando a chave e payload coincidem; payload diferente conflita. O cenário timeout-after-create persiste um pedido pending antes de simular falha de rede, permitindo recuperar esse mesmo pedido na repetição.
 
-Pedidos são recuperados por `GET /api/orders/:orderId` e atualização controlada por `POST /api/orders/:orderId/refresh`. A máquina mock permite `pending → confirmed|rejected`; estados terminais não regridem. Esta recuperação usa REST e TanStack Query; `socket.io-client` permanece sem conexão/eventos reais até o Lote 07.
+Pedidos são recuperados por `GET /api/orders/:orderId` e atualização controlada por `POST /api/orders/:orderId/refresh`. A máquina mock permite `pending → confirmed|rejected`; estados terminais não regridem. O Lote 07 acrescenta notificações Socket.IO para esses estados; REST continua autoridade e é consultado após reconexão.
 
 Ao confirmar, o mock cria um snapshot de receipt com itens, edição, quantidades, preços de linha, quote, carteira, rede, referência simulada e timestamp. Esse snapshot fica no pedido e não consulta novamente catálogo para renderização. Pedido rejected/pending preserva o carrinho; confirmação remove apenas as quantidades efetivamente gravadas no pedido. ETH continua string decimal no contrato e os cálculos mock usam wei com `bigint` conforme ADR-007.
 
 O harness MSW expõe um endpoint de teste restrito para alterar preço de fixture (`POST /api/test-scenarios/catalog-price`); a mutação persiste no estado local de mock e é limpa pelo reset de cenário. Playwright usa essa rota para comprovar que o catálogo muda enquanto o recibo confirmado conserva os valores capturados.
 
 O formulário de colecionador reaproveita dados da sessão e envia erros de validação pelo contrato do pedido. O frame mobile não possui formulário de colecionador; a composição mobile deriva a prioridade de carteira/rede/total e CTA do Figma, enquanto o formulário completo permanece no desktop. Não existe conexão de blockchain real e referências do explorer usam domínio `.invalid` de simulação.
+
+## Sincronização realtime — Lote 07
+
+`src/realtime/socket-client.ts` cria uma conexão `socket.io-client@4.8.4` por contexto de sessão, com transporte WebSocket e reconexão habilitada. O import do cliente é dinâmico após o bootstrap MSW, para que o browser use o WebSocket interceptável. `RealtimeProvider` associa a conexão à sessão atual, instala listeners uma vez por lifecycle e remove listeners/desconecta em logout, troca de usuário e unmount.
+
+Em modo mock, `src/mocks/socket/server.ts` registra `ws.link(window.location.origin)` e adapta cada conexão pelo `toSocketIo(connection)` de `@mswjs/socket.io-binding@0.2.0` (MSW 2.15.0). Usa o namespace padrão e o path Socket.IO padrão. A binding implementa o handshake/protocolo sobre WebSocket interceptado pelo MSW; não há framing manual. O escopo de demonstração não inclui namespaces customizados, rooms, broadcast distribuído, acknowledgements complexos ou anexos binários.
+
+Eventos `nft.updated` e `order.updated` carregam `eventId`, `resourceId`, `version`, recurso completo coerente com a resposta REST e payload tipado. O consumidor ignora IDs repetidos, versões iguais/antigas e transições que contrariem estado terminal; para pedido, também valida o `userId` ativo. Um evento NFT atualiza detalhe, invalida catálogo/carrinho/quote e informa que a quote precisa ser revista. A confirmação continua passando pela revalidação REST obrigatória do Lote 05. `order.updated` atualiza o pedido pendente e invalida dados relacionados; somente `confirmed` exibe confirmação.
+
+Após reconnect, a aplicação espera a nova subscription e invalida recursos REST ativos (catálogo/detalhe, carrinho/quote e pedidos), recuperando eventos perdidos sem criar novo pedido. O mock controla cenários por `POST /api/test-scenarios/realtime`: `nft-price`, `nft-availability`, `order-status`, `order-status-missed` e `disconnect`; mudanças usam as mesmas stores persistidas que os handlers REST. Reset de cenário limpa overrides e encerra conexões simuladas para isolamento determinístico.
 
 ## Perfil e carteiras — Lote 06
 
