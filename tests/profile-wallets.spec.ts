@@ -206,6 +206,7 @@ test('session expiration removes private access and keeps a login return path', 
   await prepare(page)
   await setMockScenario(page, 'session-expired')
   allowExpectedHttpFailure('/api/auth/session', 401)
+  allowExpectedHttpFailure('/api/profile', 401, { required: false })
   await page.goto('/profile')
   await expect(page).toHaveURL(/\/login\?returnTo=%2Fprofile/)
 })

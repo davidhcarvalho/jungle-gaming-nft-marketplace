@@ -89,7 +89,7 @@ export function NFTDetailPage() {
             ))}
           </div>
           <div className="detail-main-art">
-            <NFTArtwork src={nft.imageUrl} alt={`Arte digital colecionável ${nft.name}`} eager className={`artwork-view-${galleryView}`} />
+            <NFTArtwork src={nft.imageUrl} alt={`Arte digital colecionável ${nft.name}`} eager responsive sizes="(max-width: 767px) 334px, 500px" className={`artwork-view-${galleryView}`} />
             <span className="art-zoom-mark" aria-hidden="true">⌕</span>
           </div>
         </div>

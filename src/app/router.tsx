@@ -4,23 +4,25 @@ import {
   createRouter,
   redirect,
 } from '@tanstack/react-router'
+import { lazy } from 'react'
 
 import { RootLayout } from '@/components/layout/root-layout'
-import { FoundationSmokePage } from '@/features/foundation/foundation-smoke-page'
 import { NotFoundPage } from '@/routes/not-found-page'
-import { HomePage } from '@/features/catalog/home-page'
-import { NFTDetailPage } from '@/features/nft/nft-detail-page'
-import { CartPage } from '@/features/cart/cart-page'
-import { CheckoutPage } from '@/features/checkout/checkout-page'
-import { OrderPage } from '@/features/orders/order-page'
 import { validateCatalogSearch } from '@/features/catalog/model'
-import { AuthPage } from '@/features/auth/auth-page'
 import { sanitizeReturnTo, validateAuthSearch } from '@/features/auth/model'
 import { clearPrivateQueries, sessionQueryOptions } from '@/features/auth/queries'
 import { queryClient } from '@/app/query-client'
 import { queryKeys } from '@/lib/query-keys'
-import { ProfilePage } from '@/features/profile/profile-page'
-import { WalletsPage } from '@/features/wallets/wallets-page'
+
+const HomePage = lazy(() => import('@/features/catalog/home-page').then(({ HomePage }) => ({ default: HomePage })))
+const NFTDetailPage = lazy(() => import('@/features/nft/nft-detail-page').then(({ NFTDetailPage }) => ({ default: NFTDetailPage })))
+const CartPage = lazy(() => import('@/features/cart/cart-page').then(({ CartPage }) => ({ default: CartPage })))
+const CheckoutPage = lazy(() => import('@/features/checkout/checkout-page').then(({ CheckoutPage }) => ({ default: CheckoutPage })))
+const OrderPage = lazy(() => import('@/features/orders/order-page').then(({ OrderPage }) => ({ default: OrderPage })))
+const ProfilePage = lazy(() => import('@/features/profile/profile-page').then(({ ProfilePage }) => ({ default: ProfilePage })))
+const WalletsPage = lazy(() => import('@/features/wallets/wallets-page').then(({ WalletsPage }) => ({ default: WalletsPage })))
+const FoundationSmokePage = lazy(() => import('@/features/foundation/foundation-smoke-page').then(({ FoundationSmokePage }) => ({ default: FoundationSmokePage })))
+const AuthPage = lazy(() => import('@/features/auth/auth-page').then(({ AuthPage }) => ({ default: AuthPage })))
 
 const rootRoute = createRootRoute({
   component: RootLayout,

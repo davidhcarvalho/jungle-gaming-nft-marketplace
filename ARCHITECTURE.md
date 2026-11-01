@@ -1,6 +1,6 @@
-# Arquitetura da solução — Lotes 01 a 07
+# Arquitetura da solução — implementação até o Lote 07 e fechamento Lote 08
 
-Este documento registra as partes implementadas até o Lote 05. Perfil completo, CRUD de carteiras e real-time funcional seguem para lotes posteriores.
+Este documento descreve a implementação atual do marketplace, incluindo conta, carrinho, pedidos, perfil/carteiras e sincronização realtime simulada. Os serviços de domínio são executados sobre APIs e transportes MSW locais; não há backend de produção.
 
 ## Runtime e build
 
@@ -47,11 +47,11 @@ Query key da sessão é `['auth','session']`; favoritos usam `['private', userId
 
 ## shadcn/ui e visual
 
-`components.json` configura aliases e CSS variables do shadcn. O Button usa Radix Slot, class-variance-authority e `cn`. Os tokens CSS são aproximações iniciais derivadas das referências KURIO; serão comparados e refinados nos lotes de interface. Nenhuma screenshot de referência aparece na UI.
+`components.json` configura aliases e CSS variables do shadcn. O Button usa Radix Slot, class-variance-authority e `cn`. Os tokens CSS foram ajustados às referências KURIO. Nenhuma screenshot de referência aparece na UI.
 
 ## Tipos e limites conhecidos
 
-`EthAmount` é um alias string; preço e faixa trafegam como string decimal. O handler compara decimais usando unidades inteiras `BigInt`, sem converter valores ETH para `number`. Os contratos contêm campos mínimos baseados no desafio e evoluirão junto das APIs mockadas. `socket.io-client` está instalado e a factory arquitetural está preparada; transporte, eventos e subscriptions ficam para os lotes de real-time.
+`EthAmount` é um alias string; preço e faixa trafegam como string decimal. O handler compara decimais usando unidades inteiras `BigInt`, sem converter valores ETH para `number`. Os contratos contêm campos mínimos baseados no desafio e evoluem junto das APIs mockadas. `socket.io-client` mantém a conexão e os listeners versionados de realtime descritos abaixo.
 
 No ambiente de testes, `POST /api/test-scenarios/reset` seleciona deterministicamente os cenários MSW por HTTP e persiste a escolha para a próxima navegação. Catálogo e detalhe distinguem `catalog-error` e `detail-error`. Playwright inicia Vite isolado na porta 4180 (ou `PLAYWRIGHT_PORT`) sem reutilizar processo já aberto, evitando testar bundle antigo.
 
@@ -102,4 +102,14 @@ Após reconnect, a aplicação espera a nova subscription e invalida recursos RE
 
 O estado de perfil também é persistido por usuário na camada mock. Avatar é validado e transportado como data URL de imagem somente no ambiente de demonstração, com limite de tamanho e operação REST para upload/remoção. Senhas não são persistidas em claro: o handler verifica a senha atual e substitui o SHA-256 digest da conta mock. Isso continua sendo uma simulação local, sem storage externo nem serviço de autenticação de produção.
 
-Não há frames mobile de Perfil/Carteiras. ADR-009 registra a adaptação para uma coluna e a navegação refluída; os cartões de wallet mantêm o endereço integral em seu nome acessível mesmo quando o texto visual é truncado. O Lote 06 não adiciona conexão Socket.IO nem eventos; a implementação real continua reservada ao Lote 07.
+Não há frames mobile de Perfil/Carteiras. ADR-009 registra a adaptação para uma coluna e a navegação refluída; os cartões de wallet mantêm o endereço integral em seu nome acessível mesmo quando o texto visual é truncado.
+
+## Qualidade final — Lote 08
+
+As páginas de feature usam `React.lazy` com um `Suspense` explícito no conteúdo da rota; o shell, guards e not-found permanecem na árvore inicial. Essa divisão reduziu o chunk de entrada do build normal de 514,16 kB (gzip 158,66 kB) para aproximadamente 253 kB (gzip 79,27 kB). O realtime provider continua montado, mas o client Socket.IO e seu consumidor de eventos são importados dinamicamente no ponto pós-LCP em que a conexão já é iniciada. No build demo, a entrada após essa separação é 314,96 kB (gzip 101,62 kB); o interceptor MSW requerido pela demonstração permanece em chunk separado de 336,43 kB (gzip 135,12 kB). Um teste inicial com `lazyRouteComponent` do Router gerou warning React 19 ao alternar a renderização suspensa/resolvida; foi substituído por `React.lazy` e cobertura explícita de Suspense. `npm run build:demo` gera `dist/` com MSW habilitado.
+
+As quatro imagens originais de 500×500 continuam em PNG. O browser serve versões WebP qualidade 88 em `public/assets/nfts/optimized/`, revisadas visualmente contra os originais, com 32–41 kB por arquivo frente aos WebP lossless anteriores de 262–279 kB. A imagem Emerald Ape é pré-carregada por ser o destaque da Home e o recurso padrão do detalhe auditado.
+
+`npm run lighthouse` constrói o bundle demo com MSW habilitado, inicia o Vite production preview e audita via Chromium/DevTools três vezes Home e detalhe em mobile 390×844 e desktop 1440×900, com throttling simulado. Desktop usa `formFactor: desktop` e emulação desktop explícita; não usa o dev server. Cada batch armazena os 12 relatórios JSON/HTML em diretório próprio sob `evidence/lighthouse/`, mais resumo com mediana, LCP, CLS e TBT. Request `1793511419-550281-4` registrou Performance 69/49/76/52 (Home mobile/desktop, detalhe mobile/desktop), Accessibility 100/96, Best Practices 100 e SEO 100. O README pede justificar metas não atingidas; Performance abaixo de 90 não é critério eliminatório por si só. A análise em `evidence/lighthouse/analysis.md` identifica custo de inicialização JS/MSW sob throttling simulado, render delay desktop e descoberta da imagem LCP Home mobile após a resposta REST; media/font findings também estão registrados. Mocks, REST e Socket.IO permanecem no build auditado.
+
+`vercel.json` declara o build demo, `dist/` e rewrites SPA para as rotas do desafio; `public/_redirects` permanece para hosts que usam esse formato. O URL de produção será registrado depois que o deploy for validado com MSW, Socket.IO, deep links e refresh em Playwright.

@@ -93,7 +93,7 @@ export function AuthPage({ mode, returnTo }: { mode: AuthMode; returnTo: string 
     <div className={`auth-overlay auth-${mode}`}>
       <div className="auth-desktop-backdrop" aria-hidden="true">
         <div className="auth-backdrop-copy"><p>Bem-vindo à Kurio</p><strong>SEJA DONO DO FUTURO DA ARTE DIGITAL</strong></div>
-        <img src="/assets/nfts/emerald-ape.png" alt="" />
+        <img src="/assets/nfts/optimized/emerald-ape.webp" alt="" />
       </div>
       <section className="auth-panel" ref={dialogRef} aria-labelledby="auth-title" aria-modal={window.innerWidth > 640} role={window.innerWidth > 640 ? 'dialog' : undefined}>
         <Link className="auth-mobile-brand" to="/" search={{ page: 1, sort: 'recent' }} aria-label="KURIO, início">KURIO</Link>

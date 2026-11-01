@@ -126,9 +126,16 @@ test('catalog background refresh keeps existing results after reconnect error an
   await expect(updateError).toBeVisible()
   await expect(page.getByTestId('nft-card')).toHaveCount(12)
   await expect(page.getByRole('alert')).toHaveCount(0)
+  await expect(updateError.getByRole('button', { name: 'Tentar novamente' })).toBeVisible()
 
+  // Resetting the scenario reconnects the mock socket. Its REST reconciliation
+  // can recover this stale query before a manual retry click reaches the button.
+  const reconciledCatalog = page.waitForResponse((response) => {
+    const url = new URL(response.url())
+    return url.pathname === '/api/nfts' && response.status() === 200
+  })
   await setMockScenario(page, 'default')
-  await updateError.getByRole('button', { name: 'Tentar novamente' }).click()
+  await reconciledCatalog
   await expect(updateError).toHaveCount(0)
   await expect(page.getByTestId('nft-card')).toHaveCount(12)
 })

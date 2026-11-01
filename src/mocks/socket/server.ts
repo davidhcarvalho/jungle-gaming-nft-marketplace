@@ -1,4 +1,4 @@
-import { toSocketIo } from '@mswjs/socket.io-binding'
+import type { toSocketIo } from '@mswjs/socket.io-binding'
 import { ws } from 'msw'
 
 import { getMockSession } from '@/mocks/state/auth-store'
@@ -10,7 +10,8 @@ const socketLink = ws.link(window.location.origin)
 const connections = new Map<string, MockClient>()
 
 export const socketHandlers = [
-  socketLink.addEventListener('connection', (connection) => {
+  socketLink.addEventListener('connection', async (connection) => {
+    const { toSocketIo } = await import('@mswjs/socket.io-binding')
     const socket = toSocketIo(connection)
     const client: MockClient = { connection: socket }
     connections.set(connection.client.id, client)

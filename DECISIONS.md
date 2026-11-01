@@ -318,3 +318,39 @@ Pedidos seguem `pending → confirmed | rejected`; `confirmed` e `rejected` são
 
 #### Consequências
 O fluxo não depende de atualização otimista para afirmar sucesso. Se a resposta se perde após a criação, a mesma chave recupera o mesmo pedido. Catálogo pode mudar depois sem reescrever o recibo. O domínio ainda não conecta blockchain nem emite eventos Socket.IO.
+### ADR-010 — Code splitting por rota e auditoria de demonstração
+
+**Data:** 2026-10-31
+**Lote:** 08
+**Status:** Aceito
+
+#### Contexto
+O build acumulou um chunk de entrada acima de 500 kB. A entrada inicial importava as páginas completas do marketplace, embora a maioria das rotas não fosse necessária para a primeira tela. As auditorias Lighthouse também precisam representar a entrega funcional, incluindo MSW e Socket.IO mockados, sem simplificações específicas para pontuação.
+
+#### Decisão
+Usar `React.lazy` para as páginas de feature e um `Suspense` explícito dentro do shell da rota, mantendo shell, guards e not-found no bootstrap. O experimento com `lazyRouteComponent` foi descartado após o React 19 registrar warning em renders suspensas/resolvidas. Criar `build:demo` para executar TypeScript e Vite com `VITE_ENABLE_MOCKS=true`; `lighthouse` constrói esse bundle e audita Home e detalhe, nos perfis mobile/desktop, três vezes cada. O runner host aceita somente o target fixo `lighthouse`, sem argumentos de shell recebidos do arquivo request. Relatórios individuais e resumo com mediana/LCP/CLS/TBT ficam em `evidence/lighthouse/`.
+
+#### Medição inicial
+Build normal antes: entry 514,16 kB / gzip 158,66 kB. Depois: entry 252,77 kB / gzip 79,27 kB. Build de demonstração: entry 316,10 kB e chunk do interceptor MSW 336,43 kB, ambos separados por responsabilidade. Os números não implicam resultado Lighthouse; scores ainda dependem de execução auditável no browser host.
+
+#### Consequências
+Rotas não visitadas não carregam seus módulos de feature no bundle inicial. O build de demo permanece completo e usa handlers/realtime reais do mock. As medições devem ser tratadas como válidas somente após as 12 auditorias, summary completo e revisão dos alvos/condições.
+
+### ADR-011 — Otimização de arte e relatório Lighthouse com stack demo completa
+
+**Data:** 2026-10-31
+**Lote:** 08
+**Status:** Aceito
+
+#### Contexto
+As imagens principais originais em PNG tinham 413–439 kB cada. A primeira auditoria também apontou um atributo ARIA inválido e sliders menores que 24 px. A demo precisa continuar carregando os mocks REST e o binding Socket.IO real durante a auditoria.
+
+#### Decisão
+Manter os PNG originais exportados do Figma como fonte e servir derivados WebP com qualidade 88 em `public/assets/nfts/optimized/`. Uma inspeção lado a lado dos quatro originais e derivados não revelou diferença perceptível no tamanho de exibição do produto; os derivados ocupam 32–41 kB cada, contra 262–279 kB para os WebP lossless anteriores. Pré-carregar a arte Emerald Ape, comum à Home e ao detalhe auditado. Corrigir a semântica decorativa dos pontos do hero e dar 24 px de área de interação aos sliders de preço. A conexão real-time agora inicia após o primeiro paint de conteúdo, reduzindo concorrência de trabalho de rede/CPU no bootstrap sem substituir ou atrasar requests REST/MSW.
+
+Manter Lighthouse em `throttlingMethod: simulate`, no preview do build demo, com três medições por página/perfil e todas as funcionalidades da entrega habilitadas. A inicialização MSW continua anterior à montagem React para impedir requests iniciais fora do worker. Um experimento que montava React antes da inicialização (com gate no Axios) foi revertido porque elevou LCP simulado de aproximadamente 3,6 s para cerca de 5 s.
+
+#### Evidência e consequência
+Requests `1793501317-485327-4`, `1793502860-485327-11` e `1793508017-485327-23` registram as iterações iniciais da auditoria. O batch mais recente, Request `1793511419-550281-4`, completou 12/12 no production preview com mocks: Performance 69/49/76/52 (Home mobile/desktop, detalhe mobile/desktop); Accessibility 100/96; Best Practices/SEO 100; LCP 3.53–3.92 s; CLS 0–0.07; TBT 539–916.5 ms. Conforme a fonte de verdade README, as metas abaixo devem ser justificadas; Performance abaixo de 90, isoladamente, não é critério eliminatório. A análise atual e o diagnóstico completo estão em `evidence/lighthouse/analysis.md`; a auditoria manteve mocks e funcionalidades da entrega.
+
+Os comandos Vercel e de atualização das baselines foram adicionados à whitelist fixa do Local Validation Runner; nenhum argumento de shell vem do arquivo request.

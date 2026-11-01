@@ -1,5 +1,5 @@
 import { Link, Outlet, useNavigate, useRouterState } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { clearSessionToken } from '@/lib/session-token'
@@ -55,11 +55,19 @@ export function RootLayout() {
           </div>
         </div>
       </header>
-      <main id="main-content" className="main-content"><Outlet /></main>
+      <main id="main-content" className="main-content">
+        <Suspense fallback={<RouteLoading />}>
+          <Outlet />
+        </Suspense>
+      </main>
       <SiteFooter />
       {isHome && <MobileNavigation />}
     </div>
   )
+}
+
+function RouteLoading() {
+  return <div className="route-loading" role="status" aria-live="polite"><span className="sr-only">Carregando página…</span></div>
 }
 
 function AuthHeaderActions() {

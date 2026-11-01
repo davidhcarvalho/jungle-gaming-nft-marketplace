@@ -16,10 +16,10 @@ const tabs = [
 ] as const
 
 const articles = [
-  { title: 'Como funciona a propriedade de NFTs', date: '12 de setembro', read: 'Leitura de 6 min', image: '/assets/nfts/neon-vessel.png', category: 'GUIA' },
-  { title: '10 artistas digitais para acompanhar', date: '13 de setembro', read: 'Leitura de 2 min', image: '/assets/nfts/emerald-ape.png', category: 'CRIADORES' },
-  { title: 'Raridade, atributos e procedência', date: '15 de setembro', read: 'Leitura de 3 min', image: '/assets/nfts/sage-nomad.png', category: 'MERCADO' },
-  { title: 'Como proteger sua carteira', date: '15 de setembro', read: 'Leitura de 2 min', image: '/assets/nfts/golden-beat.png', category: 'SEGURANÇA' },
+  { title: 'Como funciona a propriedade de NFTs', date: '12 de setembro', read: 'Leitura de 6 min', image: '/assets/nfts/optimized/neon-vessel.webp', category: 'GUIA' },
+  { title: '10 artistas digitais para acompanhar', date: '13 de setembro', read: 'Leitura de 2 min', image: '/assets/nfts/optimized/emerald-ape.webp', category: 'CRIADORES' },
+  { title: 'Raridade, atributos e procedência', date: '15 de setembro', read: 'Leitura de 3 min', image: '/assets/nfts/optimized/sage-nomad.webp', category: 'MERCADO' },
+  { title: 'Como proteger sua carteira', date: '15 de setembro', read: 'Leitura de 2 min', image: '/assets/nfts/optimized/golden-beat.webp', category: 'SEGURANÇA' },
 ]
 
 export function HomePage() {
@@ -73,12 +73,12 @@ export function HomePage() {
           <h1 id="hero-title"><span className="hero-title-desktop">Seja dono do futuro da arte digital</span><span className="hero-title-mobile">Seja dono da cultura digital</span></h1>
           <p className="hero-description"><span className="hero-description-desktop">Descubra NFTs selecionados de criadores emergentes e consagrados. Colecione arte digital rara, apoie artistas e tenha uma parte da cultura da internet.</span><span className="hero-description-mobile">Descubra NFTs selecionados de criadores do mundo todo.</span></p>
           <a className="hero-link" href="#catalog">EXPLORAR <span aria-hidden="true">→</span></a>
-          <div className="hero-dots" aria-label="Destaque 1 de 3"><span /><span /><span /></div>
+          <div className="hero-dots" aria-hidden="true"><span /><span /><span /></div>
         </div>
         {featured ? (
           <Link className="hero-art-link" to="/nfts/$nftId" params={{ nftId: featured.id }} aria-label={`Ver destaque ${featured.name}`}>
             <NFTArtwork src={featured.imageUrl} alt={`Arte em destaque: ${featured.name}`} eager />
-            <span className="hero-floating-art"><NFTArtwork src="/assets/nfts/sage-nomad.png" alt="" /></span>
+            <span className="hero-floating-art"><NFTArtwork src="/assets/nfts/optimized/sage-nomad.webp" alt="" /></span>
           </Link>
         ) : <div className="hero-art-placeholder shimmer" aria-hidden="true" />}
       </section>
@@ -92,7 +92,7 @@ export function HomePage() {
               <p>NFT EM DESTAQUE</p>
               <strong>OFERTA LIMITADA</strong>
               <Link to="/nfts/$nftId" params={{ nftId: 'sage-nomad-009' }} aria-label="Ver destaque Sage Nomad #009">
-                <NFTArtwork src="/assets/nfts/sage-nomad.png" alt="Sage Nomad em destaque" />
+                <NFTArtwork src="/assets/nfts/optimized/sage-nomad.webp" alt="Sage Nomad em destaque" />
               </Link>
             </article>
           </div>
@@ -147,7 +147,7 @@ export function HomePage() {
             {data && items.length > 0 && (
               <>
                 <div className="nft-grid">
-                  {items.map((nft, index) => <NFTCard key={nft.id} nft={nft} staggered={index % 2 === 1} />)}
+                  {items.map((nft, index) => <NFTCard key={nft.id} nft={nft} staggered={index % 2 === 1} eager={index === 0} />)}
                 </div>
                 {data.totalPages > 1 && <Pagination page={data.page} totalPages={data.totalPages} onPageChange={(page) => updateSearch({ page }, false)} />}
               </>
@@ -159,11 +159,11 @@ export function HomePage() {
 
       <section className="feature-banners" aria-label="Destaques do mercado">
         <article className="feature-banner">
-          <NFTArtwork src="/assets/nfts/emerald-ape.png" alt="Arte da coleção Kurio Apes" />
+          <NFTArtwork src="/assets/nfts/optimized/emerald-ape.webp" alt="Arte da coleção Kurio Apes" />
           <div><p className="banner-kicker">Lançamentos gênesis de edição limitada</p><p>Colecione edições escassas diretamente dos criadores antes da revelação pública.</p><Link to="/nfts/$nftId" params={{ nftId: 'emerald-ape-042' }}>Explorar <span aria-hidden="true">→</span></Link></div>
         </article>
         <article className="feature-banner feature-banner-reverse">
-          <NFTArtwork src="/assets/nfts/neon-vessel.png" alt="Arte digital selecionada da coleção Kurio Apes" />
+          <NFTArtwork src="/assets/nfts/optimized/neon-vessel.webp" alt="Arte digital selecionada da coleção Kurio Apes" />
           <div><p className="banner-kicker">Arte digital selecionada e muito mais</p><p>Explore novos artistas, coleções verificadas e obras digitais que definem a cultura.</p><a href="#catalog">Explorar <span aria-hidden="true">→</span></a></div>
         </article>
       </section>

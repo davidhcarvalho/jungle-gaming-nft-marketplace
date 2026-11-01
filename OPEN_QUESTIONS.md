@@ -50,6 +50,18 @@ O host instalou `@mswjs/socket.io-binding@0.2.0`. A inspeção direta de package
 
 **Evidência da resolução:** `node_modules/@mswjs/socket.io-binding/{package.json,README.md,src/index.ts,build/index.d.ts,build/index.js}`; versão 0.2.0. Limitações: wrapper com namespace padrão, sem rooms/broadcasting/ack complexo e anexos binários. Integração comprovada pelo spec realtime e pelo E2E completo do Lote 07.
 
-## Q8 — Commit local do Lote 07 no ambiente host
+## Q8 — Runner host após extensão da whitelist
 
-Os gates do Lote 07 passaram, mas o ambiente agente não pode escrever no diretório `.git`: `git add` falhou ao criar `.git/index.lock` com `Read-only file system`. Nenhum arquivo foi staged e nenhum commit foi criado. O Lote 08 só pode começar após stage/commit local no host com a mensagem `feat: implement realtime synchronization` e verificação do SHA/working tree.
+**RESOLVIDO.** O runner reiniciado executou `vercel-check`, `vercel-prod` e `public-smoke`. O CLI Vercel é chamado pelo PATH autenticado do host; Node/npm de build/teste seguem fixados pelo mise.
+
+## Q9 — Deploy público obrigatório — RESOLVIDO
+
+Projeto Vercel `kurio-nft-marketplace` publicado no team `dusk15`; URL `https://kurio-nft-marketplace-zeta.vercel.app`. `public-smoke` passou em produção: rotas e refresh, MSW REST, Socket.IO, isolamento/redirect de rotas protegidas e ausência de erros inesperados. O Vercel não vinculou automaticamente GitHub por falta de Login Connection, mas deploy direto pelo CLI autorizado funcionou. Após criar o commit L08, publicar novamente e repetir smoke para associar o runtime ao código final commitado.
+
+## Q10 — Performance Lighthouse
+
+Resolvido por interpretação conforme README: Request `1793511419-550281-4` completou três medições por página/perfil e registrou medianas, LCP/CLS/TBT e causas em `evidence/lighthouse/analysis.md`. Accessibility, Best Practices e SEO atingiram as metas. Performance mediana foi 69/49 (Home mobile/desktop) e 76/52 (detalhe mobile/desktop); abaixo da meta, mas não bloqueia isoladamente. Diagnóstico aponta JS/bootstrap + MSW sob throttling, render delay desktop e descoberta da arte Home mobile depois da API; não há falha de medição/configuração nem simplificação artificial.
+
+## Q11 — Commit/push do Lote 08 no host
+
+O deploy e os gates passaram, mas a gravação Git está bloqueada neste sandbox: a tentativa de staging explícito falhou criando `.git/index.lock` com `Read-only file system`, embora `test -w` retornasse sucesso. Nenhum arquivo foi staged e o lock não permaneceu. Ação mínima: executar o staging/commit/push explícito em um terminal host com escrita no `.git`; depois retomar para redeploy e smoke do SHA final. Lote 09 aguarda essa confirmação.

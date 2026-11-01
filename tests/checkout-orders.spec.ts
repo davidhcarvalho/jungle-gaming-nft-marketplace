@@ -68,6 +68,7 @@ test('checkout redirects guests to login and returns to checkout preserving the 
   await setMockScenario(page, 'default')
   await page.goto('/nfts/emerald-ape-042')
   await page.getByRole('button', { name: 'Comprar NFT', exact: true }).click()
+  await expect(page).toHaveURL(/\/cart$/)
   await page.goto('/checkout')
   await expect(page).toHaveURL(/\/login\?returnTo=.*checkout/)
   const form = page.getByRole('form', { name: 'Formulário de acesso' })

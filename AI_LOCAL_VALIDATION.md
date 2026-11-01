@@ -27,6 +27,12 @@ Targets aceitos:
 - `static`: typecheck, lint, build e build com mocks.
 - `e2e`: `npm run test:e2e`.
 - `full`: os quatro gates estáticos e depois a suíte Playwright completa. Um gate falho não impede os seguintes.
+- `lighthouse`: `npm run lighthouse`, que cria o build de demonstração e executa a matriz fixa Lighthouse (Home/Detalhe × mobile/desktop × 3) no preview de produção.
+- `visual-update`: atualiza somente as baselines versionadas de `tests/visual-regression.spec.ts`; use apenas após revisar mudanças visuais intencionais.
+- `clean-checkout`: cria cópia temporária sem `node_modules`/cache, executa `npm ci`, typecheck, lint, builds, Playwright E2E e valida os arquivos/rotas do preview; remove a cópia ao encerrar.
+- `vercel-check`: executa apenas `vercel whoami` pelo PATH do host para confirmar a autenticação do CLI, sem exibir tokens. O Vercel CLI é executado fora de `mise exec`: ele não é um comando de build/teste Node do projeto e precisa enxergar a instalação e sessão autenticada do host.
+- `vercel-preview` e `vercel-prod`: executam comandos Vercel fixos pelo PATH do host para publicar, respectivamente, um preview ou produção.
+- `public-smoke`: valida o URL HTTPS registrado em `evidence/lot-08/deployment-url.txt`, os mocks REST, Socket.IO e navegação/refresh em rota profunda.
 - `spec:<nome>`: executa `npx playwright test tests/<nome>.spec.ts --workers=1`. O nome aceita somente letras, dígitos, `_` e `-`, e o arquivo precisa existir.
 
 Os comandos são definidos no script por whitelist. O conteúdo recebido não é avaliado nem passado a um shell; entradas desconhecidas, multilinha ou spec inválida são rejeitadas.

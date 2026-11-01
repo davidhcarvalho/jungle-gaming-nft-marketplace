@@ -98,6 +98,32 @@ process_request() {
       e2e)
         run_gate 'Playwright E2E' 'npm run test:e2e' mise exec "$NODE_SELECTOR" -- npm run test:e2e
         ;;
+      lighthouse)
+        run_gate 'Lighthouse audit batch' 'npm run lighthouse' mise exec "$NODE_SELECTOR" -- npm run lighthouse
+        ;;
+      visual-update)
+        run_gate 'Playwright visual baseline update' 'npx playwright test tests/visual-regression.spec.ts --workers=1 --update-snapshots' \
+          mise exec "$NODE_SELECTOR" -- npx playwright test tests/visual-regression.spec.ts --workers=1 --update-snapshots
+        ;;
+      vercel-check)
+        # Vercel CLI is a host-authenticated tool, not a project Node/npm command.
+        # Run it from the runner's host PATH so mise's Node selection does not
+        # hide a CLI installed by the host's package manager.
+        run_gate 'Vercel authenticated CLI check' 'vercel whoami' vercel whoami
+        ;;
+      vercel-preview)
+        run_gate 'Vercel preview deployment' 'vercel deploy --yes' vercel deploy --yes
+        ;;
+      vercel-prod)
+        run_gate 'Vercel production deployment' 'vercel deploy --prod --yes' vercel deploy --prod --yes
+        ;;
+      public-smoke)
+        run_gate 'Public deployment smoke' 'node scripts/public-smoke.mjs' mise exec "$NODE_SELECTOR" -- node scripts/public-smoke.mjs
+        ;;
+      clean-checkout)
+        run_gate 'Clean checkout install/test/build/preview' 'node scripts/clean-checkout-smoke.mjs' \
+          mise exec "$NODE_SELECTOR" -- node scripts/clean-checkout-smoke.mjs
+        ;;
       full)
         run_static
         run_gate 'Playwright E2E' 'npm run test:e2e' mise exec "$NODE_SELECTOR" -- npm run test:e2e
@@ -118,7 +144,7 @@ process_request() {
         fi
         ;;
       *)
-        printf 'Rejected: unknown target. Allowed targets: static, e2e, full, spec:<name>.\n' | tee -a "$LATEST_LOG"
+        printf 'Rejected: unknown target. Allowed targets: static, e2e, full, lighthouse, visual-update, clean-checkout, vercel-check, vercel-preview, vercel-prod, public-smoke, spec:<name>.\n' | tee -a "$LATEST_LOG"
         overall_status=1
         ;;
     esac

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "name": "kurio-nft-marketplace",
+  "framework": "vite",
+  "installCommand": "npm ci",
+  "buildCommand": "npm run build:demo",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/nfts/:nftId", "destination": "/index.html" },
+    { "source": "/cart", "destination": "/index.html" },
+    { "source": "/checkout", "destination": "/index.html" },
+    { "source": "/orders/:orderId", "destination": "/index.html" },
+    { "source": "/login", "destination": "/index.html" },
+    { "source": "/signup", "destination": "/index.html" },
+    { "source": "/profile", "destination": "/index.html" },
+    { "source": "/wallets", "destination": "/index.html" },
+    { "source": "/__foundation/smoke", "destination": "/index.html" }
+  ]
+}

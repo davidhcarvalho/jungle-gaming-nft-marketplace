@@ -88,7 +88,7 @@ Este arquivo é uma visão rápida. Os critérios completos estão em `lots/`.
 - [x] E2E
 
 ## 07 — Real-time/Failures
-- **PASS (gates):** `spec:realtime-failures` 27 PASS (Request ID `1793478980-257338-45`); `spec:catalog` PASS após correção de interação (Request ID `1793480107-257338-47`); `full` typecheck/lint/build/build com mocks PASS e E2E 249 PASS, 9 SKIPPED, 0 FAIL (Request ID `1793480213-257338-48`). Regressões históricas de screenshots restauradas; revisão visual em `evidence/lot-07/visual-review.md`. Commit local autorizado ainda pendente porque `.git` está montado somente para leitura neste ambiente; não iniciar Lote 08 antes do commit.
+- **PASS:** `spec:realtime-failures` 27 PASS (Request ID `1793478980-257338-45`); `spec:catalog` PASS após correção de interação (Request ID `1793480107-257338-47`); `full` typecheck/lint/build/build com mocks PASS e E2E 249 PASS, 9 SKIPPED, 0 FAIL (Request ID `1793480213-257338-48`). Regressões históricas de screenshots restauradas; revisão visual em `evidence/lot-07/visual-review.md`. Commit confirmado: `82d744e feat: implement realtime synchronization`.
 - [x] socket.io-client
 - [x] mock transport via MSW binding
 - [x] nft.updated
@@ -101,18 +101,20 @@ Este arquivo é uma visão rápida. Os critérios completos estão em `lots/`.
 - [x] E2E realtime
 
 ## 08 — Quality/Deploy
-- [ ] full E2E
-- [ ] visual regression
-- [ ] keyboard/focus
-- [ ] 390/768/1440
-- [ ] Lighthouse 3×
-- [ ] README
-- [ ] ARCHITECTURE
-- [ ] clean checkout
-- [ ] deploy
-- [ ] production deep link
+- **PASS — aguardando checkpoint Git:** Lighthouse 12/12 medições e medianas documentadas conforme README; `clean-checkout` PASS; `static` e `full` PASS (E2E 257 PASS, 25 SKIPPED, 0 FAIL); regressão visual PASS. Deploy Vercel de produção e smoke público PASS (Requests `1793516115-575891-11` e `1793516222-575891-12`); URL `https://kurio-nft-marketplace-zeta.vercel.app`. Próximo gate operacional: revisão final, commit e push normal para `origin/main`; não iniciar Lote 09 antes do commit/push e deploy associado ao commit.
+- [x] full E2E após split realtime (257 PASS, 25 SKIPPED, 0 FAIL; Request `1793508169-485327-25`)
+- [x] visual regression final (8/8 comparações desktop/mobile elegíveis PASS; 16 skips de viewports sem baseline; confirmado no full)
+- [x] keyboard/focus (coberto pelo full)
+- [x] 390/768/1440 (E2E completo)
+- [x] Lighthouse 12/12 medições executadas, medianas e LCP/CLS/TBT relatados; resultados sub-target justificados conforme README (Performance 69/49/76/52; A11y 100/96, BP/SEO 100; Request `1793511419-550281-4`). Performance abaixo de 90 não bloqueia isoladamente.
+- [x] README final (setup/fluxos/cenários e URL pública registrados)
+- [x] ARCHITECTURE (estado atual e otimização inicial documentados)
+- [x] clean checkout target (`npm ci` + typecheck/lint/build/demo + Playwright + preview); Request `1793511614-550281-6`, 257 PASS/25 SKIPPED/0 FAIL
+- [x] deploy Vercel autorizado e smoke público (mobile/desktop; rotas, deep links, refresh, MSW REST, Socket.IO e console)
+- [x] production deep links, refresh e assets essenciais
 
 ## 09 — Study
+- **NOT STARTED:** aguarda checkpoint Git e confirmação de deploy associado ao commit do Lote 08.
 - [ ] architecture walkthrough
 - [ ] request flow
 - [ ] session

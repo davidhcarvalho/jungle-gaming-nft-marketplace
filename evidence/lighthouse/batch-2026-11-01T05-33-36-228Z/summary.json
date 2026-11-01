@@ -1,0 +1,391 @@
+{
+  "generatedAt": "2026-11-01T05:35:28.576Z",
+  "node": "v24.22.1",
+  "lighthouseVersion": "13.6.0",
+  "operatingSystem": "Linux 7.2.8-9-omarchy x64",
+  "chromeExecutable": "/home/ventus/Documents/Teste Tecnico/Jungle_Gaming_Test/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome",
+  "previewOrigin": "http://127.0.0.1:4173",
+  "conditions": "Vite production preview built with VITE_ENABLE_MOCKS=true; Lighthouse mobile emulation 390×844 and desktop emulation 1440×900; simulated throttling; three independent runs per page/profile.",
+  "thresholds": {
+    "performance": 90,
+    "accessibility": 95,
+    "best-practices": 95,
+    "seo": 90
+  },
+  "groups": [
+    {
+      "target": "home-mobile",
+      "runs": 3,
+      "medians": {
+        "performance": 78,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metricMedians": {
+        "lcpMs": 3648.61,
+        "cls": 0,
+        "tbtMs": 478
+      }
+    },
+    {
+      "target": "home-desktop",
+      "runs": 3,
+      "medians": {
+        "performance": 50,
+        "accessibility": 96,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metricMedians": {
+        "lcpMs": 3816.61,
+        "cls": 0.07,
+        "tbtMs": 767.37
+      }
+    },
+    {
+      "target": "detail-mobile",
+      "runs": 3,
+      "medians": {
+        "performance": 78,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metricMedians": {
+        "lcpMs": 3531.64,
+        "cls": 0,
+        "tbtMs": 513.44
+      }
+    },
+    {
+      "target": "detail-desktop",
+      "runs": 3,
+      "medians": {
+        "performance": 52,
+        "accessibility": 96,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metricMedians": {
+        "lcpMs": 3931.29,
+        "cls": 0.03,
+        "tbtMs": 711
+      }
+    }
+  ],
+  "audits": [
+    {
+      "page": "home",
+      "profile": "mobile",
+      "run": 1,
+      "url": "http://127.0.0.1:4173/",
+      "scores": {
+        "performance": 78,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "lcpMs": 3662.53,
+        "cls": 0,
+        "tbtMs": 461
+      },
+      "lighthouseVersion": "13.6.0",
+      "browser": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36",
+      "warnings": [],
+      "jsonPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/home-mobile-run-1.json",
+      "htmlPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/home-mobile-run-1.html"
+    },
+    {
+      "page": "home",
+      "profile": "mobile",
+      "run": 2,
+      "url": "http://127.0.0.1:4173/",
+      "scores": {
+        "performance": 77,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "lcpMs": 3648.61,
+        "cls": 0,
+        "tbtMs": 501.5
+      },
+      "lighthouseVersion": "13.6.0",
+      "browser": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36",
+      "warnings": [
+        "Pode haver dados armazenados afetando o desempenho de carregamento neste local: IndexedDB. Examine esta página em uma janela anônima para evitar que esses recursos afetem suas pontuações."
+      ],
+      "jsonPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/home-mobile-run-2.json",
+      "htmlPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/home-mobile-run-2.html"
+    },
+    {
+      "page": "home",
+      "profile": "mobile",
+      "run": 3,
+      "url": "http://127.0.0.1:4173/",
+      "scores": {
+        "performance": 78,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "lcpMs": 3646.82,
+        "cls": 0,
+        "tbtMs": 478
+      },
+      "lighthouseVersion": "13.6.0",
+      "browser": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36",
+      "warnings": [
+        "Pode haver dados armazenados afetando o desempenho de carregamento neste local: IndexedDB. Examine esta página em uma janela anônima para evitar que esses recursos afetem suas pontuações."
+      ],
+      "jsonPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/home-mobile-run-3.json",
+      "htmlPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/home-mobile-run-3.html"
+    },
+    {
+      "page": "home",
+      "profile": "desktop",
+      "run": 1,
+      "url": "http://127.0.0.1:4173/",
+      "scores": {
+        "performance": 52,
+        "accessibility": 96,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "lcpMs": 3816.61,
+        "cls": 0.07,
+        "tbtMs": 640.5
+      },
+      "lighthouseVersion": "13.6.0",
+      "browser": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36",
+      "warnings": [
+        "Pode haver dados armazenados afetando o desempenho de carregamento neste local: IndexedDB. Examine esta página em uma janela anônima para evitar que esses recursos afetem suas pontuações."
+      ],
+      "jsonPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/home-desktop-run-1.json",
+      "htmlPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/home-desktop-run-1.html"
+    },
+    {
+      "page": "home",
+      "profile": "desktop",
+      "run": 2,
+      "url": "http://127.0.0.1:4173/",
+      "scores": {
+        "performance": 50,
+        "accessibility": 96,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "lcpMs": 3749.42,
+        "cls": 0.07,
+        "tbtMs": 767.37
+      },
+      "lighthouseVersion": "13.6.0",
+      "browser": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36",
+      "warnings": [
+        "Pode haver dados armazenados afetando o desempenho de carregamento neste local: IndexedDB. Examine esta página em uma janela anônima para evitar que esses recursos afetem suas pontuações."
+      ],
+      "jsonPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/home-desktop-run-2.json",
+      "htmlPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/home-desktop-run-2.html"
+    },
+    {
+      "page": "home",
+      "profile": "desktop",
+      "run": 3,
+      "url": "http://127.0.0.1:4173/",
+      "scores": {
+        "performance": 49,
+        "accessibility": 96,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "lcpMs": 3829.54,
+        "cls": 0.07,
+        "tbtMs": 799
+      },
+      "lighthouseVersion": "13.6.0",
+      "browser": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36",
+      "warnings": [
+        "Pode haver dados armazenados afetando o desempenho de carregamento neste local: IndexedDB. Examine esta página em uma janela anônima para evitar que esses recursos afetem suas pontuações."
+      ],
+      "jsonPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/home-desktop-run-3.json",
+      "htmlPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/home-desktop-run-3.html"
+    },
+    {
+      "page": "detail",
+      "profile": "mobile",
+      "run": 1,
+      "url": "http://127.0.0.1:4173/nfts/emerald-ape-042",
+      "scores": {
+        "performance": 76,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "lcpMs": 3564.71,
+        "cls": 0,
+        "tbtMs": 593
+      },
+      "lighthouseVersion": "13.6.0",
+      "browser": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36",
+      "warnings": [
+        "Pode haver dados armazenados afetando o desempenho de carregamento neste local: IndexedDB. Examine esta página em uma janela anônima para evitar que esses recursos afetem suas pontuações."
+      ],
+      "jsonPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/detail-mobile-run-1.json",
+      "htmlPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/detail-mobile-run-1.html"
+    },
+    {
+      "page": "detail",
+      "profile": "mobile",
+      "run": 2,
+      "url": "http://127.0.0.1:4173/nfts/emerald-ape-042",
+      "scores": {
+        "performance": 78,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "lcpMs": 3525.38,
+        "cls": 0,
+        "tbtMs": 513.44
+      },
+      "lighthouseVersion": "13.6.0",
+      "browser": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36",
+      "warnings": [
+        "Pode haver dados armazenados afetando o desempenho de carregamento neste local: IndexedDB. Examine esta página em uma janela anônima para evitar que esses recursos afetem suas pontuações."
+      ],
+      "jsonPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/detail-mobile-run-2.json",
+      "htmlPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/detail-mobile-run-2.html"
+    },
+    {
+      "page": "detail",
+      "profile": "mobile",
+      "run": 3,
+      "url": "http://127.0.0.1:4173/nfts/emerald-ape-042",
+      "scores": {
+        "performance": 78,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "lcpMs": 3531.64,
+        "cls": 0,
+        "tbtMs": 500
+      },
+      "lighthouseVersion": "13.6.0",
+      "browser": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36",
+      "warnings": [
+        "Pode haver dados armazenados afetando o desempenho de carregamento neste local: IndexedDB. Examine esta página em uma janela anônima para evitar que esses recursos afetem suas pontuações."
+      ],
+      "jsonPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/detail-mobile-run-3.json",
+      "htmlPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/detail-mobile-run-3.html"
+    },
+    {
+      "page": "detail",
+      "profile": "desktop",
+      "run": 1,
+      "url": "http://127.0.0.1:4173/nfts/emerald-ape-042",
+      "scores": {
+        "performance": 52,
+        "accessibility": 96,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "lcpMs": 3931.29,
+        "cls": 0.03,
+        "tbtMs": 713.5
+      },
+      "lighthouseVersion": "13.6.0",
+      "browser": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36",
+      "warnings": [
+        "Pode haver dados armazenados afetando o desempenho de carregamento neste local: IndexedDB. Examine esta página em uma janela anônima para evitar que esses recursos afetem suas pontuações."
+      ],
+      "jsonPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/detail-desktop-run-1.json",
+      "htmlPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/detail-desktop-run-1.html"
+    },
+    {
+      "page": "detail",
+      "profile": "desktop",
+      "run": 2,
+      "url": "http://127.0.0.1:4173/nfts/emerald-ape-042",
+      "scores": {
+        "performance": 53,
+        "accessibility": 96,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "lcpMs": 3930.45,
+        "cls": 0.03,
+        "tbtMs": 670.5
+      },
+      "lighthouseVersion": "13.6.0",
+      "browser": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36",
+      "warnings": [
+        "Pode haver dados armazenados afetando o desempenho de carregamento neste local: IndexedDB. Examine esta página em uma janela anônima para evitar que esses recursos afetem suas pontuações."
+      ],
+      "jsonPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/detail-desktop-run-2.json",
+      "htmlPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/detail-desktop-run-2.html"
+    },
+    {
+      "page": "detail",
+      "profile": "desktop",
+      "run": 3,
+      "url": "http://127.0.0.1:4173/nfts/emerald-ape-042",
+      "scores": {
+        "performance": 52,
+        "accessibility": 96,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "lcpMs": 3949.31,
+        "cls": 0.03,
+        "tbtMs": 711
+      },
+      "lighthouseVersion": "13.6.0",
+      "browser": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36",
+      "warnings": [
+        "Pode haver dados armazenados afetando o desempenho de carregamento neste local: IndexedDB. Examine esta página em uma janela anônima para evitar que esses recursos afetem suas pontuações."
+      ],
+      "jsonPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/detail-desktop-run-3.json",
+      "htmlPath": "evidence/lighthouse/batch-2026-11-01T05-33-36-228Z/detail-desktop-run-3.html"
+    }
+  ],
+  "targetFailures": [
+    {
+      "target": "home-mobile",
+      "category": "performance",
+      "value": 78,
+      "required": 90
+    },
+    {
+      "target": "home-desktop",
+      "category": "performance",
+      "value": 50,
+      "required": 90
+    },
+    {
+      "target": "detail-mobile",
+      "category": "performance",
+      "value": 78,
+      "required": 90
+    },
+    {
+      "target": "detail-desktop",
+      "category": "performance",
+      "value": 52,
+      "required": 90
+    }
+  ]
+}

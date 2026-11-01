@@ -261,33 +261,37 @@ Disponibilize comandos para desenvolvimento com mocks, build, preview, verifica�
 
 A entrega deve executar a partir de um checkout limpo, sem depender de serviços privados ou do backend de produção.
 
-## Aplicação KURIO — setup da foundation
+## Aplicação KURIO — setup e execução
 
-A fundação da aplicação foi configurada para Node `24.22.1` (registrado em `.nvmrc`) e npm. O lockfile está presente; use `npm ci` em uma instalação limpa. Há uma divergência pendente no lockfile para ESLint descrita em `PROGRESS.md`.
+A aplicação é direcionada a Node `24.22.1` (`.nvmrc`, `engines`) e npm. Use `npm ci` para instalação reproduzível a partir do lockfile. Não há backend privado nem segredos reais.
 
 ```bash
+nvm use                  # ou mise use node@24.22.1
 npm ci
 cp .env.example .env.local
-npm run mocks:worker
 npm run dev
 ```
 
-O worker MSW gerado em `public/mockServiceWorker.js` deve permanecer versionado. `VITE_ENABLE_MOCKS=true` habilita os handlers no navegador e também funciona no build de demonstração. `VITE_API_BASE_URL` define o prefixo REST; `VITE_MOCK_SCENARIO` escolhe o cenário inicial; `VITE_SOCKET_URL` fica reservado à integração Socket.IO dos próximos lotes. Não há backend privado ou segredo real.
+`VITE_ENABLE_MOCKS=true` habilita handlers REST e Socket.IO no browser e é o valor recomendado para desenvolvimento/demonstração local. `VITE_API_BASE_URL` define o prefixo REST; `VITE_MOCK_SCENARIO` seleciona o cenário inicial; `VITE_SOCKET_URL` permite configurar a origem do socket, vazia no setup local. Os valores de `.env.example` são seguros e não contêm credenciais.
 
-Comandos da aplicação:
+As imagens `.png` exportadas do Figma permanecem como originais. As quatro artes principais usam derivados WebP de qualidade 88 em `public/assets/nfts/optimized/`; os arquivos-fonte são preservados e os derivados foram revisados visualmente para reduzir bastante a transferência sem distorcer as artes. O HTML pré-carrega a arte principal da Home e do detalhe Emerald Ape.
+
+Comandos reproduzíveis:
 
 ```bash
+npm run dev              # Vite; os mocks seguem VITE_ENABLE_MOCKS do ambiente
 npm run typecheck
 npm run lint
-npm run build
-npm run preview
 npm run test:e2e
-npm run lighthouse
+npm run build            # build de produção sem mocks por padrão
+npm run build:demo       # build de produção com MSW/Socket.IO simulados
+npm run preview          # servir dist/; use build:demo para a demonstração completa
+npm run lighthouse       # build de demo e auditorias Home/Detalhe (3x, mobile/desktop)
 ```
 
-O smoke de rede está em `/__foundation/smoke` durante o servidor de desenvolvimento. Ele demonstra TanStack Query → Axios → HTTP → MSW e permite restaurar o cenário inicial. Catálogo, detalhe, autenticação e favoritos são funcionais; carrinho, checkout, perfil completo e carteiras permanecem nos lotes correspondentes.
+O worker oficial está versionado em `public/mockServiceWorker.js`. Para testes browser, instale o Chromium do Playwright uma vez com `npx playwright install chromium`. O Local Validation Runner e seus targets fixos estão documentados em [AI_LOCAL_VALIDATION.md](AI_LOCAL_VALIDATION.md).
 
-Consulte [ARCHITECTURE.md](ARCHITECTURE.md) para a arquitetura implementada. As imagens de `design-reference/` são referências, não assets renderizados pela aplicação.
+O smoke de rede `/__foundation/smoke` existe apenas em desenvolvimento. Ele demonstra TanStack Query → Axios → HTTP → MSW e permite restaurar o cenário inicial. Catálogo, detalhe, autenticação, favoritos, carrinho/cotação, checkout/pedidos, perfil/carteiras e sincronização Socket.IO usam os contratos e mocks descritos em [ARCHITECTURE.md](ARCHITECTURE.md). As imagens de `design-reference/` são referências, não assets renderizados pela aplicação.
 
 ## Contas fictícias e autenticação mockada
 
@@ -298,6 +302,12 @@ Com `VITE_ENABLE_MOCKS=true`, use uma das contas abaixo no login:
 | Ana Colecionadora | `ana@kurio.test` | `KurioDemo24!` |
 | Leo Artista | `leo@kurio.test` | `Collector24!` |
 
-O MSW também permite criar contas novas. O estado simulado persiste no `localStorage` para que a sessão e os favoritos sobrevivam ao refresh; o reset em `/__foundation/smoke` restaura as contas e dados iniciais. Os cenários de conta incluem `signup-conflict`, `session-expired` e `favorite-error`. Senhas não são persistidas em texto claro: o mock guarda um digest SHA-256 determinístico para as contas de demonstração e calcula o digest de novos cadastros antes de salvar.
+O MSW também permite criar contas novas. O estado simulado persiste no `localStorage` para que sessão, favoritos, carrinhos, perfil e carteiras sobrevivam ao refresh; o reset em `/__foundation/smoke` e nos endpoints de cenário restaura um estado determinístico. Entre os cenários documentados nos specs estão `signup-conflict`, `session-expired`, `favorite-error`, falhas de catálogo/carrinho/pagamento e eventos realtime stale/duplicate/disconnect/reconnect. Senhas não são persistidas em texto claro: o mock guarda digest SHA-256 determinístico para as contas de demonstração e calcula digest de novos cadastros antes de salvar.
 
-As rotas privadas redirecionam para `/login?returnTo=...` e restauram a intenção após autenticação. Favoritos são escopados por usuário e atualizados otimisticamente, com rollback quando a API simulada falha. Login social e recuperação de senha aparecem desabilitados porque não fazem parte do desafio simulado.
+As rotas privadas redirecionam para `/login?returnTo=...` e restauram a intenção após autenticação. Favoritos são escopados por usuário e atualizados otimisticamente, com rollback quando a API simulada falha. Checkout e dados de conta exigem sessão; operações de pedido usam idempotência, revalidação de quote e recibo snapshot. Login social e recuperação de senha aparecem desabilitados porque não fazem parte do desafio simulado.
+
+## Demonstração e limitações
+
+Todos os pagamentos, carteiras, referências de transação e eventos são simulações; não há conexão blockchain, gateway real ou autenticação de produção. A publicação Vercel usa o build de demonstração para manter handlers MSW e o binding Socket.IO no browser. Deep links e refresh foram verificados no deploy: **https://kurio-nft-marketplace-zeta.vercel.app**. O fallback SPA está configurado por `vercel.json` e `public/_redirects`.
+
+Consulte [ARCHITECTURE.md](ARCHITECTURE.md) para contratos REST/eventos, estado, cache e reconciliação. Os cenários determinísticos e seus resets também estão detalhados nos testes `tests/*.spec.ts` e handlers `src/mocks/`.
